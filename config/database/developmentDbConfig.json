@@ -1,0 +1,8 @@
+{
+  "username": "api",
+  "password": "ecp1950",
+  "database": "dev_db",
+  "host": "127.0.0.1",
+  "dialect": "postgres",
+  "logging": false
+}
