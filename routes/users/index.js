@@ -28,7 +28,7 @@ module.exports = function(router) {
 
   router.route('/changeEmail')
     .post(
-      users.emailUpdate.validate.create
+      users.emailUpdate.validate.create,
       users.emailUpdate.create
     );
 

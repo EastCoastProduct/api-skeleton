@@ -75,7 +75,7 @@ function update(req, res, next) {
 }
 
 module.exports = {
-  emailUpdate: require('./emailUpdate'),
+  emailUpdate: require('./changeEmail'),
   create: create,
   emailConfirmation: require('./emailConfirmation'),
   list: list,

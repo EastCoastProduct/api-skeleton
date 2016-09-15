@@ -16,12 +16,23 @@ const validate = {
 };
 
 function create(req, res, next) {
-
-  res.status(200).json({message: 'Request change email'});
+  services.emailUpdate.getUserAndRemoveTokens(req.body.oldEmail)
+    .then(user => services.emailUpdate.checkAndCreate({
+      dbPassword: user.password,
+      userId: user.id,
+      oldEmail: req.body.oldEmail.toLowerCase(),
+      newEmail: req.body.newEmail.toLowerCase(),
+      password: req.body.password
+    }))
+    .then(() => res.status(200).json({message: 'Request change email'}))
+    .catch(err => next(err));
 }
 
 function confirm(req, res, next) {
-  res.status(200).json({message: 'Changed email'});
+  services.emailUpdate.getByTokenAndEdit(req.params.token)
+    .then(() => services.emailUpdate.removeByToken(req.params.token))
+    .then(() => res.status(200).json({message: 'Changed email'}))
+    .catch(err => next(err));
 }
 
 module.exports = {

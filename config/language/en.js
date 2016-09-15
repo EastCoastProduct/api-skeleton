@@ -18,6 +18,7 @@ module.exports = {
 
   // Error messages
   alreadyExists: prependKeyword('already exists'),
+  emailInUse: 'Email is already in use',
   cannotDeleteSelf: 'You cannot delete yourself',
   doesNotExist: prependKeyword('does not exist'),
   invalidToken: 'Invalid token',
