@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Sequelize = require('sequelize');
 
 var id = {
@@ -22,7 +23,14 @@ var timestamps = {
   }
 };
 
+const populateTimestamps = objArray => _.map(objArray, o => {
+  o.createdAt = new Date().toUTCString();
+  o.updatedAt = new Date().toUTCString();
+  return o;
+});
+
 module.exports = {
   id: id,
-  timestamps: timestamps
+  timestamps: timestamps,
+  populateTimestamps: populateTimestamps
 };

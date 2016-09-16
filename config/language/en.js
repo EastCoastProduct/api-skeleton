@@ -16,12 +16,17 @@ module.exports = {
     user: 'User'
   },
 
+  // Validation error messages
+  unrecognizedParameter: 'unrecognized parameter',
+  required: 'required',
+
   // Error messages
   alreadyExists: prependKeyword('already exists'),
   emailInUse: 'Email is already in use',
   cannotDeleteSelf: 'You cannot delete yourself',
   doesNotExist: prependKeyword('does not exist'),
   invalidToken: 'Invalid token',
+  parametersError: 'Parameters error',
   notConfirmed: prependKeyword('is not confirmed'),
   notFound: prependKeyword('not found'),
   wrongPassword: 'Wrong password',

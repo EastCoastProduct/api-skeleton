@@ -1,12 +1,14 @@
 'use strict';
 
+const clean = require('gulp-clean');
 const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const shell = require('gulp-shell');
-const mocha = require('gulp-mocha');
+const nodemon = require('gulp-nodemon');
+const tape = require('gulp-tape');
 const istanbul = require('gulp-istanbul');
 const sequence = require('run-sequence');
-
+const tapColorize = require('tap-colorize');
 
 const paths = {
   src: [
@@ -33,9 +35,31 @@ const paths = {
 };
 
 const database = (arg) => shell.task(`node utils/fixtures/index.js ${arg}`);
-const migrate = (arg) => (arg === 'test')
-  ? shell.task('NODE_ENV=test ./node_modules/.bin/sequelize db:migrate')
-  : shell.task('./node_modules/.bin/sequelize db:migrate');
+const migrate = (arg = 'development') => shell.task([
+    `NODE_ENV=${arg} ./node_modules/.bin/sequelize db:migrate`,
+    `NODE_ENV=${arg} ./node_modules/.bin/sequelize db:seed:all`
+  ]);
+
+
+gulp.task('clear-seeds', () => gulp.src('./seedManifest.js').pipe(clean()));
+
+
+/*
+  Database tasks
+*/
+gulp.task('db-recreate', database('recreate'));
+gulp.task('db-recreate-dev', database('recreate dev'));
+gulp.task('migrate', migrate());
+gulp.task('migrate-test', migrate('test'));
+
+
+/*
+  Development tasks
+*/
+gulp.task('dev-rebuild', callback => {
+  process.env.NODE_ENV = 'development';
+  sequence('clear-seeds', 'db-recreate-dev', 'migrate', callback);
+});
 
 gulp.task('lint-src', () => {
   return gulp.src(paths.src.concat(paths.extra))
@@ -51,6 +75,19 @@ gulp.task('lint-test', () => {
 
 gulp.task('lint', ['lint-src', 'lint-test']);
 
+
+/*
+  Test tasks
+*/
+gulp.task('test', function() {
+  process.env.NODE_ENV = 'test';
+  gulp.src(paths.test)
+    .pipe(tape({timeout: 14000, reporter: tapColorize()}))
+    .once('end', () => {
+      process.exit(); // eslint-disable-line
+    });
+});
+
 gulp.task('test-cover', () => {
   process.env.NODE_ENV = 'test';
   gulp.src(paths.src)
@@ -58,7 +95,7 @@ gulp.task('test-cover', () => {
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
       gulp.src(paths.test)
-        .pipe(mocha({timeout: 14000}))
+        .pipe(tape({timeout: 14000, reporter: tapColorize()}))
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({
           thresholds: {
@@ -84,10 +121,26 @@ gulp.task('test-cover', () => {
     });
 });
 
-gulp.task('db-recreate-dev', database('recreate dev'));
-gulp.task('migrate', migrate());
-
-gulp.task('dev-rebuild', callback => {
-  process.env.NODE_ENV = 'development';
-  sequence('db-recreate-dev', 'migrate', callback);
+gulp.task('test-build', cb => {
+  sequence('clear-seeds', 'migrate-test', 'test-cover', cb);
 });
+
+gulp.task('test-rebuild', cb => {
+  sequence('clear-seeds', 'db-recreate', 'migrate-test', 'test-cover', cb);
+});
+
+
+/*
+  Server debug tasks
+*/
+gulp.task('server-debug', () => {
+  nodemon({
+    script: './bin/www',
+    nodeArgs: ['--debug']
+  });
+});
+
+gulp.task('debug', ['server-debug'],
+  shell.task('node-inspector --web-port=3465'));
+
+

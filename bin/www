@@ -2,7 +2,6 @@
 
 var debug = require('debug')('express-example');
 var app = require('../app');
-// var models = require('../models/snap');
 
 app.set('port', process.env.PORT || 3000);
 

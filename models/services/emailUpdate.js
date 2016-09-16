@@ -1,7 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcrypt');
-const errors = require('../../utils/errors')
+const errors = require('../../utils/errors');
 const Error400 = errors.Error400;
 const Error404 = errors.Error404;
 const User = require('../').user;

@@ -1,11 +1,11 @@
 {
   "username": "api",
-  "password": "ecp1950",
-  "database": "dev_db",
+  "password": "notsetyet",
+  "database": "test_db",
   "host": "127.0.0.1",
   "dialect": "postgres",
   "logging": false,
   "seederStorage": "json",
   "seederStoragePath": "seedManifest.js",
-  "seederStorageTableName": "dev_db"
+  "seederStorageTableName": "test_db"
 }

@@ -8,6 +8,17 @@ const Error404 = errors.Error404;
 const lang = require('../../config/language');
 const User = require('../../models').user;
 const jwt = require('jsonwebtoken');
+const validator = require('../../middleware/validator');
+
+const validate = {
+  authenticate: validator.validation('body', {
+    rules: {
+      email: 'email',
+      password: 'norule'
+    },
+    required: ['email', 'password']
+  })
+};
 
 function authenticate(req, res, next) {
   User.findOne({where: {email: req.body.email}})
@@ -33,5 +44,6 @@ function authenticate(req, res, next) {
 }
 
 module.exports = {
-  authenticate: authenticate
+  authenticate: authenticate,
+  validate: validate
 };

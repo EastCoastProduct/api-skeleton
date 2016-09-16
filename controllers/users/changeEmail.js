@@ -2,7 +2,6 @@
 
 const services = require('../../models/services');
 const validator = require('../../middleware/validator');
-const lang = require('../../config/language');
 
 const validate = {
   create: validator.validation('body', {

@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       unique: true,
       set: function(v) {
-        this.setDataValue('email', v.toLowerCase())
+        this.setDataValue('email', v.toLowerCase());
       }
     },
     firstname: {

@@ -2,6 +2,8 @@
 
 const jwt = require('jsonwebtoken');
 
+const defaultValue = (field, value) => field !== void 0 ? field : value;
+
 function userFromJwtHeader(headers) {
   var user;
 
@@ -30,6 +32,7 @@ function chainMiddleware(middlewares) {
 }
 
 module.exports = {
+  defaultValue: defaultValue,
   middleware: { chain: chainMiddleware },
   userFromJwtHeader: userFromJwtHeader
 };

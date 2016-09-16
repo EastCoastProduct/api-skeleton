@@ -12,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
       set: function(v) {
-        this.setDataValue('email', v.toLowerCase())
+        this.setDataValue('email', v.toLowerCase());
       }
     }
   }, {
