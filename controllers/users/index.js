@@ -2,7 +2,6 @@
 
 const services = require('../../models/services');
 const lang = require('../../config/language');
-const Error400 = require('../../utils/errors').Error400;
 const Error403 = require('../../utils/errors').Error403;
 const validator = require('../../middleware/validator');
 
@@ -46,7 +45,7 @@ function list(req, res, next) {
 
 function remove(req, res, next) {
   if (parseInt(req.params.userId) === req.user.userId) {
-    return next(Error400(lang.cannotDeleteSelf));
+    return next(Error403(lang.cannotDeleteSelf));
   }
 
   services.user.removeById(req.params.userId)
@@ -64,10 +63,9 @@ function show(req, res, next) {
 
 function update(req, res, next) {
   const user = req.user;
+  const isOwner = user.userId === parseInt(req.params.userId);
 
-  if ((user.userId !== req.params.userId) && !user.admin && !user.superadmin) {
-    return next(Error403(lang.notAuthorized));
-  }
+  if (!isOwner && !user.hasPrivilege) return next(Error403(lang.notAuthorized));
 
   services.user.update(req.body, {id: req.params.userId})
     .then(response => res.status(200).json(response))

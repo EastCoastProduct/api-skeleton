@@ -1,0 +1,21 @@
+machine:
+  environment:
+    NODE_ENV: test
+  node:
+    version: v6
+  services:
+    - postgresql
+
+database:
+  override:
+    - createdb test_db
+    - echo "CREATE ROLE api WITH UNENCRYPTED PASSWORD 'ecp1950';" | psql -U postgres
+    - echo "ALTER ROLE api WITH LOGIN;" | psql -U postgres
+test:
+  post:
+    - gulp lint
+    - gulp test-build
+
+general:
+  artifacts:
+    - "coverage" # relative to the user's home directory

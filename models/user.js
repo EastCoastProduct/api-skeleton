@@ -52,8 +52,8 @@ module.exports = function(sequelize, DataTypes) {
         var values = this.dataValues;
 
         values.admin = undefined;
-        values.password = undefined;
         values.superAdmin = undefined;
+        values.password = undefined;
 
         return values;
       }
@@ -62,6 +62,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         user.hasOne(models.forgotPassword);
         user.hasOne(models.emailUpdate);
+        user.hasOne(models.emailConfirmation);
       }
     }
   });

@@ -47,6 +47,7 @@ gulp.task('clear-seeds', () => gulp.src('./seedManifest.js').pipe(clean()));
 /*
   Database tasks
 */
+gulp.task('db-clean', database('delete'));
 gulp.task('db-recreate', database('recreate'));
 gulp.task('db-recreate-dev', database('recreate dev'));
 gulp.task('migrate', migrate());
@@ -79,7 +80,7 @@ gulp.task('lint', ['lint-src', 'lint-test']);
 /*
   Test tasks
 */
-gulp.task('test', function() {
+gulp.task('run-tests', function() {
   process.env.NODE_ENV = 'test';
   gulp.src(paths.test)
     .pipe(tape({timeout: 14000, reporter: tapColorize()}))
@@ -88,7 +89,7 @@ gulp.task('test', function() {
     });
 });
 
-gulp.task('test-cover', () => {
+gulp.task('run-test-cover', () => {
   process.env.NODE_ENV = 'test';
   gulp.src(paths.src)
     .pipe(istanbul())
@@ -121,12 +122,17 @@ gulp.task('test-cover', () => {
     });
 });
 
+gulp.task('test', cb =>
+  sequence('clear-seeds', 'db-clean', 'migrate-test', 'run-tests', cb));
+gulp.task('test-cover', cb =>
+  sequence('clear-seeds', 'db-clean', 'migrate-test', 'run-test-cover', cb));
+
 gulp.task('test-build', cb => {
-  sequence('clear-seeds', 'migrate-test', 'test-cover', cb);
+  sequence('clear-seeds', 'migrate-test', 'run-test-cover', cb);
 });
 
 gulp.task('test-rebuild', cb => {
-  sequence('clear-seeds', 'db-recreate', 'migrate-test', 'test-cover', cb);
+  sequence('clear-seeds', 'db-recreate', 'migrate-test', 'run-test-cover', cb);
 });
 
 

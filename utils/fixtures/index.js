@@ -1,6 +1,7 @@
 'use strict';
 /* eslint-disable no-console */
 const pg = require('pg');
+const cleaner = require('postgres-cleaner');
 
 const dbArgument = () => (process.argv[3] === 'dev')
   ? 'dev_db'
@@ -22,6 +23,26 @@ function recreateDatabase() {
     });
 }
 
+function cleanDatabase() {
+  var connectionString = `postgres://postgres@localhost/${dbArgument()}`;
+
+  pg.connect(connectionString, (err, connection) => {
+    if (err) throw err;
+    var options = {
+      type: 'truncate',
+      skipTables: ['SequelizeMeta']
+    };
+
+    cleaner(options, connection, error => {
+      if (error) {
+        console.log(error);
+        process.exit(1);
+      }
+      process.exit(0);
+    });
+  });
+}
+
 if (require.main === module) {
   var arg = process.argv[2];
   var toExecute;
@@ -29,8 +50,10 @@ if (require.main === module) {
   switch (arg) {
   case 'recreate':
     toExecute = recreateDatabase; break;
+  case 'delete':
+    toExecute = cleanDatabase; break;
   default:
-    console.log('I require an argument: recreate!');
+    console.log('I require an argument: recreate or delete!');
     process.exit(1);
   }
 

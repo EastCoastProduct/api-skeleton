@@ -66,7 +66,7 @@ module.exports = (Model, keyword) => {
       .then(result => {
         if (!result[0]) throw Error404(lang.notFound(keyword));
 
-        return result[1];
+        return result[1][0];
       });
 
   return {

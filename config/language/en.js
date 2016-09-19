@@ -27,6 +27,7 @@ module.exports = {
   doesNotExist: prependKeyword('does not exist'),
   invalidToken: 'Invalid token',
   parametersError: 'Parameters error',
+  notAuthorized: 'Not authorized',
   notConfirmed: prependKeyword('is not confirmed'),
   notFound: prependKeyword('not found'),
   wrongPassword: 'Wrong password',

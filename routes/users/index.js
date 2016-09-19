@@ -17,12 +17,13 @@ module.exports = function(router) {
     .get(users.show)
     .post(
       jwt({secret: config.jwtKey}),
+      authorization.isAdmin(),
       users.validate.update,
       users.update
     )
     .delete(
       jwt({secret: config.jwtKey}),
-      authorization.isAdmin,
+      authorization.isAdmin(true),
       users.remove
     );
 

@@ -3,25 +3,43 @@
 const populateTimestamps = require('../migrations').populateTimestamps;
 const users = [
   {
-    email: 'hrichardson0@plala.or.jp',
+    // id: 1,
+    // user is super admin
+    email: 'john.doe@ecp.io',
     firstname: 'Harry',
     lastname: 'Richardson',
-    password: 'iDcltEHzR2MA'
-  }, {
-    email: 'tbennett1@fotki.com',
+    password: 'password123',
+    confirmed: true,
+    admin: true,
+    superAdmin: true
+  },
+  // user not confirmed
+  {
+    // id: 2,
+    email: 'not.confirmed@ecp.io',
     firstname: 'Theresa',
     lastname: 'Bennett',
-    password: 'GJpdXURha'
-  }, {
-    email: 'jwright2@google.it',
+    password: 'password123',
+    confirmed: false
+  },
+  {
+    // id: 3,
+    // user is admin
+    email: 'user3@ecp.io',
     firstname: 'Jacqueline',
     lastname: 'Wright',
-    password: 'liH1xKb'
-  }, {
-    email: 'harnold3@goo.ne.jp',
+    password: 'password123',
+    confirmed: true,
+    admin: true
+  },
+  {
+    // id: 4,
+    // this user will be deleted
+    email: 'user4@ecp.io',
     firstname: 'Helen',
     lastname: 'Arnold',
-    password: 'L2bUQR1Dl1L'
+    password: 'password123',
+    confirmed: true
   }
 ];
 
