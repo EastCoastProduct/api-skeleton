@@ -29,8 +29,10 @@ test(`${routes.users} Invalid params`, t => {
         {path: 'password', message: lang.required}
       ];
 
-      t.same(res.status, 400);
-      t.same(res.body.debugInfo, debugInfoError);
+      t.same(
+        {status: res.status, debugInfo: res.body.debugInfo},
+        {status: 400, debugInfo: debugInfoError}
+      );
       t.end();
     });
 });
@@ -44,13 +46,16 @@ test(`${routes.users} User already exists`, t => {
       lastname: 'Surname'
     })
     .end((err, res) => {
-      t.same(res.status, 400);
-      t.same(res.body.message, lang.alreadyExists(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 400, message: lang.alreadyExists(lang.models.user)}
+      );
       t.end();
     });
 });
 
 test(`${routes.users} User successfully created`, t => {
+  let emailStub = helpers.stubMailer('success');
   let newUser = {
     email: 'new.user@ecp.io',
     password: 'Sifra123!',
@@ -75,6 +80,7 @@ test(`${routes.users} User successfully created`, t => {
         firstname: newUser.firstname,
         lastname: newUser.lastname
       });
+      helpers.resetMailer(emailStub);
       t.end();
     });
 });
@@ -96,8 +102,10 @@ test(`${routes.users} List users`, t => {
 */
 test(`${routes.userId} Fail to get one user`, t => {
   helpers.json('get', '/users/1950').end((err, res) => {
-    t.same(res.status, 404);
-    t.same(res.body.message, lang.notFound(lang.models.user));
+    t.same(
+      {status: res.status, message: res.body.message},
+      {status: 404, message: lang.notFound(lang.models.user)}
+    );
     t.end();
   });
 });
@@ -128,8 +136,10 @@ test(`${routes.userId} User with no token`, t => {
   helpers.json('post', '/users/1')
     .send({firstname: 'tryToChange'})
     .end((err, res) => {
-      t.same(res.status, 401);
-      t.same(res.body.message, 'No authorization token was found');
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 401, message: 'No authorization token was found'}
+      );
       t.end();
     });
 });
@@ -139,8 +149,10 @@ test(`${routes.userId} User not authorized to update other user`, t => {
     .set('Authorization', normalAuth)
     .send({firstname: 'tryToChange'})
     .end((err, res) => {
-      t.same(res.status, 403);
-      t.same(res.body.message, lang.notAuthorized);
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 403, message: lang.notAuthorized}
+      );
       t.end();
     });
 });
@@ -154,8 +166,10 @@ test(`${routes.userId} Invalid params`, t => {
         {path: 'email', message: lang.unrecognizedParameter}
       ];
 
-      t.same(res.status, 400);
-      t.same(res.body.debugInfo, debugInfoError);
+      t.same(
+        {status: res.status, debugInfo: res.body.debugInfo},
+        {status: 400, debugInfo: debugInfoError}
+      );
       t.end();
     });
 });
@@ -165,8 +179,10 @@ test(`${routes.userId} User not found for update`, t => {
     .set('Authorization', superAdminAuth)
     .send({firstname: 'no user'})
     .end((err, res) => {
-      t.same(res.status, 404);
-      t.same(res.body.message, lang.notFound(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 404, message: lang.notFound(lang.models.user)}
+      );
       t.end();
     });
 });
@@ -176,8 +192,10 @@ test(`${routes.userId} User successfully updated`, t => {
     .set('Authorization', superAdminAuth)
     .send({firstname: 'Changed'})
     .end((err, res) => {
-      t.same(res.status, 200);
-      t.same(res.body.firstname, 'Changed');
+      t.same(
+        {status: res.status, firstname: res.body.firstname},
+        {status: 200, firstname: 'Changed'}
+      );
       t.end();
     });
 });
@@ -187,8 +205,10 @@ test(`${routes.userId} User successfully updated by admin`, t => {
     .set('Authorization', adminAuth)
     .send({firstname: 'Changed by admin'})
     .end((err, res) => {
-      t.same(res.status, 200);
-      t.same(res.body.firstname, 'Changed by admin');
+      t.same(
+        {status: res.status, firstname: res.body.firstname},
+        {status: 200, firstname: 'Changed by admin'}
+      );
       t.end();
     });
 });
@@ -198,8 +218,10 @@ test(`${routes.userId} User successfully updated by superadmin`, t => {
     .set('Authorization', superAdminAuth)
     .send({firstname: 'Changed by superadmin'})
     .end((err, res) => {
-      t.same(res.status, 200);
-      t.same(res.body.firstname, 'Changed by superadmin');
+      t.same(
+        {status: res.status, firstname: res.body.firstname},
+        {status: 200, firstname: 'Changed by superadmin'}
+      );
       t.end();
     });
 });
@@ -214,8 +236,10 @@ test(`${routes.userId} Fail to delete user because not admin`, t => {
   helpers.json('delete', '/users/2')
     .set('Authorization', normalAuth)
     .end((err, res) => {
-      t.same(res.status, 403);
-      t.same(res.body.message, lang.notAuthorized);
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 403, message: lang.notAuthorized}
+      );
       t.end();
     });
 });
@@ -224,8 +248,10 @@ test(`${routes.userId} Fail to delete self`, t => {
   helpers.json('delete', '/users/1')
     .set('Authorization', superAdminAuth)
     .end((err, res) => {
-      t.same(res.status, 403);
-      t.same(res.body.message, lang.cannotDeleteSelf);
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 403, message: lang.cannotDeleteSelf}
+      );
       t.end();
     });
 });
@@ -234,8 +260,10 @@ test(`${routes.userId} Fail to delete because no user found`, t => {
   helpers.json('delete', '/users/1950')
     .set('Authorization', adminAuth)
     .end((err, res) => {
-      t.same(res.status, 404);
-      t.same(res.body.message, lang.notFound(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 404, message: lang.notFound(lang.models.user)}
+      );
       t.end();
     });
 });
@@ -245,8 +273,10 @@ test(`${routes.userId} User successfully deleted`, t => {
   helpers.json('delete', '/users/4')
     .set('Authorization', superAdminAuth)
     .end((err, res) => {
-      t.same(res.status, 200);
-      t.same(res.body.message, lang.successfullyRemoved(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 200, message: lang.successfullyRemoved(lang.models.user)}
+      );
       t.end();
     });
 });

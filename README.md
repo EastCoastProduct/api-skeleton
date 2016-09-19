@@ -1,4 +1,4 @@
-
+[![CircleCI](https://circleci.com/gh/EastCoastProduct/api-skeleton.svg?style=svg)](https://circleci.com/gh/EastCoastProduct/api-skeleton)
 ECP Boilerplate Access API
 ========================
 ECP Boilerplate.

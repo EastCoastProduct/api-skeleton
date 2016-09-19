@@ -5,6 +5,7 @@ const users = [
   {
     // id: 1,
     // user is super admin
+    // will update firstname
     email: 'john.doe@ecp.io',
     firstname: 'Harry',
     lastname: 'Richardson',
@@ -38,6 +39,41 @@ const users = [
     email: 'user4@ecp.io',
     firstname: 'Helen',
     lastname: 'Arnold',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 5,
+    email: 'forgot.password@ecp.io',
+    firstname: 'Forgety',
+    lastname: 'Forget',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 6,
+    // this user will be deleted
+    email: 'delete.one@ecp.io',
+    firstname: 'delete',
+    lastname: 'deletey',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 7,
+    // this user will be deleted
+    email: 'delete.two@ecp.io',
+    firstname: 'delete',
+    lastname: 'deletey2',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 8,
+    // this user will be updated
+    email: 'update.one@ecp.io',
+    firstname: 'update',
+    lastname: 'updatey2',
     password: 'password123',
     confirmed: true
   }

@@ -38,6 +38,8 @@
     "postgres-cleaner": "^0.1.2",
     "run-sequence": "^1.2.2",
     "should": "^11.1.0",
+    "sinon": "^1.17.6",
+    "sinon-as-promised": "^4.0.2",
     "supertest": "^2.0.0",
     "tap-colorize": "^1.2.0",
     "tape": "^4.6.0"

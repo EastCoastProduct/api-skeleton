@@ -16,7 +16,7 @@ const paths = {
     './routes/*.js',
     './controllers/**/*.js',
     './middleware/**/*.js',
-    './models/*.js',
+    './models/**/*.js',
     './utils/**/*.js',
     '!./**/*.test.js'
   ],

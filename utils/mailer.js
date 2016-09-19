@@ -54,6 +54,7 @@ const forgotPassword = options => {
 };
 
 module.exports = {
+  transport: transport,
   emailUpdate: emailUpdate,
   emailConfirm: emailConfirm,
   forgotPassword: forgotPassword

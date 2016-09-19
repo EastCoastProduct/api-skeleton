@@ -8,8 +8,14 @@ const forgotPasswords = [
     userId: 1
   },
   {
+    // this token will be removed
     token: uuid.v1(),
     userId: 2
+  },
+  {
+    // this token will be removed
+    token: uuid.v1(),
+    userId: 3
   }
 ];
 

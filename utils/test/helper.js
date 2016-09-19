@@ -2,6 +2,9 @@
 
 const jwt = require('jsonwebtoken');
 const request = require('supertest');
+const mailer = require('../mailer');
+const sinon = require('sinon');
+require('sinon-as-promised');
 
 const app = require('../../app');
 const config = require('../../config');
@@ -33,6 +36,21 @@ helpers.signToken = (object) => {
 
 helpers.getAuthorizationHeader = function getAuthorizationHeader(userId) {
   return 'Bearer ' + helpers.signToken({ userId: userId });
+};
+
+helpers.stubMailer = (result, isError) => {
+  let emailStub = sinon.stub(mailer.transport, 'sendMail');
+
+  if (!isError) {
+    emailStub.resolves(result);
+  }
+
+  return emailStub;
+};
+
+helpers.resetMailer = (stub) => {
+  stub.reset();
+  stub.restore();
 };
 
 module.exports = helpers;
