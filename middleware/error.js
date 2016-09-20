@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 
+/* istanbul ignore next */
 function formatErrors(errors) {
   return _.map(errors, error => {
     if (error.path !== 'lower(email::text)') return error;
@@ -13,6 +14,7 @@ function formatErrors(errors) {
   });
 }
 
+/* istanbul ignore next */
 function ErrorHandler(options) {
 
   /* eslint-disable no-unused-vars */

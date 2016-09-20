@@ -23,7 +23,11 @@ const validate = {
 function reset(req, res, next) {
   services.forgotPassword.getUserAndRemoveTokens(req.body.email).then(user =>
     services.forgotPassword.create(user)
-      .then(() => res.status(200).json({message: lang.passwordRecovery})))
+      .then(() => {
+        res.status(200);
+        res.locals.message = lang.passwordRecovery;
+        next();
+      }))
       .catch(err => next(err));
 }
 
@@ -34,7 +38,11 @@ function change(req, res, next) {
       return userFromToken.save();
     })
     .then(() => services.forgotPassword.removeByToken(req.body.token))
-    .then(() => res.status(200).json({message: lang.passwordChanged}))
+    .then(() => {
+      res.status(200);
+      res.locals.message = lang.passwordChanged;
+      next();
+    })
     .catch(err => next(err));
 }
 

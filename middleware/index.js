@@ -1,7 +1,9 @@
 'use strict';
 
+const lang = require('../config/language');
+
 function catch404(req, res, next) {
-  var err = new Error('Not Found');
+  var err = new Error(lang.routeNotFound);
   err.status = 404;
   next(err);
 }

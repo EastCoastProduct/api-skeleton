@@ -24,7 +24,11 @@ function create(req, res, next) {
       newEmail: req.body.newEmail.toLowerCase(),
       password: req.body.password
     }))
-    .then(() => res.status(200).json({message: lang.requestChangeEmail}))
+    .then(() => {
+      res.status(200);
+      res.locals.message = lang.requestChangeEmail;
+      next();
+    })
     .catch(err => next(err));
 }
 
@@ -35,7 +39,11 @@ function confirm(req, res, next) {
         .then(() =>
           services.emailConfirmation.create({id: user.id, email: user.email})
         )
-        .then(() => res.status(200).json({message: lang.changedEmail}))
+        .then(() => {
+          res.status(200);
+          res.locals.message = lang.changedEmail;
+          next();
+        })
     )
     .catch(err => next(err));
 }

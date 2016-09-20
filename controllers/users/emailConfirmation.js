@@ -22,7 +22,11 @@ function confirm(req, res, next) {
       return user.save();
     })
     .then(() => services.emailConfirmation.removeByToken(req.body.token))
-    .then(() => res.status(200).json({message: lang.emailConfirmed}))
+    .then(() => {
+      res.status(200);
+      res.locals.message = lang.emailConfirmed;
+      next();
+    })
     .catch(err => next(err));
 }
 
@@ -30,8 +34,11 @@ function resend(req, res, next) {
   services.emailConfirmation.getUserAndRemoveTokens(req.body.email)
     .then(user =>
       services.emailConfirmation.create(user)
-        .then(() => res.status(201).json({message: lang.sentConfirmationEmail}))
-    )
+        .then(() => {
+          res.status(201);
+          res.locals.message = lang.sentConfirmationEmail;
+          next();
+        }))
     .catch(err => next(err));
 }
 

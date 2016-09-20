@@ -14,7 +14,7 @@ const validate = {
       lastname: {type: 'norule', length: {max: 30}},
       password: {type: 'password'}
     },
-    required: ['firstname', 'lastname', 'email', 'password']
+    required: ['email', 'password']
   }),
   update: validator.validation('body', {
     rules: {
@@ -30,16 +30,22 @@ function create(req, res, next) {
   services.user.doesNotExist({where: {email: req.body.email}})
     .then(() => services.user.create(req.body))
     .then(user => {
-      services.emailConfirmation.create(user).then(() =>
-        res.status(201).json(user)
-      );
+      services.emailConfirmation.create(user).then(() => {
+        res.status(201);
+        res.locals = user;
+        next();
+      });
     })
     .catch(err => next(err));
 }
 
 function list(req, res, next) {
   services.user.list()
-    .then(users => res.status(200).json(users))
+    .then(users => {
+      res.status(200);
+      res.locals = users;
+      next();
+    })
     .catch(err => next(err));
 }
 
@@ -49,15 +55,21 @@ function remove(req, res, next) {
   }
 
   services.user.removeById(req.params.userId)
-    .then(() => res.status(200).json({
-      message: lang.successfullyRemoved(lang.models.user)
-    }))
+    .then(() => {
+      res.status(200);
+      res.locals.message = lang.successfullyRemoved(lang.models.user);
+      next();
+    })
     .catch(err => next(err));
 }
 
 function show(req, res, next) {
   services.user.getById(req.params.userId)
-    .then(user => res.status(200).json(user))
+    .then(user => {
+      res.status(200);
+      res.locals = user;
+      next();
+    })
     .catch(err => next(err));
 }
 
@@ -68,7 +80,11 @@ function update(req, res, next) {
   if (!isOwner && !user.hasPrivilege) return next(Error403(lang.notAuthorized));
 
   services.user.update(req.body, {id: req.params.userId})
-    .then(response => res.status(200).json(response))
+    .then(response => {
+      res.status(200);
+      res.locals = response;
+      next();
+    })
     .catch(err => next(err));
 }
 

@@ -30,6 +30,7 @@ module.exports = {
   notAuthorized: 'Not authorized',
   notConfirmed: prependKeyword('is not confirmed'),
   notFound: prependKeyword('not found'),
+  routeNotFound: 'Not found',
   wrongPassword: 'Wrong password',
 
   // Successfull response messages

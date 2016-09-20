@@ -1,9 +1,17 @@
 'use strict';
 
+const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+
+function responseMiddleware(req, res, next) {
+
+  if (_.isEmpty(res.locals)) return next();
+  res.json(res.locals);
+}
 
 const defaultValue = (field, value) => field !== void 0 ? field : value;
 
+/* istanbul ignore next */
 function userFromJwtHeader(headers) {
   var user;
 
@@ -32,6 +40,7 @@ function chainMiddleware(middlewares) {
 }
 
 module.exports = {
+  responseMiddleware: responseMiddleware,
   defaultValue: defaultValue,
   middleware: { chain: chainMiddleware },
   userFromJwtHeader: userFromJwtHeader

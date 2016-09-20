@@ -1,6 +1,7 @@
 'use strict';
 
 const app = require('express')();
+const responseMiddleware = require('./utils').responseMiddleware;
 const bodyParser = require('body-parser');
 const config = require('./config');
 const errorHandler = require('./middleware/error');
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(middleware.addHeaders);
 app.use('/', routes);
 
+app.use(responseMiddleware);
 app.use(middleware.catch404);
 app.use(errorHandler({env: config.env}));
 

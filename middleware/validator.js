@@ -4,6 +4,8 @@ const _ = require('lodash');
 const validator = require('validator');
 const errors = require('../utils/errors');
 
+/* istanbul ignore next */
+
 /**
 utility for validating filters in the requests
 you need to provide filters and set of rules for validation
@@ -74,7 +76,6 @@ function validate(reqData, rules, required, callback) {
   const onlyNumbers = (/^[0-9]+$/);
   const containsUppercase = (/[A-Z]/);
   const containsLowecase = (/[a-z]/);
-  const specialCharacters = (/[@#$%!?]/);
   const containsNumeric = (/[0-9]/);
 
   const makeMessage = (key, message) => ({
@@ -205,9 +206,6 @@ function validate(reqData, rules, required, callback) {
       }
       if (!containsLowecase.test(value)) {
         addMessage(key, 'has to contain at least one lowercase letter');
-      }
-      if (!specialCharacters.test(value)) {
-        addMessage(key, 'has to contain at least one special character');
       }
       if (!containsNumeric.test(value)) {
         addMessage(key, 'has to contain at least one number');

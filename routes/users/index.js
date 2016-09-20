@@ -40,7 +40,7 @@ module.exports = function(router) {
     .post(
       users.passwords.validate.change,
       users.passwords.change
-    )
+    );
 
   router.route('/resetPassword')
     .post(
@@ -52,11 +52,11 @@ module.exports = function(router) {
     .post(
       users.emailConfirmation.validate.resend,
       users.emailConfirmation.resend
-    )
+    );
 
   router.route('/emailConfirm')
     .post(
       users.emailConfirmation.validate.confirm,
       users.emailConfirmation.confirm
-    )
+    );
 };
