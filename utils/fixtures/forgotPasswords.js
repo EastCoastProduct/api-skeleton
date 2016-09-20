@@ -16,6 +16,11 @@ const forgotPasswords = [
     // this token will be removed
     token: uuid.v1(),
     userId: 3
+  },
+  {
+    // this token will be used
+    token: uuid.v1(),
+    userId: 8
   }
 ];
 

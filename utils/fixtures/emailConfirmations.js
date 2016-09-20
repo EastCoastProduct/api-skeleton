@@ -5,11 +5,17 @@ const populateTimestamps = require('../migrations').populateTimestamps;
 const emailConfirmations = [
   {
     token: uuid.v1(),
-    userId: 1
+    userId: 3
   },
   {
+    // this token will be removed
     token: uuid.v1(),
-    userId: 2
+    userId: 8
+  },
+  {
+    // this token will be deleted
+    token: uuid.v1(),
+    userId: 9
   }
 ];
 

@@ -44,6 +44,7 @@ const users = [
   },
   {
     // id: 5,
+    // this user forgot his password
     email: 'forgot.password@ecp.io',
     firstname: 'Forgety',
     lastname: 'Forget',
@@ -76,6 +77,15 @@ const users = [
     lastname: 'updatey2',
     password: 'password123',
     confirmed: true
+  },
+  {
+    // id: 9,
+    // this user will be confirmed
+    email: 'confirmed.one@ecp.io',
+    firstname: 'confirmed',
+    lastname: 'user',
+    password: 'password123',
+    confirmed: false
   }
 ];
 
