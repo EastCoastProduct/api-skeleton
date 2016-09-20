@@ -42,7 +42,7 @@ helpers.stubMailer = (result, isError) => {
   let emailStub = sinon.stub(mailer.transport, 'sendMail');
 
   if (!isError) {
-    emailStub.resolves(result);
+    emailStub.resolves(result || {});
   }
 
   return emailStub;

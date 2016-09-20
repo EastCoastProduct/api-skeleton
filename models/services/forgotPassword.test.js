@@ -29,9 +29,9 @@ test('Forgot password create', t => {
   let emailStub = helpers.stubMailer({status: 200});
   services.forgotPassword.create({id: 5}).then(fps => {
     t.same(fps, {status: 200});
+    helpers.resetMailer(emailStub);
     t.end();
   });
-  helpers.resetMailer(emailStub);
 });
 
 test('Forgot password get user and remove his tokens success', t => {

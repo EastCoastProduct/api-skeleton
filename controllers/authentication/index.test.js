@@ -17,9 +17,15 @@ test('/authenticate Invalid parameters', t => {
         {path: 'password', message: lang.required}
       ];
 
-      t.same(res.status, 400);
-      t.same(res.body.message, lang.parametersError);
-      t.same(res.body.debugInfo, debugInfoError);
+      t.same({
+        status: res.status,
+        message: res.body.message,
+        debugInfo: res.body.debugInfo
+      }, {
+        status: 400,
+        message: lang.parametersError,
+        debugInfo: debugInfoError
+      });
       t.end();
     });
 });
@@ -35,8 +41,9 @@ test('/authenticate User does not exist', t => {
       password: 'password123'
     })
     .end((err, res) => {
-      t.same(res.status, 404);
-      t.same(res.body.message, lang.notFound(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 404, message: lang.notFound(lang.models.user)});
       t.end();
     });
 });
@@ -48,8 +55,10 @@ test('/authenticate User not confirmed', t => {
       password: 'password123'
     })
     .end((err, res) => {
-      t.same(res.status, 400);
-      t.same(res.body.message, lang.notConfirmed(lang.models.user));
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 400, message: lang.notConfirmed(lang.models.user)}
+      );
       t.end();
     });
 });
@@ -61,8 +70,10 @@ test('/authenticate Wrong password', t => {
       password: 'wrong'
     })
     .end((err, res) => {
-      t.same(res.status, 400);
-      t.same(res.body.message, lang.wrongPassword);
+      t.same(
+        {status: res.status, message: res.body.message},
+        {status: 400, message: lang.wrongPassword}
+      );
       t.end();
     });
 });

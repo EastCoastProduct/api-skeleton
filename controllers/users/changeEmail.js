@@ -2,6 +2,7 @@
 
 const services = require('../../models/services');
 const validator = require('../../middleware/validator');
+const lang = require('../../config/language');
 
 const validate = {
   create: validator.validation('body', {
@@ -23,14 +24,19 @@ function create(req, res, next) {
       newEmail: req.body.newEmail.toLowerCase(),
       password: req.body.password
     }))
-    .then(() => res.status(200).json({message: 'Request change email'}))
+    .then(() => res.status(200).json({message: lang.requestChangeEmail}))
     .catch(err => next(err));
 }
 
 function confirm(req, res, next) {
   services.emailUpdate.getByTokenAndEdit(req.params.token)
-    .then(() => services.emailUpdate.removeByToken(req.params.token))
-    .then(() => res.status(200).json({message: 'Changed email'}))
+    .then(user =>
+      services.emailUpdate.removeByToken(req.params.token)
+        .then(() =>
+          services.emailConfirmation.create({id: user.id, email: user.email})
+        )
+        .then(() => res.status(200).json({message: lang.changedEmail}))
+    )
     .catch(err => next(err));
 }
 

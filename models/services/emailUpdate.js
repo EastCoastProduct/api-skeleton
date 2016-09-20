@@ -29,18 +29,18 @@ const checkAndCreate = data =>
     );
 
 const getByTokenAndEdit = token => generic.getOne({token: token})
-    .then(user => {
-      if (!user) throw Error404(lang.notFound(lang.models.user));
-      return User.count({where: {email: user.email}}).then(numUsers => {
+    .then(user =>
+      User.count({where: {email: user.email}}).then(numUsers => {
         if (numUsers) throw Error400(lang.emailInUse);
         let newEmail = user.email;
 
         return user.getUser().then(userModel => {
           userModel.email = newEmail;
+          userModel.confirmed = false;
           return userModel.save();
         });
-      });
-    });
+      })
+    );
 
 const getUserAndRemoveTokens = email =>
   User.findOne({where: {email: email}}).then(user => {

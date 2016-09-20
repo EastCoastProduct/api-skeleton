@@ -17,7 +17,6 @@ const create = user =>
 const getByToken = token => generic.getOne({token: token})
   .then(user => user.getUser());
 
-
 const getUserAndRemoveTokens = email =>
   User.findOne({where: {email: email}}).then(user => {
     if (!user) throw Error404(lang.notFound(lang.models.user));

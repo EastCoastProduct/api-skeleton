@@ -10,6 +10,12 @@ const istanbul = require('gulp-istanbul');
 const sequence = require('run-sequence');
 const tapColorize = require('tap-colorize');
 
+const colorizeColors = {
+  info: [100, 200, 255],
+  fail: [255, 0, 0],
+  pass: [0, 255, 0]
+};
+
 const paths = {
   src: [
     'app.js',
@@ -83,7 +89,7 @@ gulp.task('lint', ['lint-src', 'lint-test']);
 gulp.task('run-tests', function() {
   process.env.NODE_ENV = 'test';
   gulp.src(paths.test)
-    .pipe(tape({timeout: 14000, reporter: tapColorize()}))
+    .pipe(tape({timeout: 14000, reporter: tapColorize(colorizeColors)}))
     .once('end', () => {
       process.exit(); // eslint-disable-line
     });
@@ -96,7 +102,7 @@ gulp.task('run-test-cover', () => {
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
       gulp.src(paths.test)
-        .pipe(tape({timeout: 14000, reporter: tapColorize()}))
+        .pipe(tape({timeout: 14000, reporter: tapColorize(colorizeColors)}))
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({
           thresholds: {
