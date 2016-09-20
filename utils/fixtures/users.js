@@ -45,6 +45,7 @@ const users = [
   {
     // id: 5,
     // this user forgot his password
+    // this user is trying to change mail to existing
     email: 'forgot.password@ecp.io',
     firstname: 'Forgety',
     lastname: 'Forget',
@@ -86,6 +87,33 @@ const users = [
     lastname: 'user',
     password: 'password123',
     confirmed: false
+  },
+  {
+    // id: 10,
+    // this user will change his email
+    email: 'change.email@ecp.io',
+    firstname: 'change',
+    lastname: 'emailUser',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 11,
+    // this user will want to change his email
+    email: 'change.email2@ecp.io',
+    firstname: 'change',
+    lastname: 'changeTwo',
+    password: 'password123',
+    confirmed: true
+  },
+  {
+    // id: 12,
+    // this user will want to change his email
+    email: 'change.email3@ecp.io',
+    firstname: 'change',
+    lastname: 'changeThree',
+    password: 'password123',
+    confirmed: true
   }
 ];
 

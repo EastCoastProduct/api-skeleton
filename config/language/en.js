@@ -33,6 +33,8 @@ module.exports = {
   wrongPassword: 'Wrong password',
 
   // Successfull response messages
+  changedEmail: 'Chaned email',
+  requestChangeEmail: 'An email has been sent to your new email address',
   passwordChanged: 'Your password has been updated',
   passwordRecovery: 'Your password recovery email has been sent',
   successfullyRemoved: prependKeyword('successfully removed'),
