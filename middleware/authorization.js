@@ -20,7 +20,7 @@ const getUser = (checking) => {
         throw Error403(lang.notConfirmed(lang.models.user));
       }
 
-      if (checking) {
+      if (checking === 'admin' || checking === 'superAdmin') {
         req.user.privileges = {admin: user.admin, superAdmin: user.superAdmin};
       }
 
@@ -55,13 +55,13 @@ const checkSuperAdmin = (adminRoute = false) =>
 function authorization(type, adminRoute = false) {
   let middlewareChain = [
     jwt({secret: config.jwtKey}),
-    getUser(!!type)
+    getUser(type)
   ];
 
   switch (type) {
   case 'admin':
     middlewareChain.push(checkAdmin(adminRoute)); break;
-  case 'superadmin':
+  case 'superAdmin':
     middlewareChain.push(checkSuperAdmin(adminRoute)); break;
   }
 
@@ -72,5 +72,5 @@ module.exports = {
   isUser: authorization(),
   isConfirmed: authorization('confirmed'),
   isAdmin: (adminRoute) => authorization('admin', adminRoute),
-  isSuperAdmin: (adminRoute) => authorization('superadmin', adminRoute)
+  isSuperAdmin: (adminRoute) => authorization('superAdmin', adminRoute)
 };

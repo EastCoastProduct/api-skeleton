@@ -9,6 +9,7 @@
   "author": "EastCoastProduct",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.6.4",
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "connect": "^3.5.0",
@@ -19,6 +20,8 @@
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.15.0",
     "morgan": "^1.7.0",
+    "multer": "^1.2.0",
+    "node-mocks-http": "^1.5.4",
     "nodemailer": "^2.6.0",
     "pg": "^6.1.0",
     "sequelize": "^3.24.3",

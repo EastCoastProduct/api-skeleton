@@ -114,6 +114,15 @@ const users = [
     lastname: 'changeThree',
     password: 'password123',
     confirmed: true
+  },
+  {
+    // id: 13,
+    // this user needs to stay confirmed
+    email: 'stay.confirmed@ecp.io',
+    firstname: 'change',
+    lastname: 'stay',
+    password: 'password123',
+    confirmed: true
   }
 ];
 
