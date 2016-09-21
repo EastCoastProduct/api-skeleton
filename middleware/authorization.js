@@ -5,6 +5,7 @@ const User = require('../models').user;
 const lang = require('../config/language');
 const errors = require('../utils/errors');
 const Error403 = errors.Error403;
+const Error404 = errors.Error404;
 const jwt = require('express-jwt');
 const utils = require('../utils');
 
@@ -26,7 +27,7 @@ const getUser = (checking) => {
       next();
     })
     .catch(err => next(err));
-  }
+  };
 };
 
 function doesUserHavePrivilege(type, adminRoute) {
@@ -58,10 +59,10 @@ function authorization(type, adminRoute = false) {
   ];
 
   switch (type) {
-    case 'admin':
-      middlewareChain.push(checkAdmin(adminRoute)); break;
-    case 'superadmin':
-      middlewareChain.push(checkSuperAdmin(adminRoute)); break;
+  case 'admin':
+    middlewareChain.push(checkAdmin(adminRoute)); break;
+  case 'superadmin':
+    middlewareChain.push(checkSuperAdmin(adminRoute)); break;
   }
 
   return utils.middleware.chain(middlewareChain);
