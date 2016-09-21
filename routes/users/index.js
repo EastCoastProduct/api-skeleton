@@ -16,13 +16,11 @@ module.exports = function(router) {
   router.route('/users/:userId')
     .get(users.show)
     .post(
-      jwt({secret: config.jwtKey}),
       authorization.isAdmin(),
       users.validate.update,
       users.update
     )
     .delete(
-      jwt({secret: config.jwtKey}),
       authorization.isAdmin(true),
       users.remove
     );

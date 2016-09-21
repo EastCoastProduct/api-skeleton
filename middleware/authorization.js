@@ -1,44 +1,75 @@
 'use strict';
 
+const config = require('../config');
 const User = require('../models').user;
 const lang = require('../config/language');
 const errors = require('../utils/errors');
 const Error403 = errors.Error403;
+const jwt = require('express-jwt');
 const utils = require('../utils');
 
-function userFromToken(req, res, next) {
-  if (req.user) return next();
+const getUser = (checking) => {
+  const attributes = ['admin', 'confirmed', 'superAdmin'];
 
-  if (req.headers && req.headers.authorization) {
-    req.user = utils.userFromJwtHeader(req.headers);
+  return (req, res, next) => {
+    User.findById(req.user.userId, {attributes: attributes}).then(user => {
+      if (!user) throw Error404(lang.notFound(lang.models.user));
+
+      if (checking === 'confirmed' && !user.confirmed) {
+        throw Error403(lang.notConfirmed(lang.models.user));
+      }
+
+      if (checking) {
+        req.user.privileges = {admin: user.admin, superAdmin: user.superAdmin};
+      }
+
+      next();
+    })
+    .catch(err => next(err));
   }
+};
 
-  next();
+function doesUserHavePrivilege(type, adminRoute) {
+  return (req, res, next) => {
+    const privileges = req.user.privileges;
+    const hasPrivilege = privileges.superAdmin || privileges[type];
+
+    if (adminRoute && !hasPrivilege) return next(Error403(lang.notAuthorized));
+
+    req.user.privileges = undefined;
+
+    if (hasPrivilege) req.user.hasPrivilege = true;
+
+    next();
+  };
 }
 
-function checkAdminAndSuperAdmin(isAdminRoute = false, onlyAdmin) {
-  function _checkAdminAndSuperAdmin(req, res, next) {
-    if (!req.user) return next(Error403(lang.invalidToken));
-    const queryParams = onlyAdmin
-      ? {$or: [{admin: true}, {superAdmin: true}]}
-      : {superAdmin: true};
+const checkAdmin = (adminRoute = false) =>
+  doesUserHavePrivilege('admin', adminRoute);
 
-    User.count({where: {$and: [{id: req.user.userId}, queryParams]}})
-      .then(user => {
-        if (!user && isAdminRoute) throw Error403(lang.notAuthorized);
-        if (user) req.user.hasPrivilege = true;
-        next();
-      })
-      .catch(err => next(err));
+const checkSuperAdmin = (adminRoute = false) =>
+  doesUserHavePrivilege('superAdmin', adminRoute);
+
+// this function chains middleware for authorization
+function authorization(type, adminRoute = false) {
+  let middlewareChain = [
+    jwt({secret: config.jwtKey}),
+    getUser(!!type)
+  ];
+
+  switch (type) {
+    case 'admin':
+      middlewareChain.push(checkAdmin(adminRoute)); break;
+    case 'superadmin':
+      middlewareChain.push(checkSuperAdmin(adminRoute)); break;
   }
 
-  return utils.middleware.chain([
-    userFromToken,
-    _checkAdminAndSuperAdmin
-  ]);
+  return utils.middleware.chain(middlewareChain);
 }
 
 module.exports = {
-  isAdmin: (isAdminRoute) => checkAdminAndSuperAdmin(isAdminRoute, true),
-  isSuperAdmin: (isAdminRoute) => checkAdminAndSuperAdmin(isAdminRoute)
+  isUser: authorization(),
+  isConfirmed: authorization('confirmed'),
+  isAdmin: (adminRoute) => authorization('admin', adminRoute),
+  isSuperAdmin: (adminRoute) => authorization('superadmin', adminRoute)
 };

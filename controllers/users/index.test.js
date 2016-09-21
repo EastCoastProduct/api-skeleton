@@ -23,8 +23,6 @@ test(`${routes.users} Invalid params`, t => {
     .end((err, res) => {
       const debugInfoError = [
         {path: 'confirmed', message: lang.unrecognizedParameter},
-        {path: 'firstname', message: lang.required},
-        {path: 'lastname', message: lang.required},
         {path: 'email', message: lang.required},
         {path: 'password', message: lang.required}
       ];

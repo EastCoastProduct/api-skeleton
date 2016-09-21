@@ -48,21 +48,6 @@ test('/authenticate User does not exist', t => {
     });
 });
 
-test('/authenticate User not confirmed', t => {
-  helpers.json('post', '/authenticate')
-    .send({
-      email: 'not.confirmed@ecp.io',
-      password: 'password123'
-    })
-    .end((err, res) => {
-      t.same(
-        {status: res.status, message: res.body.message},
-        {status: 400, message: lang.notConfirmed(lang.models.user)}
-      );
-      t.end();
-    });
-});
-
 test('/authenticate Wrong password', t => {
   helpers.json('post', '/authenticate')
     .send({

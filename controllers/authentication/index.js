@@ -24,7 +24,6 @@ function authenticate(req, res, next) {
   User.findOne({where: {email: req.body.email}})
     .then(user => {
       if (!user) throw Error404(lang.notFound(lang.models.user));
-      if (!user.confirmed) throw Error400(lang.notConfirmed(lang.models.user));
 
       const sentPassword = req.body.password;
       const oldPassword = user.password.trim();
