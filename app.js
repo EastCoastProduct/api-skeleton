@@ -12,7 +12,9 @@ const routes = require('./routes');
 app.use(logger('dev'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({
+  extended: false, limit: `${config.files.size}mb`
+}));
 
 app.use(middleware.addHeaders);
 app.use('/', routes);

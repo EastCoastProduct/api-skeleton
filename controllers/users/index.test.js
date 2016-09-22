@@ -6,10 +6,6 @@ const lang = require('../../config/language');
 const superAdminAuth = helpers.getAuthorizationHeader(1);
 const adminAuth = helpers.getAuthorizationHeader(3);
 const normalAuth = helpers.getAuthorizationHeader(4);
-const routes = {
-  users: '/users',
-  userId: '/users/:userId'
-};
 
 test('POST /users', t => {
 
@@ -192,7 +188,7 @@ test('POST /users/:userId', t => {
           ft.end();
         });
     });
-  })
+  });
 
   t.test('Success', s => {
     s.test('User successfully updated', st => {

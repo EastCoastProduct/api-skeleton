@@ -21,8 +21,8 @@ test('Email update service', t => {
     f.test('Email update check and create fail because wrong password', ft => {
       services.emailUpdate.checkAndCreate({
         newEmail: 'wrong@ecp.io',
-        dbPassword: 'password123',
-        password: 'password123'
+        dbPassword: 'Password123',
+        password: 'Password123'
       }).catch(err => {
         ft.same(err, {status: 400, message: lang.wrongPassword});
         ft.end();
@@ -53,7 +53,7 @@ test('Email update service', t => {
         services.emailUpdate.checkAndCreate({
           newEmail: 'cool.mailTwo@ecp.io',
           dbPassword: user.password,
-          password: 'password123',
+          password: 'Password123',
           userId: user.id
         }).then(resp => {
           st.same(resp, {status: 200});

@@ -9,7 +9,7 @@ const users = [
     email: 'john.doe@ecp.io',
     firstname: 'Harry',
     lastname: 'Richardson',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true,
     admin: true,
     superAdmin: true
@@ -20,7 +20,7 @@ const users = [
     email: 'not.confirmed@ecp.io',
     firstname: 'Theresa',
     lastname: 'Bennett',
-    password: 'password123',
+    password: 'Password123',
     confirmed: false
   },
   {
@@ -29,7 +29,7 @@ const users = [
     email: 'user3@ecp.io',
     firstname: 'Jacqueline',
     lastname: 'Wright',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true,
     admin: true
   },
@@ -39,7 +39,7 @@ const users = [
     email: 'user4@ecp.io',
     firstname: 'Helen',
     lastname: 'Arnold',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -49,7 +49,7 @@ const users = [
     email: 'forgot.password@ecp.io',
     firstname: 'Forgety',
     lastname: 'Forget',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -58,7 +58,7 @@ const users = [
     email: 'delete.one@ecp.io',
     firstname: 'delete',
     lastname: 'deletey',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -67,7 +67,7 @@ const users = [
     email: 'delete.two@ecp.io',
     firstname: 'delete',
     lastname: 'deletey2',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -76,7 +76,7 @@ const users = [
     email: 'update.one@ecp.io',
     firstname: 'update',
     lastname: 'updatey2',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -85,7 +85,7 @@ const users = [
     email: 'confirmed.one@ecp.io',
     firstname: 'confirmed',
     lastname: 'user',
-    password: 'password123',
+    password: 'Password123',
     confirmed: false
   },
   {
@@ -94,7 +94,7 @@ const users = [
     email: 'change.email@ecp.io',
     firstname: 'change',
     lastname: 'emailUser',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -103,7 +103,7 @@ const users = [
     email: 'change.email2@ecp.io',
     firstname: 'change',
     lastname: 'changeTwo',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -112,7 +112,7 @@ const users = [
     email: 'change.email3@ecp.io',
     firstname: 'change',
     lastname: 'changeThree',
-    password: 'password123',
+    password: 'Password123',
     confirmed: true
   },
   {
@@ -121,7 +121,16 @@ const users = [
     email: 'stay.confirmed@ecp.io',
     firstname: 'change',
     lastname: 'stay',
-    password: 'password123',
+    password: 'Password123',
+    confirmed: true
+  },
+  {
+    // id: 14,
+    // this user will change password
+    email: 'change.password123@ecp.io',
+    firstname: 'change',
+    lastname: 'passChange',
+    password: 'Password123',
     confirmed: true
   }
 ];

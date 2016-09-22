@@ -20,8 +20,7 @@ const validate = {
     rules: {
       bio: {type: 'norule', length: 1000},
       firstname: {type: 'norule', length: {max: 30}},
-      lastname: {type: 'norule', length: {max: 30}},
-      password: {type: 'password'}
+      lastname: {type: 'norule', length: {max: 30}}
     }
   })
 };

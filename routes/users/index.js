@@ -36,8 +36,15 @@ module.exports = function(router) {
 
   router.route('/changePassword')
     .post(
+      authorization.isUser,
       users.passwords.validate.change,
       users.passwords.change
+    );
+
+  router.route('/changePassword/:token')
+    .post(
+      users.passwords.validate.changeWithToken,
+      users.passwords.changeWithToken
     );
 
   router.route('/resetPassword')

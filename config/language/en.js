@@ -5,6 +5,7 @@
 */
 
 const messageBuilder = require('./messageBuilder');
+const appendKeyword = messageBuilder.appendKeyword;
 const prependKeyword = messageBuilder.prependKeyword;
 
 module.exports = {
@@ -16,29 +17,51 @@ module.exports = {
     user: 'User'
   },
 
-  // Validation error messages
-  unrecognizedParameter: 'unrecognized parameter',
-  required: 'required',
-
   // Error messages
+
+  // A
   alreadyExists: prependKeyword('already exists'),
-  emailInUse: 'Email is already in use',
+  // C
   cannotDeleteSelf: 'You cannot delete yourself',
+  // D
   doesNotExist: prependKeyword('does not exist'),
+  // E
+  emailInUse: 'Email is already in use',
+  // F
+  fileNotProvided: 'File was not provided',
+  // I
   invalidToken: 'Invalid token',
-  parametersError: 'Parameters error',
+  // N
   notAuthorized: 'Not authorized',
-  notConfirmed: prependKeyword('is not confirmed'),
   notFound: prependKeyword('not found'),
+  notConfirmed: prependKeyword('is not confirmed'),
+  // P
+  parametersError: 'Parameters error',
+  // R
+  required: 'required',
   routeNotFound: 'Not found',
+  // T
+  tooManyFiles: appendKeyword('Max number of files for upload is'),
+  // U
+  unrecognizedFileField: appendKeyword('Unrecognized field'),
+  unrecognizedParameter: 'unrecognized parameter',
+  unsupportedImageExtension: 'Unsupported image extension',
+  unsupportedDocumentExtension: 'Unsupported document extension',
+  // W
   wrongPassword: 'Wrong password',
 
+
   // Successfull response messages
+  // C
   changedEmail: 'Chaned email',
-  requestChangeEmail: 'An email has been sent to your new email address',
+  // E
+  emailConfirmed: 'Email confirmed',
+  // P
   passwordChanged: 'Your password has been updated',
   passwordRecovery: 'Your password recovery email has been sent',
-  successfullyRemoved: prependKeyword('successfully removed'),
+  // R
+  requestChangeEmail: 'An email has been sent to your new email address',
+  // S
   sentConfirmationEmail: 'Your confirmation email has been sent',
-  emailConfirmed: 'Email confirmed'
+  successfullyRemoved: prependKeyword('successfully removed')
 };

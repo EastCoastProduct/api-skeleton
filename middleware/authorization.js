@@ -9,10 +9,10 @@ const Error404 = errors.Error404;
 const jwt = require('express-jwt');
 const utils = require('../utils');
 
-const getUser = (checking) => {
+function getUser(checking) {
   const attributes = ['admin', 'confirmed', 'superAdmin'];
 
-  return (req, res, next) => {
+  return function(req, res, next) {
     User.findById(req.user.userId, {attributes: attributes}).then(user => {
       if (!user) throw Error404(lang.notFound(lang.models.user));
 
@@ -28,7 +28,7 @@ const getUser = (checking) => {
     })
     .catch(err => next(err));
   };
-};
+}
 
 function doesUserHavePrivilege(type, adminRoute) {
   return (req, res, next) => {

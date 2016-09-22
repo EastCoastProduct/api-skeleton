@@ -8,10 +8,9 @@ var emails = {
   dontReply: 'ECP Boilerplate <dont.reply@eastcoastproduct.com>'
 };
 
-const sendEmail = options =>
-  transport.sendMail(options).then(r => r);
+const sendEmail = options => transport.sendMail(options).then(r => r);
 
-const emailUpdate = options => {
+function emailUpdate(options) {
   let link = `${config.webUrl}/changeEmail/${options.token}`;
   let mailOptions = {
     to: options.user.email,
@@ -23,9 +22,9 @@ const emailUpdate = options => {
   };
 
   return sendEmail(mailOptions);
-};
+}
 
-const emailConfirm = options => {
+function emailConfirm(options) {
   let link = `${config.webUrl}/emailConfirm/${options.token}`;
   let mailOptions = {
     to: options.user.email,
@@ -37,10 +36,10 @@ const emailConfirm = options => {
   };
 
   return sendEmail(mailOptions);
-};
+}
 
-const forgotPassword = options => {
-  let link = `${config.webUrl}/forgotPassword/${options.token}`;
+function forgotPassword(options) {
+  let link = `${config.webUrl}/changePassword/${options.token}`;
   let mailOptions = {
     to: options.user.email,
     from: emails.dontReply,
@@ -51,7 +50,7 @@ const forgotPassword = options => {
   };
 
   return sendEmail(mailOptions);
-};
+}
 
 module.exports = {
   transport: transport,

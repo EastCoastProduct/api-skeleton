@@ -38,7 +38,7 @@ test('POST /changeEmail', t => {
         .send({
           oldEmail: 'not.a.user@ecp.io',
           newEmail: 'totaly.changed@ecp.io',
-          password: 'password123'
+          password: 'Password123'
         })
         .end((err, res) => {
           ft.same(
@@ -57,7 +57,7 @@ test('POST /changeEmail', t => {
         .send({
           oldEmail: 'change.email2@ecp.io',
           newEmail: 'try.changed@ecp.io',
-          password: 'password123'
+          password: 'Password123'
         })
         .end((err, res) => {
           st.same(

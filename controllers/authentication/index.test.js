@@ -36,7 +36,7 @@ test('POST /authenticate', st => {
       helpers.json('post', '/authenticate')
         .send({
           email: 'not.user@ecp.io',
-          password: 'password123'
+          password: 'Password123'
         })
         .end((err, res) => {
           t.same(
@@ -65,7 +65,7 @@ test('POST /authenticate', st => {
       helpers.json('post', '/authenticate')
         .send({
           email: 'john.doe@ecp.io',
-          password: 'password123'
+          password: 'Password123'
         })
         .end((err, res) => {
           t.same(res.status, 200);

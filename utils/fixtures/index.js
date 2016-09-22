@@ -29,7 +29,7 @@ function cleanDatabase() {
   pg.connect(connectionString, (err, connection) => {
     if (err) throw err;
     var options = {
-      type: 'truncate',
+      type: 'delete',
       skipTables: ['SequelizeMeta']
     };
 

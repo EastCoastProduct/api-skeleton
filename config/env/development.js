@@ -7,6 +7,17 @@
 module.exports = {
   env: 'development',
 
+  // s3 configuration
+  aws: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'notToday',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'notToday'
+  },
+
+  s3Url: {
+    bucketName: process.env.BUCKET_NAME || 'ecp-boilerplate',
+    prefix: process.env.IMAGE_PREFIX || 'aPrefix'
+  },
+
   apiUrl: 'http://192.168.50.4:3000',
   webUrl: 'http://192.168.50.4:7000',
   superAdminUrl: 'http://192.168.50.4:7001',
@@ -18,7 +29,10 @@ module.exports = {
   // tokenExpiration : 60 * 60 * 24 * 7 // 7 days in seconds
   tokenExpiration: 60 * 60 * 24 * 7 * 1000,
 
-  fileSize: 1, // in MBs
+  files: {
+    size: 1, // in MBs
+    maxNum: process.env.MAX_NUM_FILES || 5
+  },
 
   statusTimeout: 1500,
 
