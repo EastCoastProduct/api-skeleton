@@ -27,7 +27,8 @@ module.exports = (Model, keyword) => {
   const list = function() {
     let params = {
       offset: config.paginate.offset,
-      limit: config.paginate.limit
+      limit: config.paginate.limit,
+      order: ['id']
     };
 
     _.mapKeys(arguments, val => _.merge(params, val));
@@ -43,13 +44,13 @@ module.exports = (Model, keyword) => {
       });
 
   const removeById = id =>
-    Model.destroy({where: {id: id}}).then(r => {
+    Model.destroy({where: {id: id}, individualHooks: true}).then(r => {
       if (!r) throw Error404(lang.notFound(keyword));
       return r;
     });
 
-  const getById = id =>
-    Model.findById(id).then(r => {
+  const getById = (id, options) =>
+    Model.findById(id, options).then(r => {
       if (!r) throw Error404(lang.notFound(keyword));
       return r;
     });
@@ -62,7 +63,7 @@ module.exports = (Model, keyword) => {
       });
 
   const update = (body, params) =>
-    Model.update(body, {where: params, returning: true})
+    Model.update(body, {where: params, returning: true, individualHooks: true})
       .then(result => {
         if (!result[0]) throw Error404(lang.notFound(keyword));
 

@@ -15,7 +15,7 @@ module.exports = {
 
   s3Url: {
     bucketName: process.env.BUCKET_NAME || 'ecp-boilerplate',
-    prefix: process.env.IMAGE_PREFIX || 'aPrefix'
+    prefix: process.env.IMAGE_PREFIX || 'https://s3.amazonaws.com/'
   },
 
   apiUrl: 'http://192.168.50.4:3000',

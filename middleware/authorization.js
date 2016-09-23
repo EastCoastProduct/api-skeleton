@@ -16,7 +16,7 @@ function getUser(checking) {
     User.findById(req.user.userId, {attributes: attributes}).then(user => {
       if (!user) throw Error404(lang.notFound(lang.models.user));
 
-      if (checking === 'confirmed' && !user.confirmed) {
+      if (checking && !user.confirmed) {
         throw Error403(lang.notConfirmed(lang.models.user));
       }
 

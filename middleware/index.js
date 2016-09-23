@@ -1,12 +1,9 @@
 'use strict';
 
+const _ = require('lodash');
 const lang = require('../config/language');
-
-function catch404(req, res, next) {
-  var err = new Error(lang.routeNotFound);
-  err.status = 404;
-  next(err);
-}
+const deleteHangingFiles = require('./remove').deleteHangingFiles;
+const utils = require('../utils');
 
 // add headers to every response
 function addHeaders(req, res, next) {
@@ -18,7 +15,25 @@ function addHeaders(req, res, next) {
   next();
 }
 
+function catch404(req, res, next) {
+  var err = new Error(lang.routeNotFound);
+  err.status = 404;
+  next(err);
+}
+
+function _responseMiddleware(req, res, next) {
+  delete res.locals._uploaded;
+  delete res.locals._delete;
+
+  if (_.isEmpty(res.locals)) return next();
+  res.json(res.locals).end();
+}
+
+const responseMiddleware = () =>
+  utils.middleware.chain([deleteHangingFiles, _responseMiddleware]);
+
 module.exports = {
+  addHeaders: addHeaders,
   catch404: catch404,
-  addHeaders: addHeaders
+  responseMiddleware: responseMiddleware()
 };

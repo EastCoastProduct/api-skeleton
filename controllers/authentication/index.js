@@ -37,7 +37,9 @@ function authenticate(req, res, next) {
         {expiresIn: config.tokenExpiration}
       );
 
-      res.status(200).json({token: token, user: user});
+      res.status(200);
+      res.locals = {token: token, user: user};
+      next();
     })
     .catch(err => next(err));
 }

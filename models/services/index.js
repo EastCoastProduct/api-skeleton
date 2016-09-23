@@ -8,5 +8,7 @@ module.exports = {
   emailUpdate: require('./emailUpdate'),
   emailConfirmation: require('./emailConfirmation'),
   forgotPassword: require('./forgotPassword'),
+  resource: require('./resource'),
+  s3: require('./s3'),
   user: generic(models.user, langModel.user)
 };

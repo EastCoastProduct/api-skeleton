@@ -2,8 +2,11 @@
 
 const bcrypt = require('bcrypt');
 const config = require('../config');
+const hookServices = require('./services/_hooks');
 
 module.exports = function(sequelize, DataTypes) {
+  let resourceId;
+
   const user = sequelize.define('user', {
     admin: {
       type: DataTypes.BOOLEAN,
@@ -61,6 +64,24 @@ module.exports = function(sequelize, DataTypes) {
         user.hasOne(models.forgotPassword);
         user.hasOne(models.emailUpdate);
         user.hasOne(models.emailConfirmation);
+        user.belongsTo(models.resource);
+      }
+    },
+    hooks: {
+      beforeUpdate: function(model, options, cb) {
+        resourceId = model._previousDataValues.resourceId;
+        cb();
+      },
+      afterUpdate: function(model, options, cb) {
+        let resource = hookServices(this, 'resource');
+        if (resourceId) resource.remove({id: resourceId});
+        cb();
+      },
+      afterDestroy: function(model, options, cb) {
+        if (!model.resourceId) return cb();
+        let resource = hookServices(this, 'resource');
+        resource.remove({id: model.resourceId});
+        cb();
       }
     }
   });

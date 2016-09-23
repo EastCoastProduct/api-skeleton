@@ -14,6 +14,7 @@ module.exports = {
     emailUpdate: 'Change email',
     emailConfirmation: 'Confirmation email',
     forgotPassword: 'Recovery token',
+    resource: 'Resource',
     user: 'User'
   },
 

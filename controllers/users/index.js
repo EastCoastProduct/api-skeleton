@@ -1,14 +1,17 @@
 'use strict';
 
+const _ = require('lodash');
 const services = require('../../models/services');
+const Resource = require('../../models').resource;
 const lang = require('../../config/language');
 const Error403 = require('../../utils/errors').Error403;
 const validator = require('../../middleware/validator');
+const prependS3 = require('../../utils/s3').prependS3;
 
 const validate = {
   create: validator.validation('body', {
     rules: {
-      bio: {type: 'norule', length: 1000},
+      bio: {type: 'norule', length: {max: 1000}},
       email: {type: 'email'},
       firstname: {type: 'norule', length: {max: 30}},
       lastname: {type: 'norule', length: {max: 30}},
@@ -18,7 +21,7 @@ const validate = {
   }),
   update: validator.validation('body', {
     rules: {
-      bio: {type: 'norule', length: 1000},
+      bio: {type: 'norule', length: {max: 1000}},
       firstname: {type: 'norule', length: {max: 30}},
       lastname: {type: 'norule', length: {max: 30}}
     }
@@ -39,10 +42,13 @@ function create(req, res, next) {
 }
 
 function list(req, res, next) {
-  services.user.list()
+  services.user.list({include: [{model: Resource, required: false}]})
     .then(users => {
       res.status(200);
-      res.locals = users;
+      res.locals = {
+        count: users.count,
+        rows: _.forEach(users.rows, user => prependS3(user, 'image'))
+      };
       next();
     })
     .catch(err => next(err));
@@ -63,13 +69,16 @@ function remove(req, res, next) {
 }
 
 function show(req, res, next) {
-  services.user.getById(req.params.userId)
-    .then(user => {
-      res.status(200);
-      res.locals = user;
-      next();
-    })
-    .catch(err => next(err));
+  services.user.getById(
+    req.params.userId,
+    {include: [{model: Resource, required: false}]}
+  )
+  .then(user => {
+    res.locals = prependS3(user, 'image');
+    res.status(200);
+    next();
+  })
+  .catch(err => next(err));
 }
 
 function update(req, res, next) {
@@ -77,14 +86,20 @@ function update(req, res, next) {
   const isOwner = user.userId === parseInt(req.params.userId);
 
   if (!isOwner && !user.hasPrivilege) return next(Error403(lang.notAuthorized));
+  if (res.locals._uploaded) req.body.resourceId = res.locals._uploaded.file.id;
 
-  services.user.update(req.body, {id: req.params.userId})
-    .then(response => {
-      res.status(200);
-      res.locals = response;
-      next();
+  services.user.getById(req.params.userId)
+  .then(() =>
+    services.user.update(req.body, {id: req.params.userId}).then(resp => {
+      return resp.getResource().then(resource => {
+        resp.resource = resource;
+        res.status(200);
+        res.locals = prependS3(resp, 'image');
+        next();
+      });
     })
-    .catch(err => next(err));
+  )
+  .catch(err => next(err));
 }
 
 module.exports = {

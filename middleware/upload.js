@@ -1,17 +1,16 @@
 'use strict';
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
-const Promise = require('bluebird');
 const config = require('../config');
 const Error400 = require('../utils/errors').Error400;
 const lang = require('../config/language');
 const multer = require('multer');
+const Promise = require('bluebird');
 const path = require('path');
+const services = require('../models/services');
 const utils = require('../utils');
 const uuid = require('node-uuid');
 
-AWS.config.update(config.aws);
 const storage = multer.memoryStorage();
 const limits = {
   fieldSize: config.files.size * 1024 * 1024,
@@ -21,7 +20,8 @@ const limits = {
 // construct the file name for upload
 function constructFileName(options, filename) {
   let prefix = '';
-  let extension = filename.toLowerCase().split('.')[1];
+  let extension = filename.toLowerCase().split('.');
+  extension = extension[extension.length - 1];
 
   switch (options) {
   case 'image':
@@ -74,29 +74,16 @@ function multerErrorHandler(err, next) {
 }
 
 /*
-  Generic S3 upload
+  Upload to s3
 */
 
-function __upload(s3, file) {
-  const params = {
-    Bucket: config.s3Url.bucketName,
-    Key: file._filename,
-    ContentType: file.contentType,
-    Body: file.buffer
-  };
-
-  return s3.putObject(params).promise();
-}
-
 const uploadToS3 = options => (req, res, next) => {
-  const s3 = new AWS.S3();
   const file = req.file;
 
   if (!file) return next();
-  req.body.file = constructFileName(options, file.originalname);
-  file._filename = req.body.file;
+  file._filename = constructFileName(options, file.originalname);
 
-  __upload(s3, req.file).then(() => next()).catch(err => next(err));
+  services.s3.upload(req.file).then(() => next()).catch(err => next(err));
 };
 
 /*
@@ -115,14 +102,11 @@ const _uploadMultipleFiles = options => (req, res, next) =>
   )(req, res, err => multerErrorHandler(err, next));
 
 const _uploadMultipleToS3 = options => (req, res, next) => {
-  const s3 = new AWS.S3();
   let promises = [];
-  req.body.files = [];
 
   _.mapValues(req.files, file => {
     file._filename = constructFileName(options.field, file.originalname);
-    req.body.files.push(file._filename);
-    promises.push(__upload(s3, file));
+    promises.push(services.s3.upload(file));
   });
   Promise.all(promises).then(() => next()).catch(err => next(err));
 };

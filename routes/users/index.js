@@ -2,6 +2,8 @@
 
 const authorization = require('../../middleware/authorization');
 const config = require('../../config');
+const resources = require('../../controllers').resources;
+const upload = require('../../middleware/upload');
 const users = require('../../controllers').users;
 const jwt = require('express-jwt');
 
@@ -17,6 +19,8 @@ module.exports = function(router) {
     .get(users.show)
     .post(
       authorization.isAdmin(),
+      upload.uploadImage('image'),
+      resources.mapSingle(),
       users.validate.update,
       users.update
     )
@@ -36,7 +40,7 @@ module.exports = function(router) {
 
   router.route('/changePassword')
     .post(
-      authorization.isUser,
+      authorization.isConfirmed,
       users.passwords.validate.change,
       users.passwords.change
     );
