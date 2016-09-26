@@ -44,7 +44,7 @@ test('POST /resendConfirmation', t => {
             {status: res.status, message: res.body.message},
             {status: 201, message: lang.sentConfirmationEmail}
           );
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
     });

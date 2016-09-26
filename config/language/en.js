@@ -30,6 +30,7 @@ module.exports = {
   emailInUse: 'Email is already in use',
   // F
   fileNotProvided: 'File was not provided',
+  filesNotProvided: 'Files not provided',
   // I
   invalidToken: 'Invalid token',
   // N

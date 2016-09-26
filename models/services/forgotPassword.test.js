@@ -47,7 +47,7 @@ test('Forgot password service', t => {
       let emailStub = helpers.stubMailer({status: 200});
       services.forgotPassword.create({id: 5}).then(fps => {
         st.same(fps, {status: 200});
-        helpers.resetMailer(emailStub);
+        helpers.resetStub(emailStub);
         st.end();
       });
     });

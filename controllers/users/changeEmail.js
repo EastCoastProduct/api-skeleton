@@ -9,7 +9,7 @@ const validate = {
     rules: {
       oldEmail: 'email',
       newEmail: 'email',
-      password: 'norule'
+      password: 'password'
     },
     required: ['oldEmail', 'newEmail', 'password']
   })

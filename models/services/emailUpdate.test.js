@@ -57,7 +57,7 @@ test('Email update service', t => {
           userId: user.id
         }).then(resp => {
           st.same(resp, {status: 200});
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
       });
@@ -68,8 +68,8 @@ test('Email update service', t => {
         services.emailUpdate.getByTokenAndEdit(eus.token).then(resp => {
           eus.getUser().then(user => {
             st.same(
-              {email: user.email, confirmed: user.confirmed},
-              {email: 'cool.mail@ecp.io', confirmed: false}
+              {email: user.email},
+              {email: 'cool.mail@ecp.io'}
             );
             st.end();
           });

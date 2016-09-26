@@ -14,7 +14,7 @@ const validate = {
   authenticate: validator.validation('body', {
     rules: {
       email: 'email',
-      password: 'norule'
+      password: 'password'
     },
     required: ['email', 'password']
   })

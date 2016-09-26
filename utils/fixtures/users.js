@@ -12,7 +12,8 @@ const users = [
     password: 'Password123',
     confirmed: true,
     admin: true,
-    superAdmin: true
+    superAdmin: true,
+    resourceId: 1
   },
   // user not confirmed
   {

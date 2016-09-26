@@ -9,6 +9,9 @@ const Error404 = errors.Error404;
 
 module.exports = (Model, keyword) => {
 
+  const bulkCreate = params => Model.bulkCreate(params, {returning: true})
+    .then(r => r);
+
   const create = params => Model.create(params).then(r => r);
 
   const _exists = (params, shouldNotExist) =>
@@ -71,6 +74,7 @@ module.exports = (Model, keyword) => {
       });
 
   return {
+    bulkCreate: bulkCreate,
     create: create,
     doesNotExist: doesNotExist,
     exists: exists,

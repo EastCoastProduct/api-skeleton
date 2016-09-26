@@ -64,7 +64,7 @@ test('POST /changeEmail', t => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.requestChangeEmail}
           );
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
     });
@@ -94,7 +94,7 @@ test('POST /changeEmail/:token', t => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.changedEmail}
           );
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
       });

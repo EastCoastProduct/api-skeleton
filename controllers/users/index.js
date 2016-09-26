@@ -23,7 +23,8 @@ const validate = {
     rules: {
       bio: {type: 'norule', length: {max: 1000}},
       firstname: {type: 'norule', length: {max: 30}},
-      lastname: {type: 'norule', length: {max: 30}}
+      lastname: {type: 'norule', length: {max: 30}},
+      resourceId: {type: 'positive'}
     }
   })
 };
@@ -86,7 +87,6 @@ function update(req, res, next) {
   const isOwner = user.userId === parseInt(req.params.userId);
 
   if (!isOwner && !user.hasPrivilege) return next(Error403(lang.notAuthorized));
-  if (res.locals._uploaded) req.body.resourceId = res.locals._uploaded.file.id;
 
   services.user.getById(req.params.userId)
   .then(() =>

@@ -5,6 +5,35 @@ const services = require('../../models/services');
 const lang = require('../../config/language');
 const Error400 = require('../../utils/errors').Error400;
 
+// map files for db
+function _mapFiles(files) {
+
+
+  const _mapFile = file => {
+    return {
+      extension: file._filename.split('.')[1],
+      mimetype: file.mimetype,
+      name: file.originalname,
+      path: file._filename
+    };
+  };
+
+  if (!_.isArray(files)) return _mapFile(files);
+
+  let mappedFiles = [];
+  _.forEach(files, file => mappedFiles.push(_mapFile(file)));
+  return mappedFiles;
+}
+
+function _mapResponse(files) {
+  let filesObj = {_uploaded: {files: []}};
+
+  _.forEach(files, file =>
+    filesObj._uploaded.files.push({id: file.id, _filename: file.path})
+  );
+  return filesObj;
+}
+
 const mapSingle = isRequired => (req, res, next) => {
   const file = req.file;
 
@@ -13,27 +42,33 @@ const mapSingle = isRequired => (req, res, next) => {
     return next(error);
   }
 
-  services.resource.createOne({
-    extension: file._filename.split('.')[1],
-    mimetype: file.mimetype,
-    name: file.originalname,
-    path: file._filename
-  })
+  services.resource.create(_mapFiles(file))
   .then(resource => {
     let obj = { _uploaded: {file: {id: resource.id, _filename: resource.path}}};
+    req.body.resourceId = resource.id;
     _.merge(res.locals, obj);
     next();
   })
   .catch(err => next(err));
 };
 
-// TODO figure out how to do this properly
-// const mapMultiple = isRequired => (req, res, next) => {
-//   res.locals = 'not ready yet';
-//   next();
-// };
+const mapMultiple = isRequired => (req, res, next) => {
+  const files = req.files;
+
+  if (_.isEmpty(files)) {
+    let error = isRequired ? Error400(lang.filesNotProvided) : null;
+    return next(error);
+  }
+
+  services.resource.bulkCreate(_mapFiles(files)).then(resource => {
+    _.merge(res.locals, _mapResponse(resource));
+    next();
+  })
+  .catch(err => next(err));
+
+};
 
 module.exports = {
-  mapSingle: (isRequired = false) => mapSingle(isRequired)
-  // mapMultiple: (isRequired = false) => mapMultiple(isRequired)
+  mapSingle: (isRequired = false) => mapSingle(isRequired),
+  mapMultiple: (isRequired = false) => mapMultiple(isRequired)
 };

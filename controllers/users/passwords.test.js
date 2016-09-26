@@ -45,7 +45,7 @@ test('POST /resetPassword', t => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.passwordRecovery}
           );
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
     });

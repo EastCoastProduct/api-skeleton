@@ -7,27 +7,6 @@ const lang = require('../../config/language');
 test('Generic model tests', t => {
 
   t.test('Failed', f => {
-    f.test('Generic model create', ft => {
-      services.user.create({
-        email: 'created.guy@ecp.io',
-        firstname: 'Harry',
-        lastname: 'Richardson',
-        password: 'password123'
-      })
-      .then(resp => {
-        ft.same({
-          email: resp.email,
-          firstname: resp.firstname,
-          lastname: resp.lastname
-        }, {
-          email: 'created.guy@ecp.io',
-          firstname: 'Harry',
-          lastname: 'Richardson'
-        });
-        ft.end();
-      });
-    });
-
     f.test('Generic check if model exists fail', ft => {
       services.user.exists({where: {email: 'some@guy.io'}}).catch(err => {
         ft.same(
@@ -75,6 +54,42 @@ test('Generic model tests', t => {
   });
 
   t.test('Success', s => {
+    s.test('Generic bulk create', st => {
+      let users = [
+        {email: 'bulkcreate1@ecp.io', password: 'Password123'},
+        {email: 'bulkcreate2@ecp.io', password: 'Password123'},
+        {email: 'bulkcreate3@ecp.io', password: 'Password123'}
+      ];
+      services.user.bulkCreate(users).then(resp => {
+        st.same(
+          [resp[0].email, resp[1].email, resp[2].email],
+          [users[0].email, users[1].email, users[2].email]
+        );
+        st.end();
+      });
+    });
+
+    s.test('Generic model create', st => {
+      services.user.create({
+        email: 'created.guy@ecp.io',
+        firstname: 'Harry',
+        lastname: 'Richardson',
+        password: 'Password123'
+      })
+      .then(resp => {
+        st.same({
+          email: resp.email,
+          firstname: resp.firstname,
+          lastname: resp.lastname
+        }, {
+          email: 'created.guy@ecp.io',
+          firstname: 'Harry',
+          lastname: 'Richardson'
+        });
+        st.end();
+      });
+    });
+
     s.test('Generic check if model exists success', st => {
       services.user.exists({where: {email: 'john.doe@ecp.io'}}).then(resp => {
         st.same(resp, 1);

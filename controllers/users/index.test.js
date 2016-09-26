@@ -2,10 +2,15 @@
 
 const test = require('tape');
 const helpers = require('../../utils/test/helper');
+const Resource = require('../../models').resource;
 const lang = require('../../config/language');
 const superAdminAuth = helpers.getAuthorizationHeader(1);
 const adminAuth = helpers.getAuthorizationHeader(3);
 const normalAuth = helpers.getAuthorizationHeader(4);
+const files = helpers.filePaths({
+  image: 'ecp.jpg',
+  imageUppercase: 'ecp.JPG'
+});
 
 test('POST /users', t => {
 
@@ -76,7 +81,7 @@ test('POST /users', t => {
             firstname: newUser.firstname,
             lastname: newUser.lastname
           });
-          helpers.resetMailer(emailStub);
+          helpers.resetStub(emailStub);
           st.end();
         });
     });
@@ -188,9 +193,24 @@ test('POST /users/:userId', t => {
           ft.end();
         });
     });
+
+    f.test('Wrong image name', ft => {
+      helpers.json('post', '/users/1')
+        .set('Authorization', superAdminAuth)
+        .attach('wrongImage', files.image)
+        .end((err, res) => {
+          ft.same(
+            {status: res.status, message: res.body.message},
+            {status: 400, message: lang.unrecognizedFileField('wrongImage')}
+          );
+          ft.end();
+        });
+    });
   });
 
   t.test('Success', s => {
+    let stubS3 = helpers.stubS3({image: 'someImage'});
+
     s.test('User successfully updated', st => {
       helpers.json('post', '/users/1')
         .set('Authorization', superAdminAuth)
@@ -227,6 +247,21 @@ test('POST /users/:userId', t => {
             {status: 200, firstname: 'Changed by superadmin'}
           );
           st.end();
+        });
+    });
+
+    s.test('User updated with image and remove previous', st => {
+      helpers.json('post', '/users/1')
+        .set('Authorization', superAdminAuth)
+        .attach('image', files.image)
+        .end((err, res) => {
+          st.same({status: res.status}, {status: 200});
+          st.error(!res.body.image, 'Image not mapped properly');
+          Resource.findById(1).then(resource => {
+            helpers.resetStub(stubS3);
+            st.error(resource, 'Resource should not exist');
+            st.end();
+          });
         });
     });
   });
@@ -273,6 +308,7 @@ test('DELETE /users/:userId', t => {
   });
 
   t.test('Success', s => {
+    let s3Stub = helpers.stubS3();
     s.test('User successfully deleted', st => {
       helpers.json('delete', '/users/4')
         .set('Authorization', superAdminAuth)
@@ -281,6 +317,7 @@ test('DELETE /users/:userId', t => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.successfullyRemoved(lang.models.user)}
           );
+          helpers.resetStub(s3Stub);
           st.end();
         });
     });
