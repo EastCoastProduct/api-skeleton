@@ -2,69 +2,69 @@
 
 const ForgotPassword = require('../').forgotPassword;
 const services = require('.');
-const test = require('tape');
+const tests = require('tape');
 const lang = require('../../config/language');
 const helpers = require('../../utils/test/helper');
 
-test('Forgot password service', t => {
+tests('Forgot password service', forgotPassword => {
 
-  t.test('Failed', f => {
-    f.test('Forgot password get user by token failure', ft => {
+  forgotPassword.test('Failed', failed => {
+    failed.test('Forgot password get user by token failure', test => {
       services.forgotPassword.getByToken().catch(err => {
-        ft.same(err, {
+        test.same(err, {
           status: 404,
           message: lang.notFound(lang.models.forgotPassword)
         });
-        ft.end();
+        test.end();
       });
     });
 
-    f.test('Forgot password get user and remove his tokens failure', ft => {
+    failed.test('Forgot password get user and remove his tokens failure', test => {
       services.forgotPassword.getUserAndRemoveTokens('not@real.io')
       .catch(err => {
-        ft.same(err, {
+        test.same(err, {
           status: 404,
           message: lang.notFound(lang.models.user)
         });
-        ft.end();
+        test.end();
       });
     });
   });
 
-  t.test('Success', s => {
+  forgotPassword.test('Success', success => {
 
-    s.test('Forgot password get user by token success', st => {
+    success.test('Forgot password get user by token success', test => {
       ForgotPassword.findOne({where: {userId: 1}}).then(helper =>
         services.forgotPassword.getByToken(helper.token).then(fps => {
-          st.same({email: fps.email}, {email: 'john.doe@ecp.io'});
-          st.end();
+          test.same({email: fps.email}, {email: 'john.doe@ecp.io'});
+          test.end();
         })
       );
     });
 
 
-    s.test('Forgot password create', st => {
+    success.test('Forgot password create', test => {
       let emailStub = helpers.stubMailer({status: 200});
       services.forgotPassword.create({id: 5}).then(fps => {
-        st.same(fps, {status: 200});
+        test.same(fps, {status: 200});
         helpers.resetStub(emailStub);
-        st.end();
+        test.end();
       });
     });
 
-    s.test('Forgot password get user and remove his tokens success', st => {
+    success.test('Forgot password get user and remove his tokens success', test => {
       services.forgotPassword.getUserAndRemoveTokens('user3@ecp.io')
       .then(user => {
-        st.same({firstname: user.firstname}, {firstname: 'McFirstname2'});
-        st.end();
+        test.same({firstname: user.firstname}, {firstname: 'McFirstname2'});
+        test.end();
       });
     });
 
-    s.test('Forgot password remove by token', st => {
+    success.test('Forgot password remove by token', test => {
       ForgotPassword.findOne({where: {userId: 5}}).then(helper =>
         services.forgotPassword.removeByToken(helper.token).then(fps => {
-          st.same(fps, 1);
-          st.end();
+          test.same(fps, 1);
+          test.end();
         })
       );
     });

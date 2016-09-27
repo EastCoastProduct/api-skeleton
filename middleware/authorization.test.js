@@ -2,14 +2,14 @@
 
 const authorization = require('./authorization');
 const mock = require('node-mocks-http');
-const test = require('tape');
+const tests = require('tape');
 const lang = require('../config/language');
 const helpers = require('../utils/test/helper');
 
-test('Authorization', t => {
+tests('Authorization', authorizationTest => {
 
-  t.test('Failed', f => {
-    f.test('It should return 403 User not confirmed', ft => {
+  authorizationTest.test('Failed', failed => {
+    failed.test('It should return 403 User not confirmed', test => {
       let req = mock.createRequest({
         method: 'POST',
         url: '/users/1',
@@ -19,15 +19,15 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isConfirmed(req, res, err => {
-        ft.same(
+        test.same(
           err,
           {status: 403, message: lang.notConfirmed(lang.models.user)}
         );
-        ft.end();
+        test.end();
       });
     });
 
-    f.test('It should fail because the user does not exist', ft => {
+    failed.test('It should fail because the user does not exist', test => {
       let req = mock.createRequest({
         method: 'GET',
         url: '/users'
@@ -36,12 +36,12 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isConfirmed(req, res, err => {
-        ft.same(err, {status: 404, message: lang.notFound(lang.models.user)});
-        ft.end();
+        test.same(err, {status: 404, message: lang.notFound(lang.models.user)});
+        test.end();
       });
     });
 
-    f.test('It should fail but not break because user is not admin', ft => {
+    failed.test('It should fail but not break because user is not admin', test => {
       let req = mock.createRequest({
         method: 'GET',
         url: '/users'
@@ -50,12 +50,12 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isAdmin()(req, res, err => {
-        ft.error(err, 'There should be no error');
-        ft.end();
+        test.error(err, 'There should be no error');
+        test.end();
       });
     });
 
-    f.test('It should fail because user is not admin', ft => {
+    failed.test('It should fail because user is not admin', test => {
       let req = mock.createRequest({
         method: 'GET',
         url: '/users'
@@ -64,14 +64,14 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isAdmin(true)(req, res, err => {
-        ft.same(err, {status: 403, message: lang.notAuthorized});
-        ft.end();
+        test.same(err, {status: 403, message: lang.notAuthorized});
+        test.end();
       });
     });
   });
 
-  t.test('Success', s => {
-    s.test('It should succeed because user is confirmed', st => {
+  authorizationTest.test('Success', success => {
+    success.test('It should succeed because user is confirmed', test => {
       let req = mock.createRequest({
         method: 'POST',
         url: '/users/1',
@@ -81,12 +81,12 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isConfirmed(req, res, err => {
-        st.error(err, 'There should be no error because user is confirmed');
-        st.end();
+        test.error(err, 'There should be no error because user is confirmed');
+        test.end();
       });
     });
 
-    s.test('It should succeed because user is admin', st => {
+    success.test('It should succeed because user is admin', test => {
       let req = mock.createRequest({
         method: 'GET',
         url: '/users'
@@ -95,12 +95,12 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isAdmin()(req, res, err => {
-        st.error(err, 'There should be no error because user is admin');
-        st.end();
+        test.error(err, 'There should be no error because user is admin');
+        test.end();
       });
     });
 
-    s.test('It should succeed because user is superadmin', st => {
+    success.test('It should succeed because user is superadmin', test => {
       let req = mock.createRequest({
         method: 'GET',
         url: '/users'
@@ -109,8 +109,8 @@ test('Authorization', t => {
       let res = mock.createResponse();
 
       authorization.isSuperAdmin()(req, res, err => {
-        st.error(err, 'There should be no error because user is superadmin');
-        st.end();
+        test.error(err, 'There should be no error because user is superadmin');
+        test.end();
       });
     });
   });

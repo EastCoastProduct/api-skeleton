@@ -1,14 +1,14 @@
 'use strict';
 
-const test = require('tape');
+const tests = require('tape');
 const helpers = require('../../utils/test/helper');
 const EmailConfirmation = require('../../models').emailConfirmation;
 const lang = require('../../config/language');
 
-test('POST /changeEmail', t => {
+tests('POST /changeEmail', changeEmail => {
 
-  t.test('Failed', f => {
-    f.test('Invalid params', ft => {
+  changeEmail.test('Failed', failed => {
+    failed.test('Invalid params', test => {
       helpers.json('post', '/changeEmail')
         .send({wrong: 'asd'})
         .end((err, res) => {
@@ -19,7 +19,7 @@ test('POST /changeEmail', t => {
             { message: lang.required, path: 'password' }
           ];
 
-          ft.same({
+          test.same({
             debugInfo: res.body.debugInfo,
             status: res.status,
             message: res.body.message
@@ -28,11 +28,11 @@ test('POST /changeEmail', t => {
             status: 400,
             message: lang.parametersError
           });
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User not found', ft => {
+    failed.test('User not found', test => {
       helpers.json('post', '/changeEmail')
         .send({
           oldEmail: 'not.a.user@ecp.io',
@@ -40,15 +40,15 @@ test('POST /changeEmail', t => {
           password: 'Password123'
         })
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 404, message: lang.notFound(lang.models.user)}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User sent wrong password', ft => {
+    failed.test('User sent wrong password', test => {
       helpers.json('post', '/changeEmail')
         .send({
           oldEmail: 'user3@ecp.io',
@@ -56,15 +56,15 @@ test('POST /changeEmail', t => {
           password: 'WrongPassword123'
         })
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.wrongPassword}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User sent an email that is in use', ft => {
+    failed.test('User sent an email that is in use', test => {
       helpers.json('post', '/changeEmail')
         .send({
           oldEmail: 'user3@ecp.io',
@@ -72,18 +72,18 @@ test('POST /changeEmail', t => {
           password: 'Password123'
         })
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.emailInUse}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
+  changeEmail.test('Success', success => {
     let emailStub = helpers.stubMailer({status: 200});
-    s.test('User request for email change success', st => {
+    success.test('User request for email change success', test => {
       helpers.json('post', '/changeEmail')
         .send({
           oldEmail: 'change.email4@ecp.io',
@@ -91,27 +91,27 @@ test('POST /changeEmail', t => {
           password: 'Password123'
         })
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.requestChangeEmail}
           );
-          st.error(!emailStub.calledOnce, 'Mailer should have been called');
+          test.error(!emailStub.calledOnce, 'Mailer should have been called');
           helpers.resetStub(emailStub);
-          st.end();
+          test.end();
         });
     });
 
-    s.test('User successfully changed email', st => {
+    success.test('User successfully changed email', test => {
       EmailConfirmation.findOne({where: {email: 'cool.mail@ecp.io'}})
         .then(ecs => {
           helpers.json('post', '/emailConfirm')
             .send({token: ecs.token})
             .end((err, res) => {
-              st.same(
+              test.same(
                 {status: res.status, message: res.body.message},
                 {status: 200, message: lang.emailConfirmed}
               );
-              st.end();
+              test.end();
             });
         });
     });

@@ -1,98 +1,98 @@
 'use strict';
 
-const test = require('tape');
+const tests = require('tape');
 const uuid = require('node-uuid');
 const helpers = require('../../utils/test/helper');
 const EmailConfirmation = require('../../models').emailConfirmation;
 const lang = require('../../config/language');
 
-test('POST /resendConfirmation', t => {
-  t.test('Failed', f => {
-    f.test('Invalid params', ft => {
+tests('POST /resendConfirmation', resendConfirmation => {
+  resendConfirmation.test('Failed', failed => {
+    failed.test('Invalid params', test => {
       helpers.json('post', '/resendConfirmation')
         .send({wrong: 'invalid'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.parametersError}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Token not found', ft => {
+    failed.test('Token not found', test => {
       helpers.json('post', '/resendConfirmation')
         .send({email: 'jack@ecp.io'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 404, message: lang.notFound(lang.models.user)}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
-    s.test('Successfully resent email', st => {
+  resendConfirmation.test('Success', success => {
+    success.test('Successfully resent email', test => {
       let emailStub = helpers.stubMailer();
 
       helpers.json('post', '/resendConfirmation')
         .send({email: 'confirmed.one@ecp.io'})
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 201, message: lang.sentConfirmationEmail}
           );
           helpers.resetStub(emailStub);
-          st.end();
+          test.end();
         });
     });
   });
 });
 
 
-test('POST /emailConfirm', t => {
+tests('POST /emailConfirm', emailConfirmation => {
 
-  t.test('Failed', f => {
-    f.test('Invalid params', ft => {
+  emailConfirmation.test('Failed', failed => {
+    failed.test('Invalid params', test => {
       helpers.json('post', '/emailConfirm')
         .send({wrong: 'invalid'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.parametersError}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Token not found', ft => {
+    failed.test('Token not found', test => {
       helpers.json('post', '/emailConfirm')
         .send({token: uuid.v1()})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 404, message: lang.notFound(lang.models.emailConfirmation)}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
-    s.test('Successfully confirmed user', st => {
+  emailConfirmation.test('Success', success => {
+    success.test('Successfully confirmed user', test => {
       EmailConfirmation.findOne({where: {userId: 9}}).then(ec => {
         helpers.json('post', '/emailConfirm')
           .send({token: ec.token})
           .end((err, res) => {
-            st.same(
+            test.same(
               {status: res.status, message: res.body.message},
               {status: 200, message: lang.emailConfirmed}
             );
             ec.getUser().then(user => {
-              st.error(!user.confirmed, 'User not confirmed');
-              st.end();
+              test.error(!user.confirmed, 'User not confirmed');
+              test.end();
             });
           });
       });

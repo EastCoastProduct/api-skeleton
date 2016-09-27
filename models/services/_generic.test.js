@@ -1,75 +1,75 @@
 'use strict';
 
 const services = require('.');
-const test = require('tape');
+const tests = require('tape');
 const lang = require('../../config/language');
 
-test('Generic model tests', t => {
+tests('Generic model tests', generic => {
 
-  t.test('Failed', f => {
-    f.test('Generic check if model exists fail', ft => {
+  generic.test('Failed', failed => {
+    failed.test('Generic check if model exists fail', test => {
       services.user.exists({where: {email: 'some@guy.io'}}).catch(err => {
-        ft.same(
+        test.same(
           {status: err.status, message: err.message},
           {status: 400, message: lang.doesNotExist(lang.models.user)}
         );
-        ft.end();
+        test.end();
       });
     });
 
-    f.test('Generic check if model does not exist fail', ft => {
+    failed.test('Generic check if model does not exist fail', test => {
       services.user.doesNotExist({where: {email: 'john.doe@ecp.io'}})
       .catch(err => {
-        ft.same(
+        test.same(
           err,
           {status: 400, message: lang.alreadyExists(lang.models.user)}
         );
-        ft.end();
+        test.end();
       });
     });
 
-    f.test('Generic remove failure', ft => {
+    failed.test('Generic remove failure', test => {
       services.user.remove({email: 'asd.one@ecp.io'}).catch(err => {
-        ft.same(err, {status: 404, message: lang.notFound(lang.models.user)});
-        ft.end();
+        test.same(err, {status: 404, message: lang.notFound(lang.models.user)});
+        test.end();
       });
     });
 
-    f.test('Generic remove by id failure', ft => {
+    failed.test('Generic remove by id failure', test => {
       services.user.removeById(1950).catch(err => {
-        ft.same(err, {status: 404, message: lang.notFound(lang.models.user)});
-        ft.end();
+        test.same(err, {status: 404, message: lang.notFound(lang.models.user)});
+        test.end();
       });
     });
 
-    f.test('Generic update failure', ft => {
+    failed.test('Generic update failure', test => {
       services.user.update(
         {firstname: 'New firstname', lastname: 'New lastname'},
         {email: 'not.user@ecp.io'}
       ).catch(err => {
-        ft.same(err, {status: 404, message: lang.notFound(lang.models.user)});
-        ft.end();
+        test.same(err, {status: 404, message: lang.notFound(lang.models.user)});
+        test.end();
       });
     });
   });
 
-  t.test('Success', s => {
-    s.test('Generic bulk create', st => {
+  generic.test('Success', success => {
+    success.test('Generic bulk create', test => {
       let users = [
         {email: 'bulkcreate1@ecp.io', password: 'Password123'},
         {email: 'bulkcreate2@ecp.io', password: 'Password123'},
         {email: 'bulkcreate3@ecp.io', password: 'Password123'}
       ];
       services.user.bulkCreate(users).then(resp => {
-        st.same(
+        test.same(
           [resp[0].email, resp[1].email, resp[2].email],
           [users[0].email, users[1].email, users[2].email]
         );
-        st.end();
+        test.end();
       });
     });
 
-    s.test('Generic model create', st => {
+    success.test('Generic model create', test => {
       services.user.create({
         email: 'created.guy@ecp.io',
         firstname: 'Harry',
@@ -77,7 +77,7 @@ test('Generic model tests', t => {
         password: 'Password123'
       })
       .then(resp => {
-        st.same({
+        test.same({
           email: resp.email,
           firstname: resp.firstname,
           lastname: resp.lastname
@@ -86,62 +86,62 @@ test('Generic model tests', t => {
           firstname: 'Harry',
           lastname: 'Richardson'
         });
-        st.end();
+        test.end();
       });
     });
 
-    s.test('Generic check if model exists success', st => {
+    success.test('Generic check if model exists success', test => {
       services.user.exists({where: {email: 'john.doe@ecp.io'}}).then(resp => {
-        st.same(resp, 1);
-        st.end();
+        test.same(resp, 1);
+        test.end();
       });
     });
 
-    s.test('Generic check if model does not exist success', st => {
+    success.test('Generic check if model does not exist success', test => {
       services.user.doesNotExist({where: {email: 'some@guy.io'}}).then(resp => {
-        st.same(resp, 0);
-        st.end();
+        test.same(resp, 0);
+        test.end();
       });
     });
 
-    s.test('Generic list', st => {
+    success.test('Generic list', test => {
       services.user.list({limit: 1}).then(users => {
-        st.error(!users.rows, 'No users');
-        st.end();
+        test.error(!users.rows, 'No users');
+        test.end();
       });
     });
 
-    s.test('Generic remove success', st => {
+    success.test('Generic remove success', test => {
       services.user.remove({email: 'delete.one@ecp.io'}).then(resp => {
-        st.same(resp, 1);
-        st.end();
+        test.same(resp, 1);
+        test.end();
       });
     });
 
-    s.test('Generic remove by id success', st => {
+    success.test('Generic remove by id success', test => {
       services.user.removeById(7).then(resp => {
-        st.same(resp, 1);
-        st.end();
+        test.same(resp, 1);
+        test.end();
       });
     });
 
-    s.test('Generic get one success', st => {
+    success.test('Generic get one success', test => {
       services.user.getOne({email: 'john.doe@ecp.io'}).then(user => {
-        st.same({email: user.email}, {email: 'john.doe@ecp.io'});
-        st.end();
+        test.same({email: user.email}, {email: 'john.doe@ecp.io'});
+        test.end();
       });
     });
 
-    s.test('Generic update success', st => {
+    success.test('Generic update success', test => {
       services.user.update(
         {firstname: 'New firstname', lastname: 'New lastname'},
         {email: 'update.one@ecp.io'}
       ).then(user => {
-        st.same(
+        test.same(
           {firstname: user.firstname, lastname: user.lastname},
           {firstname: 'New firstname', lastname: 'New lastname'}
         );
-        st.end();
+        test.end();
       });
     });
   });

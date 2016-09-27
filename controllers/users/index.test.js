@@ -1,6 +1,6 @@
 'use strict';
 
-const test = require('tape');
+const tests = require('tape');
 const helpers = require('../../utils/test/helper');
 const Resource = require('../../models').resource;
 const lang = require('../../config/language');
@@ -12,10 +12,10 @@ const files = helpers.filePaths({
   imageUppercase: 'ecp.JPG'
 });
 
-test('POST /users', t => {
+tests('POST /users', userCreate => {
 
-  t.test('Failed', f => {
-    f.test('Invalid params', ft => {
+  userCreate.test('Failed', failed => {
+    failed.test('Invalid params', test => {
       helpers.json('post', '/users')
         .send({
           confirmed: true
@@ -27,15 +27,15 @@ test('POST /users', t => {
             {path: 'password', message: lang.required}
           ];
 
-          ft.same(
+          test.same(
             {status: res.status, debugInfo: res.body.debugInfo},
             {status: 400, debugInfo: debugInfoError}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User already exists', ft => {
+    failed.test('User already exists', test => {
       helpers.json('post', '/users')
         .send({
           email: 'john.doe@ecp.io',
@@ -44,17 +44,17 @@ test('POST /users', t => {
           lastname: 'Surname'
         })
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.alreadyExists(lang.models.user)}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
-    s.test('User successfully created', st => {
+  userCreate.test('Success', success => {
+    success.test('User successfully created', test => {
       let emailStub = helpers.stubMailer('success');
       let newUser = {
         email: 'new.user@ecp.io',
@@ -66,7 +66,7 @@ test('POST /users', t => {
       helpers.json('post', '/users')
         .send(newUser)
         .end((err, res) => {
-          st.same({
+          test.same({
             status: res.status,
             bio: res.body.bio,
             email: res.body.email,
@@ -82,41 +82,41 @@ test('POST /users', t => {
             lastname: newUser.lastname
           });
           helpers.resetStub(emailStub);
-          st.end();
+          test.end();
         });
     });
   });
 });
 
 
-test('GET /users', t => {
-  t.test('List users', s => {
+tests('GET /users', usersList => {
+  usersList.test('List users', test => {
     helpers.json('get', '/users').end((err, res) => {
-      s.same(res.status, 200);
-      s.end();
+      test.same(res.status, 200);
+      test.end();
     });
   });
 });
 
 
-test('GET /users/:userId', t => {
+tests('GET /users/:userId', userShow => {
 
-  t.test('Failed', f => {
-    f.test('Fail to get one user', ft => {
+  userShow.test('Failed', failed => {
+    failed.test('Fail to get one user', test => {
       helpers.json('get', '/users/1950').end((err, res) => {
-        ft.same(
+        test.same(
           {status: res.status, message: res.body.message},
           {status: 404, message: lang.notFound(lang.models.user)}
         );
-        ft.end();
+        test.end();
       });
     });
   });
 
-  t.test('Success', s => {
-    s.test('Get one user', st => {
+  userShow.test('Success', success => {
+    success.test('Get one user', test => {
       helpers.json('get', '/users/1').end((err, res) => {
-        st.same({
+        test.same({
           status: res.status,
           email: res.body.email,
           firstname: res.body.firstname,
@@ -129,42 +129,42 @@ test('GET /users/:userId', t => {
           lastname: 'McLastname0',
           confirmed: true
         });
-        st.end();
+        test.end();
       });
     });
   });
 });
 
 
-test('POST /users/:userId', t => {
+tests('POST /users/:userId', userEdit => {
 
-  t.test('Failed', f => {
-    f.test('User with no token', ft => {
+  userEdit.test('Failed', failed => {
+    failed.test('User with no token', test => {
       helpers.json('post', '/users/1')
         .send({firstname: 'tryToChange'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 401, message: 'No authorization token was found'}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User not authorized to update other user', ft => {
+    failed.test('User not authorized to update other user', test => {
       helpers.json('post', '/users/2')
         .set('Authorization', normalAuth)
         .send({firstname: 'tryToChange'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 403, message: lang.notAuthorized}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Invalid params', ft => {
+    failed.test('Invalid params', test => {
       helpers.json('post', '/users/1')
         .set('Authorization', superAdminAuth)
         .send({email: 'cantDo@it.likethis'})
@@ -173,152 +173,152 @@ test('POST /users/:userId', t => {
             {path: 'email', message: lang.unrecognizedParameter}
           ];
 
-          ft.same(
+          test.same(
             {status: res.status, debugInfo: res.body.debugInfo},
             {status: 400, debugInfo: debugInfoError}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('User not found for update', ft => {
+    failed.test('User not found for update', test => {
       helpers.json('post', '/users/1950')
         .set('Authorization', superAdminAuth)
         .send({firstname: 'no user'})
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 404, message: lang.notFound(lang.models.user)}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Wrong image name', ft => {
+    failed.test('Wrong image name', test => {
       helpers.json('post', '/users/1')
         .set('Authorization', superAdminAuth)
         .attach('wrongImage', files.image)
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 400, message: lang.unrecognizedFileField('wrongImage')}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
+  userEdit.test('Success', success => {
     let stubS3 = helpers.stubS3({image: 'someImage'});
 
-    s.test('User successfully updated', st => {
+    success.test('User successfully updated', test => {
       helpers.json('post', '/users/1')
         .set('Authorization', superAdminAuth)
         .send({firstname: 'Changed'})
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, firstname: res.body.firstname},
             {status: 200, firstname: 'Changed'}
           );
-          st.end();
+          test.end();
         });
     });
 
-    s.test('User successfully updated by admin', st => {
+    success.test('User successfully updated by admin', test => {
       helpers.json('post', '/users/2')
         .set('Authorization', adminAuth)
         .send({firstname: 'Changed by admin'})
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, firstname: res.body.firstname},
             {status: 200, firstname: 'Changed by admin'}
           );
-          st.end();
+          test.end();
         });
     });
 
-    s.test('User successfully updated by superadmin', st => {
+    success.test('User successfully updated by superadmin', test => {
       helpers.json('post', '/users/2')
         .set('Authorization', superAdminAuth)
         .send({firstname: 'Changed by superadmin'})
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, firstname: res.body.firstname},
             {status: 200, firstname: 'Changed by superadmin'}
           );
-          st.end();
+          test.end();
         });
     });
 
-    s.test('User updated with image and remove previous', st => {
+    success.test('User updated with image and remove previous', test => {
       helpers.json('post', '/users/1')
         .set('Authorization', superAdminAuth)
         .attach('image', files.image)
         .end((err, res) => {
-          st.same({status: res.status}, {status: 200});
-          st.error(!res.body.image, 'Image not mapped properly');
+          test.same({status: res.status}, {status: 200});
+          test.error(!res.body.image, 'Image not mapped properly');
           Resource.findById(1).then(resource => {
             helpers.resetStub(stubS3);
-            st.error(resource, 'Resource should not exist');
-            st.end();
+            test.error(resource, 'Resource should not exist');
+            test.end();
           });
         });
     });
   });
 });
 
-test('DELETE /users/:userId', t => {
+tests('DELETE /users/:userId', userDelete => {
 
-  t.test('Failed', f => {
-    f.test('Fail to delete user because not admin', ft => {
+  userDelete.test('Failed', failed => {
+    failed.test('Fail to delete user because not admin', test => {
       helpers.json('delete', '/users/2')
         .set('Authorization', normalAuth)
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 403, message: lang.notAuthorized}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Fail to delete self', ft => {
+    failed.test('Fail to delete self', test => {
       helpers.json('delete', '/users/1')
         .set('Authorization', superAdminAuth)
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 403, message: lang.cannotDeleteSelf}
           );
-          ft.end();
+          test.end();
         });
     });
 
-    f.test('Fail to delete because no user found', ft => {
+    failed.test('Fail to delete because no user found', test => {
       helpers.json('delete', '/users/1950')
         .set('Authorization', adminAuth)
         .end((err, res) => {
-          ft.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 404, message: lang.notFound(lang.models.user)}
           );
-          ft.end();
+          test.end();
         });
     });
   });
 
-  t.test('Success', s => {
+  userDelete.test('Success', success => {
     let s3Stub = helpers.stubS3();
-    s.test('User successfully deleted', st => {
+    success.test('User successfully deleted', test => {
       helpers.json('delete', '/users/4')
         .set('Authorization', superAdminAuth)
         .end((err, res) => {
-          st.same(
+          test.same(
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.successfullyRemoved(lang.models.user)}
           );
           helpers.resetStub(s3Stub);
-          st.end();
+          test.end();
         });
     });
   });
