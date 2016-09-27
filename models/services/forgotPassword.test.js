@@ -55,7 +55,7 @@ test('Forgot password service', t => {
     s.test('Forgot password get user and remove his tokens success', st => {
       services.forgotPassword.getUserAndRemoveTokens('user3@ecp.io')
       .then(user => {
-        st.same({firstname: user.firstname}, {firstname: 'Jacqueline'});
+        st.same({firstname: user.firstname}, {firstname: 'McFirstname2'});
         st.end();
       });
     });

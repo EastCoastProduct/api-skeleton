@@ -16,8 +16,8 @@ const validate = {
 };
 
 function create(req, res, next) {
-  services.emailUpdate.getUserAndRemoveTokens(req.body.oldEmail)
-    .then(user => services.emailUpdate.checkAndCreate({
+  services.emailConfirmation.getUserAndRemoveTokens(req.body.oldEmail)
+    .then(user => services.emailConfirmation.checkAndCreate({
       dbPassword: user.password,
       userId: user.id,
       oldEmail: req.body.oldEmail.toLowerCase(),
@@ -32,24 +32,7 @@ function create(req, res, next) {
     .catch(err => next(err));
 }
 
-function confirm(req, res, next) {
-  services.emailUpdate.getByTokenAndEdit(req.params.token)
-    .then(user =>
-      services.emailUpdate.removeByToken(req.params.token)
-        .then(() =>
-          services.emailConfirmation.create({id: user.id, email: user.email})
-        )
-        .then(() => {
-          res.status(200);
-          res.locals.message = lang.changedEmail;
-          next();
-        })
-    )
-    .catch(err => next(err));
-}
-
 module.exports = {
   create: create,
-  confirm: confirm,
   validate: validate
 };

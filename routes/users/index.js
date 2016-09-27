@@ -35,9 +35,6 @@ module.exports = function(router) {
       users.emailUpdate.create
     );
 
-  router.route('/changeEmail/:token')
-    .post(users.emailUpdate.confirm);
-
   router.route('/changePassword')
     .post(
       authorization.isConfirmed,

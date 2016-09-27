@@ -1,27 +1,28 @@
 'use strict';
 
 const uuid = require('node-uuid');
-const populateTimestamps = require('../migrations').populateTimestamps;
+const populatePresets = require('../migrations').populatePresets;
+
+const preset = () => ({
+  token: uuid.v1()
+});
+
 const forgotPasswords = [
   {
-    token: uuid.v1(),
     userId: 1
   },
   {
     // this token will be removed
-    token: uuid.v1(),
     userId: 2
   },
   {
     // this token will be removed
-    token: uuid.v1(),
     userId: 3
   },
   {
     // this token will be used
-    token: uuid.v1(),
     userId: 8
   }
 ];
 
-module.exports = populateTimestamps(forgotPasswords);
+module.exports = populatePresets(forgotPasswords, preset);

@@ -11,7 +11,6 @@ const prependKeyword = messageBuilder.prependKeyword;
 module.exports = {
   // All model names
   models: {
-    emailUpdate: 'Change email',
     emailConfirmation: 'Confirmation email',
     forgotPassword: 'Recovery token',
     resource: 'Resource',

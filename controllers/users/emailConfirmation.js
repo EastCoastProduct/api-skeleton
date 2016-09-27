@@ -17,9 +17,12 @@ const validate = {
 
 function confirm(req, res, next) {
   services.emailConfirmation.getByToken(req.body.token)
-    .then(user => {
-      user.confirmed = true;
-      return user.save();
+    .then(ec => {
+      return ec.getUser().then(user => {
+        if (ec.email) user.email = ec.email;
+        user.confirmed = true;
+        return user.save();
+      });
     })
     .then(() => services.emailConfirmation.removeByToken(req.body.token))
     .then(() => {

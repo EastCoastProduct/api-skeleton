@@ -62,7 +62,6 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         user.hasOne(models.forgotPassword);
-        user.hasOne(models.emailUpdate);
         user.hasOne(models.emailConfirmation);
         user.belongsTo(models.resource);
       }

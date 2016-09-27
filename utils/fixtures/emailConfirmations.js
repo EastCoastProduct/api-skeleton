@@ -1,22 +1,29 @@
 'use strict';
 
 const uuid = require('node-uuid');
-const populateTimestamps = require('../migrations').populateTimestamps;
+const populatePresets = require('../migrations').populatePresets;
+
+const preset = () => ({
+  token: uuid.v1()
+});
+
 const emailConfirmations = [
   {
-    token: uuid.v1(),
     userId: 3
   },
   {
     // this token will be removed
-    token: uuid.v1(),
     userId: 8
   },
   {
     // this token will be deleted
-    token: uuid.v1(),
     userId: 9
+  },
+  {
+    // this will change the email
+    email: 'cool.mail@ecp.io',
+    userId: 10
   }
 ];
 
-module.exports = populateTimestamps(emailConfirmations);
+module.exports = populatePresets(emailConfirmations, preset);

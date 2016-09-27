@@ -2,6 +2,9 @@
 
 module.exports = function(sequelize, DataTypes) {
   const emailConfirmation = sequelize.define('emailConfirmation', {
+    email: {
+      type: DataTypes.STRING
+    },
     token: {
       allowNull: false,
       defaultValue: DataTypes.UUIDV1,

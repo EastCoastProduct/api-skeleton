@@ -35,7 +35,7 @@ test('POST /resendConfirmation', t => {
 
   t.test('Success', s => {
     s.test('Successfully resent email', st => {
-      let emailStub = helpers.stubMailer({});
+      let emailStub = helpers.stubMailer();
 
       helpers.json('post', '/resendConfirmation')
         .send({email: 'confirmed.one@ecp.io'})

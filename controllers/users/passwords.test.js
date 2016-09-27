@@ -96,7 +96,7 @@ test('POST /changePassword', t => {
         .end((err, res) => {
           st.same(
             {status: res.status, email: res.body.email},
-            {status: 200, email: 'change.password123@ecp.io'}
+            {status: 200, email: 'change.password@ecp.io'}
           );
           st.end();
         });

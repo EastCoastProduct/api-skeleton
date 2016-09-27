@@ -33,9 +33,9 @@ test('Email confirmation service', t => {
 
   t.test('Success', s => {
     s.test('Email confirmation get user by token success', st => {
-      EmailConfirmation.findOne({where: {userId: 3}}).then(helper =>
+      EmailConfirmation.findOne({where: {userId: 16}}).then(helper =>
         services.emailConfirmation.getByToken(helper.token).then(fps => {
-          st.same({email: fps.email}, {email: 'user3@ecp.io'});
+          st.same({email: fps.email}, {email: null});
           st.end();
         })
       );
@@ -54,7 +54,7 @@ test('Email confirmation service', t => {
     s.test('Email confirmation get user and remove his tokens success', st => {
       services.emailConfirmation.getUserAndRemoveTokens('confirmed.one@ecp.io')
         .then(user => {
-          st.same({firstname: user.firstname}, {firstname: 'confirmed'});
+          st.same({firstname: user.firstname}, {firstname: 'McFirstname8'});
           st.end();
         });
     });

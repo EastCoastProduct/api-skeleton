@@ -5,7 +5,6 @@ const models = require('../');
 const langModel = require('../../config/language').models;
 
 module.exports = {
-  emailUpdate: require('./emailUpdate'),
   emailConfirmation: require('./emailConfirmation'),
   forgotPassword: require('./forgotPassword'),
   resource: require('./resource'),

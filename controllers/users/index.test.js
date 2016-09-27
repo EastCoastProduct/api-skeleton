@@ -125,8 +125,8 @@ test('GET /users/:userId', t => {
         }, {
           status: 200,
           email: 'john.doe@ecp.io',
-          firstname: 'Harry',
-          lastname: 'Richardson',
+          firstname: 'McFirstname0',
+          lastname: 'McLastname0',
           confirmed: true
         });
         st.end();

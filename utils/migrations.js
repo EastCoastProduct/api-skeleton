@@ -30,16 +30,21 @@ var timestamps = {
   }
 };
 
-const populateTimestamps = objArray => _.map(objArray, o => {
-  if (o.password) o.password = encryptPassword(o.password);
-  o.createdAt = new Date().toUTCString();
-  o.updatedAt = new Date().toUTCString();
-  return o;
-});
+const populatePresets = (fixtureArray, presetFunction, hasTimestamps = true) =>
+  _.map(fixtureArray, (fixture, index) => {
+    fixture = _.merge({}, presetFunction(index), fixture);
+    if (fixture.password) fixture.password = encryptPassword(fixture.password);
+
+    if (hasTimestamps) {
+      fixture.createdAt = new Date().toUTCString();
+      fixture.updatedAt = new Date().toUTCString();
+    }
+    return fixture;
+  });
 
 module.exports = {
   id: id,
   encryptPassword: encryptPassword,
   timestamps: timestamps,
-  populateTimestamps: populateTimestamps
+  populatePresets: populatePresets
 };

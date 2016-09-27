@@ -68,9 +68,9 @@ helpers.stubS3 = (r, isError) => {
   return stub;
 };
 
-helpers.resetStub = (stub, shouldRestore = true) => {
+helpers.resetStub = (stub, restoreStub = true) => {
   stub.reset();
-  if (shouldRestore) stub.restore();
+  if (restoreStub) stub.restore();
 };
 
 const filePath = function(directory, file) {

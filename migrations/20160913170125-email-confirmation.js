@@ -6,6 +6,9 @@ const utils = require('../utils/migrations');
 module.exports = {
   up: function(queryInterface, Sequelize) {
     const baseSchema = {
+      email: {
+        type: Sequelize.STRING
+      },
       token: {
         allowNull: false,
         primaryKey: true,

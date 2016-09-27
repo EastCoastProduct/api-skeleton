@@ -1,9 +1,8 @@
 'use strict';
 
 const test = require('tape');
-const uuid = require('node-uuid');
 const helpers = require('../../utils/test/helper');
-const EmailUpdate = require('../../models').emailUpdate;
+const EmailConfirmation = require('../../models').emailConfirmation;
 const lang = require('../../config/language');
 
 test('POST /changeEmail', t => {
@@ -48,15 +47,47 @@ test('POST /changeEmail', t => {
           ft.end();
         });
     });
+
+    f.test('User sent wrong password', ft => {
+      helpers.json('post', '/changeEmail')
+        .send({
+          oldEmail: 'user3@ecp.io',
+          newEmail: 'totaly.changed123@ecp.io',
+          password: 'WrongPassword123'
+        })
+        .end((err, res) => {
+          ft.same(
+            {status: res.status, message: res.body.message},
+            {status: 400, message: lang.wrongPassword}
+          );
+          ft.end();
+        });
+    });
+
+    f.test('User sent an email that is in use', ft => {
+      helpers.json('post', '/changeEmail')
+        .send({
+          oldEmail: 'user3@ecp.io',
+          newEmail: 'change.password@ecp.io',
+          password: 'Password123'
+        })
+        .end((err, res) => {
+          ft.same(
+            {status: res.status, message: res.body.message},
+            {status: 400, message: lang.emailInUse}
+          );
+          ft.end();
+        });
+    });
   });
 
   t.test('Success', s => {
+    let emailStub = helpers.stubMailer({status: 200});
     s.test('User request for email change success', st => {
-      let emailStub = helpers.stubMailer({status: 200});
       helpers.json('post', '/changeEmail')
         .send({
-          oldEmail: 'change.email2@ecp.io',
-          newEmail: 'try.changed@ecp.io',
+          oldEmail: 'change.email4@ecp.io',
+          newEmail: 'try.changed123@ecp.io',
           password: 'Password123'
         })
         .end((err, res) => {
@@ -64,40 +95,25 @@ test('POST /changeEmail', t => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.requestChangeEmail}
           );
+          st.error(!emailStub.calledOnce, 'Mailer should have been called');
           helpers.resetStub(emailStub);
           st.end();
         });
     });
-  });
-});
 
-test('POST /changeEmail/:token', t => {
-  t.test('Failed', f => {
-    f.test('Token does not exist', ft => {
-      helpers.json('post', `/changeEmail/${uuid.v1()}`).end((err, res) => {
-        ft.same(
-          {status: res.status, message: res.body.message},
-          {status: 404, message: lang.notFound(lang.models.emailUpdate)}
-        );
-        ft.end();
-      });
-    });
-  });
-
-  t.test('Success', s => {
-    s.test('Successfully changed user email', st => {
-      let emailStub = helpers.stubMailer({status: 200});
-      EmailUpdate.findOne({where: {email: 'totaly.changed@ecp.io'}})
-      .then(eus => {
-        helpers.json('post', `/changeEmail/${eus.token}`).end((err, res) => {
-          st.same(
-            {status: res.status, message: res.body.message},
-            {status: 200, message: lang.changedEmail}
-          );
-          helpers.resetStub(emailStub);
-          st.end();
+    s.test('User successfully changed email', st => {
+      EmailConfirmation.findOne({where: {email: 'cool.mail@ecp.io'}})
+        .then(ecs => {
+          helpers.json('post', '/emailConfirm')
+            .send({token: ecs.token})
+            .end((err, res) => {
+              st.same(
+                {status: res.status, message: res.body.message},
+                {status: 200, message: lang.emailConfirmed}
+              );
+              st.end();
+            });
         });
-      });
     });
   });
 });
