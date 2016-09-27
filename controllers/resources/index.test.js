@@ -2,7 +2,6 @@
 
 const helpers = require('../../utils/test/helper');
 const lang = require('../../config/language');
-const mock = require('node-mocks-http');
 const tests = require('tape');
 const resourcesMiddleware = require('.');
 const services = require('../../models/services');
@@ -15,22 +14,12 @@ function generateImage(name, extension) {
   };
 }
 
-function generateRequestAndResponse() {
-  let req = mock.createRequest({
-    method: 'POST',
-    url: '/mapSingleFile'
-  });
-  let res = mock.createResponse();
-
-  return {req, res};
-}
-
 tests('Resources', resources => {
 
   resources.test('Failed', failed => {
 
     failed.test('It should fail because no image provided', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapSingle(true)(req, res, err => {
         test.same(
@@ -42,7 +31,7 @@ tests('Resources', resources => {
     });
 
     failed.test('It should fail because file is invalid', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
 
       req.file = generateImage('newImage', 'jpg');
       delete req.file.mimetype;
@@ -54,7 +43,7 @@ tests('Resources', resources => {
     });
 
     failed.test('It should fail and break because files are not provided', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapMultiple(true)(req, res, err => {
         test.same(
@@ -66,7 +55,7 @@ tests('Resources', resources => {
     });
 
     failed.test('It should fail to create multiple because invalid file', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
       req.files = [
         generateImage('someImage2', 'jpg'),
         generateImage('someImage3', 'jpg')
@@ -82,8 +71,12 @@ tests('Resources', resources => {
 
   resources.test('Success', success => {
     success.test('It should create a new resource', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
       req.file = generateImage('newImage', 'jpg');
+      res.locals = {
+        _uploaded: {file: {}},
+        _delete: {}
+      };
 
       resourcesMiddleware.mapSingle()(req, res, err => {
         test.error(err, 'There should be no error because file is provided');
@@ -91,8 +84,8 @@ tests('Resources', resources => {
       });
     });
 
-    success.test('It should create a new resources', test => {
-      const {req, res} = generateRequestAndResponse();
+    success.test('It should create new resources', test => {
+      const {req, res} = helpers.generateRequestAndResponse();
       req.files = [
         generateImage('newImage2', 'jpg'),
         generateImage('newImage3', 'jpg')
@@ -105,7 +98,7 @@ tests('Resources', resources => {
     });
 
     success.test('It should pass because no file provided', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapSingle()(req, res, err => {
         test.error(err, 'There should be no error');
@@ -114,7 +107,7 @@ tests('Resources', resources => {
     });
 
     success.test('It should pass because no files are not provided', test => {
-      const {req, res} = generateRequestAndResponse();
+      const {req, res} = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapMultiple()(req, res, err => {
         test.error(err, 'There should be no error');

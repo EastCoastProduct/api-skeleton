@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
 const request = require('supertest');
 const mailer = require('../mailer');
+const mock = require('node-mocks-http');
 const sinon = require('sinon');
 require('sinon-as-promised');
 
@@ -42,6 +43,23 @@ helpers.getAuthorizationHeader = function getAuthorizationHeader(userId) {
   return 'Bearer ' + helpers.signToken({ userId: userId });
 };
 
+/*
+  Generic mock helper
+*/
+
+helpers.generateRequestAndResponse = () => {
+  let req = mock.createRequest({
+    method: 'POST',
+    url: '/dummy'
+  });
+  let res = mock.createResponse();
+
+  return {req, res};
+};
+
+/*
+  Stub helper
+*/
 helpers.stubMailer = (result, isError) => {
   let emailStub = sinon.stub(mailer.transport, 'sendMail');
 
@@ -73,6 +91,9 @@ helpers.resetStub = (stub, restoreStub = true) => {
   if (restoreStub) stub.restore();
 };
 
+/*
+  File helper
+*/
 const filePath = function(directory, file) {
   if (arguments.length < 2) {
     file = directory;

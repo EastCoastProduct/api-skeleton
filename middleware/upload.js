@@ -36,20 +36,20 @@ function constructFileName(options, filename) {
 /*
   Filter functionality
 */
-const documentFilter = (req, file, cb) => {
+const documentFilter = (req, file, callback) => {
   let supportedDocuments = config.supportedDocumentsExtensions;
   let filename = path.extname(file.originalname.toLowerCase());
 
-  if (_.includes(supportedDocuments, filename)) return cb(null, true);
-  cb(Error400(lang.unsupportedDocumentExtension));
+  if (_.includes(supportedDocuments, filename)) return callback(null, true);
+  callback(Error400(lang.unsupportedDocumentExtension));
 };
 
-const imageFilter = (req, file, cb) => {
+const imageFilter = (req, file, callback) => {
   let supportedImages = config.supportedImageExtensions;
   let filename = path.extname(file.originalname.toLowerCase());
 
-  if (_.includes(supportedImages, filename)) return cb(null, true);
-  cb(Error400(lang.unsupportedImageExtension));
+  if (_.includes(supportedImages, filename)) return callback(null, true);
+  callback(Error400(lang.unsupportedImageExtension));
 };
 
 /*
@@ -86,6 +86,23 @@ const uploadToS3 = options => (req, res, next) => {
   services.s3.upload(req.file).then(() => next()).catch(err => next(err));
 };
 
+function _mapResponseLocals(req, res, next) {
+  res.locals = {
+    _uploaded: {file: {}, files: []},
+    _delete: {file: {}, files: []}
+  };
+  let _uploaded = res.locals._uploaded;
+  const file = req.file;
+  const files = req.files;
+
+  if (file) _uploaded.file = {_filename: file.originalname};
+  if (!_.isEmpty(files)) {
+    _uploaded.files = _.map(files, f => ({_filename: f.originalname}));
+  }
+
+  next();
+}
+
 /*
   Functionality for multiple uploads
 */
@@ -116,7 +133,8 @@ function uploadImages(options) {
 
   return utils.middleware.chain([
     _uploadMultipleFiles(options),
-    _uploadMultipleToS3(options)
+    _uploadMultipleToS3(options),
+    _mapResponseLocals
   ]);
 }
 
@@ -125,7 +143,8 @@ function uploadDocuments(options) {
 
   return utils.middleware.chain([
     _uploadMultipleFiles(options),
-    _uploadMultipleToS3(options)
+    _uploadMultipleToS3(options),
+    _mapResponseLocals
   ]);
 }
 
@@ -146,7 +165,8 @@ function uploadImage(options) {
 
   return utils.middleware.chain([
     _uploadSingleFile(options),
-    uploadToS3('image')
+    uploadToS3('image'),
+    _mapResponseLocals
   ]);
 }
 
@@ -155,7 +175,8 @@ function uploadDocument(options) {
 
   return utils.middleware.chain([
     _uploadSingleFile(options),
-    uploadToS3('document')
+    uploadToS3('document'),
+    _mapResponseLocals
   ]);
 }
 

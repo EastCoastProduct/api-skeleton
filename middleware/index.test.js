@@ -1,8 +1,9 @@
 'use strict';
 
-const tests = require('tape');
-const helpers = require('../utils/test/helper');
 const lang = require('../config/language');
+const tests = require('tape');
+const responseMiddleware = require('.').responseMiddleware;
+const helpers = require('../utils/test/helper');
 
 tests('Middleware test', middleware => {
   middleware.test('Failed', failed => {
@@ -15,6 +16,24 @@ tests('Middleware test', middleware => {
           );
           test.end();
         });
+    });
+
+    failed.test('Remove files from resources because something broke', test => {
+      let stub = helpers.stubS3();
+      const {req, res} = helpers.generateRequestAndResponse();
+
+      res.locals = {
+        _delete: {
+          file: {id: 4},
+          files: [{id: 5}, {id: 6}]
+        }
+      };
+
+      responseMiddleware(req, res, err => {
+        test.error(err, 'There should be no error message');
+        helpers.resetStub(stub);
+        test.end();
+      });
     });
   });
 });

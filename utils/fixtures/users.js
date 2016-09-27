@@ -104,6 +104,13 @@ const users = [
     // this user will want to change his email
     email: 'change.email4@ecp.io',
     confirmed: true
+  },
+  {
+    // id: 16,
+    // this user has an image and will get deleted
+    email: 'delete.three@ecp.io',
+    confirmed: true,
+    resourceId: 7
   }
 ];
 

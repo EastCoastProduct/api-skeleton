@@ -11,7 +11,7 @@ var emails = {
 const sendEmail = options => transport.sendMail(options).then(r => r);
 
 function emailUpdate(options) {
-  let link = `${config.webUrl}/changeEmail/${options.token}`;
+  let link = `${config.webUrl}/emailConfirm/${options.token}`;
   let mailOptions = {
     to: options.user.email,
     from: emails.dontReply,

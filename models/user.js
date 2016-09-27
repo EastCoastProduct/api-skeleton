@@ -67,20 +67,20 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     hooks: {
-      beforeUpdate: function(model, options, cb) {
+      beforeUpdate: function(model, options, callback) {
         resourceId = model._previousDataValues.resourceId;
-        cb();
+        callback();
       },
-      afterUpdate: function(model, options, cb) {
+      afterUpdate: function(model, options, callback) {
         let resource = hookServices(this, 'resource');
         if (resourceId) resource.remove({id: resourceId});
-        cb();
+        callback();
       },
-      afterDestroy: function(model, options, cb) {
-        if (!model.resourceId) return cb();
+      afterDestroy: function(model, options, callback) {
+        if (!model.resourceId) return callback();
         let resource = hookServices(this, 'resource');
         resource.remove({id: model.resourceId});
-        cb();
+        callback();
       }
     }
   });

@@ -5,7 +5,6 @@ const config = require('../../config');
 const resources = require('../../controllers').resources;
 const upload = require('../../middleware/upload');
 const users = require('../../controllers').users;
-const jwt = require('express-jwt');
 
 module.exports = function(router) {
   router.route('/users')

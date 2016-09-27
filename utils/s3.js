@@ -14,7 +14,7 @@ function prependS3(model, name, keepResources = false) {
     let obj = model.toJSON();
 
     if (!keepResources) obj.resource = undefined;
-    if (img) obj[name] = s3Prefix + model.resource.path;
+    if (img) obj[name] = s3Prefix + '/' + model.resource.path;
     return obj;
   }
 

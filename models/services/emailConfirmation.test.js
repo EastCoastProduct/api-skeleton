@@ -33,7 +33,7 @@ tests('Email confirmation service', emailConfirmation => {
 
   emailConfirmation.test('Success', success => {
     success.test('Email confirmation get user by token success', test => {
-      EmailConfirmation.findOne({where: {userId: 16}}).then(helper =>
+      EmailConfirmation.findOne({where: {userId: 2}}).then(helper =>
         services.emailConfirmation.getByToken(helper.token).then(fps => {
           test.same({email: fps.email}, {email: null});
           test.end();

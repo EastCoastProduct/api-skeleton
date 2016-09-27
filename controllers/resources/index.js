@@ -8,21 +8,16 @@ const Error400 = require('../../utils/errors').Error400;
 // map files for db
 function _mapFiles(files) {
 
-
-  const _mapFile = file => {
-    return {
-      extension: file._filename.split('.')[1],
-      mimetype: file.mimetype,
-      name: file.originalname,
-      path: file._filename
-    };
-  };
+  const _mapFile = file => ({
+    extension: file._filename.split('.')[1],
+    mimetype: file.mimetype,
+    name: file.originalname,
+    path: file._filename
+  });
 
   if (!_.isArray(files)) return _mapFile(files);
 
-  let mappedFiles = [];
-  _.forEach(files, file => mappedFiles.push(_mapFile(file)));
-  return mappedFiles;
+  return _.map(files, file => _mapFile(file));
 }
 
 function _mapResponse(files) {
@@ -44,9 +39,8 @@ const mapSingle = isRequired => (req, res, next) => {
 
   services.resource.create(_mapFiles(file))
   .then(resource => {
-    let obj = { _uploaded: {file: {id: resource.id, _filename: resource.path}}};
+    res.locals._uploaded.file.id = resource.id;
     req.body.resourceId = resource.id;
-    _.merge(res.locals, obj);
     next();
   })
   .catch(err => next(err));

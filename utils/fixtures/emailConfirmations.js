@@ -9,6 +9,9 @@ const preset = () => ({
 
 const emailConfirmations = [
   {
+    userId: 2
+  },
+  {
     userId: 3
   },
   {

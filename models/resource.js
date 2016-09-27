@@ -27,9 +27,9 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     hooks: {
-      beforeDestroy: function(file, options, cb) {
+      beforeDestroy: function(file, options, callback) {
         s3.remove({_filename: file.path});
-        cb();
+        callback();
       }
     },
     tableName: 'resources'

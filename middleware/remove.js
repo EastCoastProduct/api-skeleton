@@ -19,8 +19,13 @@ function _deleteHangingFiles(err, req, res, next) {
     next(err);
   }
 
-  const _makePromises = file =>
-    deletePromises.push(services.resource.remove({id: file.id}));
+  const _makePromises = file => {
+    if (file.id) {
+      deletePromises.push(services.resource.remove({id: file.id}));
+    } else if (file._filename) {
+      deletePromises.push(services.s3.remove(file));
+    }
+  };
 
   const _addToDelete = o => {
     if (!_.isArray(o)) return deleteFiles.push(o);

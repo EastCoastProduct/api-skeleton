@@ -317,6 +317,20 @@ tests('DELETE /users/:userId', userDelete => {
             {status: res.status, message: res.body.message},
             {status: 200, message: lang.successfullyRemoved(lang.models.user)}
           );
+          helpers.resetStub(s3Stub, false);
+          test.end();
+        });
+    });
+
+    success.test('User and resource successfully deleted', test => {
+      helpers.json('delete', '/users/16')
+        .set('Authorization', superAdminAuth)
+        .end((err, res) => {
+          test.error(s3Stub.calledOnce, 'S3 delete should have been called');
+          test.same(
+            {status: res.status, message: res.body.message},
+            {status: 200, message: lang.successfullyRemoved(lang.models.user)}
+          );
           helpers.resetStub(s3Stub);
           test.end();
         });
