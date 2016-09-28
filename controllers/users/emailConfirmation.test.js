@@ -2,6 +2,7 @@
 
 const tests = require('tape');
 const uuid = require('node-uuid');
+const User = require('../../models').user;
 const helpers = require('../../utils/test/helper');
 const EmailConfirmation = require('../../models').emailConfirmation;
 const lang = require('../../config/language');
@@ -44,13 +45,17 @@ tests('POST /resendConfirmation', resendConfirmation => {
             {status: res.status, message: res.body.message},
             {status: 201, message: lang.sentConfirmationEmail}
           );
-          helpers.resetStub(emailStub);
-          test.end();
+          User.count(
+            {where: {$and: [{email: 'confirmed.one@ecp.io'}, {confirmed: false}]}}
+          ).then(users => {
+            test.error(!users, 'The user should not be confirmed');
+            helpers.resetStub(emailStub);
+            test.end();
+          });
         });
     });
   });
 });
-
 
 tests('POST /emailConfirm', emailConfirmation => {
 
@@ -77,6 +82,23 @@ tests('POST /emailConfirm', emailConfirmation => {
           );
           test.end();
         });
+    });
+
+    failed.test('Failed to change user email because it is in use', test => {
+      EmailConfirmation.findOne({where: {userId: 17}}).then(ec => {
+        helpers.json('post', '/emailConfirm')
+          .send({token: ec.token})
+          .end((err, res) => {
+            test.same(
+              {status: res.status, message: res.body.message},
+              {status: 400, message: lang.alreadyExists(lang.models.user)}
+            );
+            ec.getUser().then(user => {
+              test.error(!user.confirmed, 'User not confirmed');
+              test.end();
+            });
+          });
+      });
     });
   });
 

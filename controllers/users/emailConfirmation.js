@@ -18,11 +18,12 @@ const validate = {
 function confirm(req, res, next) {
   services.emailConfirmation.getByToken(req.body.token)
     .then(ec => {
-      return ec.getUser().then(user => {
-        if (ec.email) user.email = ec.email;
-        user.confirmed = true;
-        return user.save();
-      });
+      return services.user.doesNotExist({where: {email: ec.email}}).then(() =>
+        ec.getUser().then(user => {
+          if (ec.email) user.email = ec.email;
+          user.confirmed = true;
+          return user.save();
+        }));
     })
     .then(() => services.emailConfirmation.removeByToken(req.body.token))
     .then(() => {
@@ -34,14 +35,12 @@ function confirm(req, res, next) {
 }
 
 function resend(req, res, next) {
-  services.emailConfirmation.getUserAndRemoveTokens(req.body.email)
-    .then(user =>
-      services.emailConfirmation.create(user)
-        .then(() => {
-          res.status(201);
-          res.locals.message = lang.sentConfirmationEmail;
-          next();
-        }))
+  services.emailConfirmation.getUserAndCreateToken(req.body.email)
+    .then(user => services.emailConfirmation.sendMail(user).then(() => {
+      res.status(201);
+      res.locals.message = lang.sentConfirmationEmail;
+      next();
+    }))
     .catch(err => next(err));
 }
 

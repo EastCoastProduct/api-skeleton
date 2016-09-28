@@ -20,7 +20,7 @@ tests('Email confirmation service', emailConfirmation => {
     });
 
     failed.test('Email confirmation get user and remove his tokens failure', test => {
-      services.emailConfirmation.getUserAndRemoveTokens('not@real.io')
+      services.emailConfirmation.getUserAndCreateToken('not@real.io')
         .catch(err => {
           test.same(err, {
             status: 404,
@@ -44,17 +44,17 @@ tests('Email confirmation service', emailConfirmation => {
     success.test('Email confirmation create', test => {
       let emailStub = helpers.stubMailer({status: 200});
 
-      services.emailConfirmation.create({id: 5}).then(fps => {
-        test.same(fps, {status: 200});
+      services.emailConfirmation.createToken({id: 5}).then(fps => {
+        test.error(!fps.token, 'There should be a token');
         helpers.resetStub(emailStub);
         test.end();
       });
     });
 
     success.test('Email confirmation get user and remove his tokens success', test => {
-      services.emailConfirmation.getUserAndRemoveTokens('confirmed.one@ecp.io')
+      services.emailConfirmation.getUserAndCreateToken('confirmed.one@ecp.io')
         .then(user => {
-          test.same({firstname: user.firstname}, {firstname: 'McFirstname8'});
+          test.same(user.email, 'confirmed.one@ecp.io');
           test.end();
         });
     });

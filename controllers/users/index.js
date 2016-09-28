@@ -33,7 +33,7 @@ function create(req, res, next) {
   services.user.doesNotExist({where: {email: req.body.email}})
     .then(() => services.user.create(req.body))
     .then(user => {
-      services.emailConfirmation.create(user).then(() => {
+      services.emailConfirmation.createWithEmail(user).then(() => {
         res.status(201);
         res.locals = user;
         next();

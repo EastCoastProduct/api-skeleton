@@ -79,6 +79,22 @@ tests('POST /changeEmail', changeEmail => {
           test.end();
         });
     });
+
+    failed.test('User sent an email that will be in use', test => {
+      helpers.json('post', '/changeEmail')
+        .send({
+          oldEmail: 'user3@ecp.io',
+          newEmail: 'some.random@ecp.io',
+          password: 'Password123'
+        })
+        .end((err, res) => {
+          test.same(
+            {status: res.status, message: res.body.message},
+            {status: 400, message: lang.emailInUse}
+          );
+          test.end();
+        });
+    });
   });
 
   changeEmail.test('Success', success => {

@@ -16,20 +16,23 @@ const validate = {
 };
 
 function create(req, res, next) {
-  services.emailConfirmation.getUserAndRemoveTokens(req.body.oldEmail)
-    .then(user => services.emailConfirmation.checkAndCreate({
-      dbPassword: user.password,
-      userId: user.id,
-      oldEmail: req.body.oldEmail.toLowerCase(),
-      newEmail: req.body.newEmail.toLowerCase(),
-      password: req.body.password
+  services.emailConfirmation.getUserAndCheckPassword({
+    email: req.body.oldEmail,
+    password: req.body.password
+  })
+  .then(user =>
+    services.emailConfirmation.checkIfEmailInUse(req.body.newEmail)
+    .then(() => services.emailConfirmation.createWithEmail({
+      email: req.body.newEmail,
+      id: user.id
     }))
     .then(() => {
       res.status(200);
       res.locals.message = lang.requestChangeEmail;
       next();
     })
-    .catch(err => next(err));
+  )
+  .catch(err => next(err));
 }
 
 module.exports = {

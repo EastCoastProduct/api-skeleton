@@ -9,6 +9,11 @@ const preset = () => ({
 
 const emailConfirmations = [
   {
+    // this mail is used for change email test
+    email: 'some.random@ecp.io',
+    userId: 1
+  },
+  {
     userId: 2
   },
   {
@@ -26,6 +31,11 @@ const emailConfirmations = [
     // this will change the email
     email: 'cool.mail@ecp.io',
     userId: 10
+  },
+  {
+    // this email is in use and will fail confirmation
+    email: 'john.doe@ecp.io',
+    userId: 17
   }
 ];
 

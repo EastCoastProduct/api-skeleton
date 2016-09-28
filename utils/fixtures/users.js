@@ -111,6 +111,12 @@ const users = [
     email: 'delete.three@ecp.io',
     confirmed: true,
     resourceId: 7
+  },
+  {
+    // id: 17
+    // this user will fail to change his email
+    email: 'change.email5@ecp.io',
+    confirmed: true
   }
 ];
 
