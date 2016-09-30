@@ -18,7 +18,6 @@
     "debug": "^2.2.0",
     "express": "^4.14.0",
     "express-jwt": "^5.0.0",
-    "fingerprintjs2": "^1.4.1",
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.15.0",
     "morgan": "^1.7.0",

@@ -32,13 +32,16 @@ const validate = {
 function create(req, res, next) {
   services.user.doesNotExist({where: {email: req.body.email}})
     .then(() => services.user.create(req.body))
-    .then(user => {
-      services.emailConfirmation.createWithEmail(user).then(() => {
+    .then(user => services.emailConfirmation.createToken(user)
+      .then(ecs => services.emailConfirmation.sendMail({
+        email: user.email, token: ecs.token
+      }))
+      .then(() => {
         res.status(201);
         res.locals = user;
         next();
-      });
-    })
+      })
+    )
     .catch(err => next(err));
 }
 

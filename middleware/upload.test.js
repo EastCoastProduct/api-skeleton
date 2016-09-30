@@ -1,9 +1,9 @@
 'use strict';
 
-const upload = require('./upload');
-const tests = require('tape');
-const mock = require('node-mocks-http');
 const helpers = require('../utils/test/helper');
+const mock = require('node-mocks-http');
+const tests = require('tape');
+const upload = require('./upload');
 
 const generateFakeImage = name => ({
   originalname: `${name}.jpg`,

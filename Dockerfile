@@ -12,3 +12,4 @@ COPY . /app/src
 WORKDIR /app/src
 RUN npm install -g sequelize-cli
 RUN npm install -g nodemon
+RUN npm install -g gulp

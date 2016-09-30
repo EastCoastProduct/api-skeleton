@@ -36,11 +36,16 @@ function confirm(req, res, next) {
 
 function resend(req, res, next) {
   services.emailConfirmation.getUserAndCreateToken(req.body.email)
-    .then(user => services.emailConfirmation.sendMail(user).then(() => {
-      res.status(201);
-      res.locals.message = lang.sentConfirmationEmail;
-      next();
-    }))
+    .then(user => {
+      let mailType;
+
+      if (user.newEmail) mailType = 'emailChange';
+      return services.emailConfirmation.sendMail(user, mailType).then(() => {
+        res.status(201);
+        res.locals.message = lang.sentConfirmationEmail;
+        next();
+      });
+    })
     .catch(err => next(err));
 }
 

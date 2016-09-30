@@ -9,9 +9,11 @@ const emailConfirmationLang = lang.models.emailConfirmation;
 const mailer = require('../../utils/mailer');
 const generic = require('./_generic')(EmailConfirmation, emailConfirmationLang);
 
-const sendMail = user => mailer.emailConfirm({
-  user: {email: user.email}, token: user.token
-});
+const sendMail = (user, type) => {
+  let options = {user: {email: user.email}, token: user.token};
+  if (type) return mailer.emailUpdate(options);
+  return mailer.emailConfirm(options);
+};
 
 const createToken = user =>
   User.update({confirmed: false}, {where: {id: user.id}})
@@ -27,7 +29,9 @@ const checkIfEmailInUse = newEmail =>
 
 const createWithEmail = data =>
   generic.create({email: data.email, userId: data.id})
-    .then(ecs => sendMail({email: data.email, token: ecs.token}));
+    .then(ecs => sendMail(
+      {user: {email: data.email, token: ecs.token}}, 'emailUpdate'
+    ));
 
 const getUserAndCheckPassword = data =>
   User.findOne({where: {email: data.email}}).then(user => {
@@ -52,7 +56,9 @@ const getUserAndCreateToken = email =>
       if (ecs) return ecs.save();
       return createToken({id: user.id, email: email});
     }))
-  .then(ecs => ({email: ecs.email || email, token: ecs.token}));
+  .then(ecs => ({
+    email: ecs.email || email, token: ecs.token, newEmail: !!ecs.email
+  }));
 
 const removeByToken = token => generic.remove({token: token});
 
