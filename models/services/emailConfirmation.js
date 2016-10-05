@@ -30,7 +30,7 @@ const checkIfEmailInUse = newEmail =>
 const createWithEmail = data =>
   generic.create({email: data.email, userId: data.id})
     .then(ecs => sendMail(
-      {user: {email: data.email, token: ecs.token}}, 'emailUpdate'
+      {email: data.email, token: ecs.token}, 'emailUpdate'
     ));
 
 const getUserAndCheckPassword = data =>
