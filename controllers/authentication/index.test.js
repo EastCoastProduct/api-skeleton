@@ -29,10 +29,8 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
-  });
 
-  authenticate.test('Success', success => {
-    success.test('User does not exist', test => {
+    failed.test('User does not exist', test => {
       helpers.json('post', '/authenticate')
         .send({
           email: 'not.user@mail.com',
@@ -46,7 +44,7 @@ tests('POST /authenticate', authenticate => {
         });
     });
 
-    success.test('Wrong password', test => {
+    failed.test('Wrong password', test => {
       helpers.json('post', '/authenticate')
         .send({
           email: 'user@mail.com',
@@ -57,6 +55,23 @@ tests('POST /authenticate', authenticate => {
             { status: res.status, message: res.body.message },
             { status: 400, message: lang.wrongPassword }
           );
+          test.end();
+        });
+    });
+  });
+
+  authenticate.test('Success', success => {
+    success.test('Successfull login with image', test => {
+      helpers.json('post', '/authenticate')
+        .send({
+          email: 'stay.confirmed@mail.com',
+          password: 'Password123'
+        })
+        .end((err, res) => {
+          test.same(res.status, 200);
+          test.error(!res.body.token, 'No token');
+          test.error(!res.body.user, 'No user');
+          test.error(!res.body.user.image, 'No image for user');
           test.end();
         });
     });
@@ -74,6 +89,5 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
-
   });
 });
