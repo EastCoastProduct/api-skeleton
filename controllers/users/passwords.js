@@ -30,19 +30,19 @@ const validate = {
 
 function change(req, res, next) {
   services.user.getById(req.user.userId)
-  .then(user => {
-    const oldPassword = req.body.oldPassword.trim();
-    let isCorrectPassword = bcrypt.compareSync(oldPassword, user.password);
+    .then( user => {
+      const oldPassword = req.body.oldPassword.trim();
+      let isCorrectPassword = bcrypt.compareSync(oldPassword, user.password);
 
-    if (!isCorrectPassword) throw Error400(lang.wrongPassword);
-    user.password = req.body.newPassword.trim();
+      if (!isCorrectPassword) throw Error400(lang.wrongPassword);
+      user.password = req.body.newPassword.trim();
 
-    return user.save().then(resp => {
-      res.locals = resp;
-      next();
-    });
-  })
-  .catch(err => next(err));
+      return user.save().then(resp => {
+        res.locals = resp;
+        next();
+      });
+    })
+    .catch(err => next(err));
 }
 
 function changeWithToken(req, res, next) {
@@ -51,8 +51,8 @@ function changeWithToken(req, res, next) {
       userFromToken.password = req.body.password;
       return userFromToken.save();
     })
-    .then(() => services.forgotPassword.removeByToken(req.params.token))
-    .then(() => {
+    .then( () => services.forgotPassword.removeByToken(req.params.token))
+    .then( () => {
       res.status(200);
       res.locals.message = lang.passwordChanged;
       next();
@@ -63,7 +63,7 @@ function changeWithToken(req, res, next) {
 function reset(req, res, next) {
   services.forgotPassword.getUserAndRemoveTokens(req.body.email).then(user =>
     services.forgotPassword.create(user)
-      .then(() => {
+      .then( () => {
         res.status(200);
         res.locals.message = lang.passwordRecovery;
         next();

@@ -35,4 +35,12 @@ require('./authentication')(router);
 */
 require('./users')(router);
 
+/*
+  Super admin routes
+
+    - Authentication
+      /superAdmin/authenticate
+*/
+require('./superAdmin')(router);
+
 module.exports = router;

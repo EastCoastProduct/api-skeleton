@@ -19,19 +19,19 @@ tests('Resources', resources => {
   resources.test('Failed', failed => {
 
     failed.test('It should fail because no image provided', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapSingle(true)(req, res, err => {
         test.same(
-          {status: err.status, message: err.message},
-          {status: 400, message: lang.fileNotProvided}
+          { status: err.status, message: err.message },
+          { status: 400, message: lang.fileNotProvided }
         );
         test.end();
       });
     });
 
     failed.test('It should fail because file is invalid', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
 
       req.file = generateImage('newImage', 'jpg');
       delete req.file.mimetype;
@@ -43,12 +43,12 @@ tests('Resources', resources => {
     });
 
     failed.test('It should fail and break because files are not provided', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapMultiple(true)(req, res, err => {
         test.same(
-          {status: err.status, message: err.message},
-          {status: 400, message: lang.filesNotProvided}
+          { status: err.status, message: err.message },
+          { status: 400, message: lang.filesNotProvided }
         );
         test.end();
       });
@@ -71,7 +71,8 @@ tests('Resources', resources => {
 
   resources.test('Success', success => {
     success.test('It should create a new resource', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
+
       req.file = generateImage('newImage', 'jpg');
       res.locals = {
         _uploaded: {file: {}},
@@ -98,7 +99,7 @@ tests('Resources', resources => {
     });
 
     success.test('It should pass because no file provided', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
 
       resourcesMiddleware.mapSingle()(req, res, err => {
         test.error(err, 'There should be no error');
@@ -118,7 +119,7 @@ tests('Resources', resources => {
     success.test('It should delete a resource', test => {
       let stub = helpers.stubS3();
 
-      services.resource.remove({id: 3}).then(resp => {
+      services.resource.remove({ id: 3 }).then(resp => {
         test.error(!resp, 'There should be a response');
         helpers.resetStub(stub);
         test.end();

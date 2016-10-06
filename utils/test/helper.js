@@ -39,9 +39,26 @@ helpers.signToken = (object) => {
   );
 };
 
+helpers.signSuperAdminToken = (object) => {
+  let userId = object.userId;
+  let jwtKey = defaultValue(object.jwtKey, config.jwtKey);
+  let expiresIn = defaultValue(object.expiresIn, config.tokenExpiration);
+
+  return jwt.sign(
+    { userId: userId, isSuperAdmin: true },
+    jwtKey,
+    { expiresIn: expiresIn }
+  );
+};
+
 helpers.getAuthorizationHeader = function getAuthorizationHeader(userId) {
   return 'Bearer ' + helpers.signToken({ userId: userId });
 };
+
+helpers.getSuperAdminAuthorizationHeader =
+  function getSuperAdminAuthorizationHeader(userId) {
+    return 'Bearer ' + helpers.signSuperAdminToken({ userId: userId });
+  };
 
 /*
   Generic mock helper

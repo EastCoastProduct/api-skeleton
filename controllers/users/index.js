@@ -4,37 +4,36 @@ const _ = require('lodash');
 const services = require('../../models/services');
 const Resource = require('../../models').resource;
 const lang = require('../../config/language');
-const Error403 = require('../../utils/errors').Error403;
 const validator = require('../../middleware/validator');
 const prependS3 = require('../../utils/s3').prependS3;
 
 const validate = {
   create: validator.validation('body', {
     rules: {
-      bio: {type: 'norule', length: {max: 1000}},
-      email: {type: 'email'},
-      firstname: {type: 'norule', length: {max: 30}},
-      lastname: {type: 'norule', length: {max: 30}},
-      password: {type: 'password'}
+      bio: { type: 'norule', length: { max: 1000 }},
+      email: { type: 'email' },
+      firstname: { type: 'norule', length: { max: 30 }},
+      lastname: { type: 'norule', length: { max: 30 }},
+      password: { type: 'password' }
     },
     required: ['email', 'password']
   }),
   update: validator.validation('body', {
     rules: {
-      bio: {type: 'norule', length: {max: 1000}},
-      firstname: {type: 'norule', length: {max: 30}},
-      lastname: {type: 'norule', length: {max: 30}},
-      resourceId: {type: 'positive'}
+      bio: { type: 'norule', length: { max: 1000 }},
+      firstname: { type: 'norule', length: { max: 30 }},
+      lastname: { type: 'norule', length: { max: 30 }},
+      resourceId: { type: 'positive'}
     }
   })
 };
 
 function create(req, res, next) {
-  services.user.doesNotExist({where: {email: req.body.email}})
-    .then(() => services.user.create(req.body))
-    .then(user => services.emailConfirmation.createToken(user)
-      .then(ecs => services.emailConfirmation.sendMail({
-        email: user.email, token: ecs.token
+  services.user.doesNotExist({ where: { email: req.body.email }})
+    .then( () => services.user.create(req.body))
+    .then( user => services.emailConfirmation.createToken(user)
+      .then( emailConfirmation => services.emailConfirmation.sendMail({
+        email: user.email, token: emailConfirmation.token
       }))
       .then(() => {
         res.status(201);
@@ -46,8 +45,8 @@ function create(req, res, next) {
 }
 
 function list(req, res, next) {
-  services.user.list({include: [{model: Resource, required: false}]})
-    .then(users => {
+  services.user.list({ include: [{ model: Resource, required: false }]})
+    .then( users => {
       res.status(200);
       res.locals = {
         count: users.count,
@@ -59,12 +58,9 @@ function list(req, res, next) {
 }
 
 function remove(req, res, next) {
-  if (parseInt(req.params.userId) === req.user.userId) {
-    return next(Error403(lang.cannotDeleteSelf));
-  }
 
   services.user.removeById(req.params.userId)
-    .then(() => {
+    .then( () => {
       res.status(200);
       res.locals.message = lang.successfullyRemoved(lang.models.user);
       next();
@@ -75,7 +71,7 @@ function remove(req, res, next) {
 function show(req, res, next) {
   services.user.getById(
     req.params.userId,
-    {include: [{model: Resource, required: false}]}
+    { include: [{ model: Resource, required: false }]}
   )
   .then(user => {
     res.locals = prependS3(user, 'image');
@@ -86,21 +82,18 @@ function show(req, res, next) {
 }
 
 function update(req, res, next) {
-  const user = req.user;
-  const isOwner = user.userId === parseInt(req.params.userId);
-
-  if (!isOwner && !user.hasPrivilege) return next(Error403(lang.notAuthorized));
 
   services.user.getById(req.params.userId)
-  .then(() =>
-    services.user.update(req.body, {id: req.params.userId}).then(resp => {
-      return resp.getResource().then(resource => {
-        resp.resource = resource;
-        res.status(200);
-        res.locals = prependS3(resp, 'image');
-        next();
-      });
-    })
+  .then( () =>
+    services.user.update(req.body, { id: req.params.userId })
+      .then( updatedUser => {
+        return updatedUser.getResource().then(resource => {
+          updatedUser.resource = resource;
+          res.status(200);
+          res.locals = prependS3(updatedUser, 'image');
+          next();
+        });
+      })
   )
   .catch(err => next(err));
 }

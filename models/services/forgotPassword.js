@@ -8,22 +8,23 @@ const langForgotPassword = lang.models.forgotPassword;
 const generic = require('./_generic')(ForgotPassword, langForgotPassword);
 const mailer = require('../../utils/mailer');
 
-const create = user => generic.create({userId: user.id})
-  .then(confirmation =>
+const create = user => generic.create({ userId: user.id })
+  .then( confirmation =>
     mailer.forgotPassword({
-      user: {email: user.email}, token: confirmation.token
+      user: { email: user.email }, token: confirmation.token
     }));
 
 const getByToken = token => generic.getOne({token: token})
   .then(user => user.getUser());
 
 const getUserAndRemoveTokens = email =>
-  User.findOne({where: {email: email}}).then(user => {
+  User.findOne({ where: { email: email }}).then(user => {
     if (!user) throw Error404(lang.notFound(lang.models.user));
+
     return user;
   })
   .then(user =>
-    ForgotPassword.destroy({where: {userId: user.id}}).then(() => user)
+    ForgotPassword.destroy({ where: { userId: user.id }}).then(() => user)
   );
 
 const removeByToken = token => generic.remove({token: token});

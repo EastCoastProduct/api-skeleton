@@ -8,7 +8,7 @@ tests('POST /authenticate', authenticate => {
 
   authenticate.test('Failed', failed => {
     failed.test('Invalid parameters', test => {
-      helpers.json('post', '/authenticate')
+      helpers.json('post', '/superAdmin/authenticate')
         .send({ invalidParam: 'wrong' })
         .end((err, res) => {
           const debugInfoError = [
@@ -33,7 +33,7 @@ tests('POST /authenticate', authenticate => {
 
   authenticate.test('Success', success => {
     success.test('User does not exist', test => {
-      helpers.json('post', '/authenticate')
+      helpers.json('post', '/superAdmin/authenticate')
         .send({
           email: 'not.user@mail.com',
           password: 'Password123'
@@ -47,9 +47,9 @@ tests('POST /authenticate', authenticate => {
     });
 
     success.test('Wrong password', test => {
-      helpers.json('post', '/authenticate')
+      helpers.json('post', '/superAdmin/authenticate')
         .send({
-          email: 'user@mail.com',
+          email: 'super.admin@mail.com',
           password: 'Wrong123'
         })
         .end((err, res) => {
@@ -61,10 +61,10 @@ tests('POST /authenticate', authenticate => {
         });
     });
 
-    success.test('Successfull login regular user', test => {
-      helpers.json('post', '/authenticate')
+    success.test('Successfull login super admin user', test => {
+      helpers.json('post', '/superAdmin/authenticate')
         .send({
-          email: 'regular@mail.com',
+          email: 'super.admin@mail.com',
           password: 'Password123'
         })
         .end((err, res) => {

@@ -11,11 +11,11 @@ tests('POST /resendConfirmation', resendConfirmation => {
   resendConfirmation.test('Failed', failed => {
     failed.test('Invalid params', test => {
       helpers.json('post', '/resendConfirmation')
-        .send({wrong: 'invalid'})
-        .end((err, res) => {
+        .send({ wrong: 'invalid' })
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 400, message: lang.parametersError}
+            { status: res.status, message: res.body.message },
+            { status: 400, message: lang.parametersError }
           );
           test.end();
         });
@@ -23,11 +23,11 @@ tests('POST /resendConfirmation', resendConfirmation => {
 
     failed.test('Token not found', test => {
       helpers.json('post', '/resendConfirmation')
-        .send({email: 'jack@ecp.io'})
-        .end((err, res) => {
+        .send({ email: 'jack@mail.com' })
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 404, message: lang.notFound(lang.models.user)}
+            { status: res.status, message: res.body.message },
+            { status: 404, message: lang.notFound(lang.models.user) }
           );
           test.end();
         });
@@ -39,15 +39,21 @@ tests('POST /resendConfirmation', resendConfirmation => {
       let emailStub = helpers.stubMailer();
 
       helpers.json('post', '/resendConfirmation')
-        .send({email: 'confirmed.one@ecp.io'})
-        .end((err, res) => {
+        .send({ email: 'confirmed.one@mail.com' })
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 201, message: lang.sentConfirmationEmail}
+            { status: res.status, message: res.body.message },
+            { status: 201, message: lang.sentConfirmationEmail }
           );
-          User.count(
-            {where: {$and: [{email: 'confirmed.one@ecp.io'}, {confirmed: false}]}}
-          ).then(users => {
+          User.count({
+            where: {
+              $and: [
+                { email: 'confirmed.one@mail.com' },
+                { confirmed: false }
+              ]
+            }
+          })
+          .then( users => {
             test.error(!users, 'The user should not be confirmed');
             helpers.resetStub(emailStub);
             test.end();
@@ -62,11 +68,11 @@ tests('POST /emailConfirm', emailConfirmation => {
   emailConfirmation.test('Failed', failed => {
     failed.test('Invalid params', test => {
       helpers.json('post', '/emailConfirm')
-        .send({wrong: 'invalid'})
-        .end((err, res) => {
+        .send({ wrong: 'invalid' })
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 400, message: lang.parametersError}
+            { status: res.status, message: res.body.message },
+            { status: 400, message: lang.parametersError }
           );
           test.end();
         });
@@ -74,45 +80,46 @@ tests('POST /emailConfirm', emailConfirmation => {
 
     failed.test('Token not found', test => {
       helpers.json('post', '/emailConfirm')
-        .send({token: uuid.v1()})
-        .end((err, res) => {
+        .send({ token: uuid.v1() })
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 404, message: lang.notFound(lang.models.emailConfirmation)}
+            { status: res.status, message: res.body.message },
+            { status: 404, message: lang.notFound(lang.models.emailConfirmation) }
           );
           test.end();
         });
     });
 
     failed.test('Failed to change user email because it is in use', test => {
-      EmailConfirmation.findOne({where: {userId: 17}}).then(ec => {
-        helpers.json('post', '/emailConfirm')
-          .send({token: ec.token})
-          .end((err, res) => {
-            test.same(
-              {status: res.status, message: res.body.message},
-              {status: 400, message: lang.alreadyExists(lang.models.user)}
-            );
-            ec.getUser().then(user => {
-              test.error(!user.confirmed, 'User not confirmed');
-              test.end();
+      EmailConfirmation.findOne({ where: { userId: 17 }})
+        .then(emailConfirmationData => {
+          helpers.json('post', '/emailConfirm')
+            .send({ token: emailConfirmationData.token })
+            .end( (err, res) => {
+              test.same(
+                { status: res.status, message: res.body.message },
+                { status: 400, message: lang.alreadyExists(lang.models.user) }
+              );
+              emailConfirmationData.getUser().then( user => {
+                test.error(!user.confirmed, 'User not confirmed');
+                test.end();
+              });
             });
-          });
-      });
+        });
     });
   });
 
   emailConfirmation.test('Success', success => {
     success.test('Successfully confirmed user', test => {
-      EmailConfirmation.findOne({where: {userId: 9}}).then(ec => {
+      EmailConfirmation.findOne({ where: { userId: 9 }}).then(emailConfirmationData => {
         helpers.json('post', '/emailConfirm')
-          .send({token: ec.token})
-          .end((err, res) => {
+          .send({ token: emailConfirmationData.token })
+          .end( (err, res) => {
             test.same(
-              {status: res.status, message: res.body.message},
-              {status: 200, message: lang.emailConfirmed}
+              { status: res.status, message: res.body.message },
+              { status: 200, message: lang.emailConfirmed }
             );
-            ec.getUser().then(user => {
+            emailConfirmationData.getUser().then( user => {
               test.error(!user.confirmed, 'User not confirmed');
               test.end();
             });
