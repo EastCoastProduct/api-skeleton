@@ -4,6 +4,7 @@ const authorization = require('./authorization');
 const tests = require('tape');
 const lang = require('../config/language');
 const helpers = require('../utils/test/helper');
+const mock = require('node-mocks-http');
 
 tests('Authorization', authorizationTest => {
 
@@ -40,6 +41,21 @@ tests('Authorization', authorizationTest => {
         test.end();
       });
     });
+
+    failed.test('It should fail because user is not the owner', test => {
+      const req = mock.createRequest({
+        method: 'POST',
+        url: '/dummy/:userId',
+        params: { userId: 1 }
+      });
+      const res = mock.createResponse();
+      req.headers.authorization = helpers.getAuthorizationHeader(3);
+
+      authorization.isOwner(req, res, err => {
+        test.same(err, { status: 403, message: lang.notAuthorized });
+        test.end();
+      });
+    });
   });
 
   authorizationTest.test('Success', success => {
@@ -59,6 +75,21 @@ tests('Authorization', authorizationTest => {
 
       authorization.isSuperAdmin(req, res, err => {
         test.error(err, 'There should be no error because user is superadmin');
+        test.end();
+      });
+    });
+
+    success.test('It should succeed because user is the owner', test => {
+      const req = mock.createRequest({
+        method: 'POST',
+        url: '/dummy/:userId',
+        params: { userId: 3 }
+      });
+      const res = mock.createResponse();
+      req.headers.authorization = helpers.getAuthorizationHeader(3);
+
+      authorization.isOwner(req, res, err => {
+        test.error(err, 'There should be no error becase user is owner');
         test.end();
       });
     });
