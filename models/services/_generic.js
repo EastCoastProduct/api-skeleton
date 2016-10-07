@@ -73,12 +73,27 @@ module.exports = (Model, keyword) => {
         return result[1][0];
       });
 
+  const listWithPagination = (queryParams) =>
+    // offset = (page - 1) * itemsPerPage + 1
+    let params = {
+      offset: queryParams ? (queryParams.page - 1) * queryParams.limit + 1 : config.paginate.offset
+      limit: queryParams ? queryParams ?.limit : config.paginate.limit,
+      order: ['id']
+    };
+
+    // WTF??
+    _.mapKeys(arguments, val => _.merge(params, val));
+
+
+    Model.findAndCountAll(params).then(response => response)
+
   return {
     bulkCreate: bulkCreate,
     create: create,
     doesNotExist: doesNotExist,
     exists: exists,
     list: list,
+    listWithPagination: listWithPagination,
     remove: remove,
     removeById: removeById,
     getById: getById,
