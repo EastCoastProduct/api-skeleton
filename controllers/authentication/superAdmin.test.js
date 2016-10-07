@@ -29,10 +29,8 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
-  });
 
-  authenticate.test('Success', success => {
-    success.test('User does not exist', test => {
+    failed.test('User does not exist', test => {
       helpers.json('post', '/superAdmin/authenticate')
         .send({
           email: 'not.user@mail.com',
@@ -46,7 +44,7 @@ tests('POST /authenticate', authenticate => {
         });
     });
 
-    success.test('Wrong password', test => {
+    failed.test('Wrong password', test => {
       helpers.json('post', '/superAdmin/authenticate')
         .send({
           email: 'super.admin@mail.com',
@@ -60,6 +58,10 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
+
+  });
+
+  authenticate.test('Success', success => {
 
     success.test('Successfull login super admin user', test => {
       helpers.json('post', '/superAdmin/authenticate')

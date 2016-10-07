@@ -51,7 +51,6 @@ module.exports = {
   // W
   wrongPassword: 'Wrong password',
 
-
   // Successfull response messages
   // C
   changedEmail: 'Chaned email',

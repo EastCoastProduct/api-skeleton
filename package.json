@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "dev-start": "nodemon ./bin/www"
   },
   "author": "EastCoastProduct",
   "license": "ISC",

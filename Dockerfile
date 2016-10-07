@@ -1,15 +1,12 @@
-FROM node:6.0
+FROM node:6.7
 
-RUN mkdir -p /app/src
-RUN mkdir -p /app/install
+RUN useradd --user-group --create-home --shell /bin/bash app
+RUN npm install -g --silent sequelize-cli
+RUN npm install -g --silent nodemon
+RUN npm install -g --silent gulp
 
-COPY package.json /app/install
-WORKDIR /app/install
-RUN npm install
-ENV NODE_PATH=/app/install/node_modules
+RUN mkdir /home/app/src
 
-COPY . /app/src
-WORKDIR /app/src
-RUN npm install -g sequelize-cli
-RUN npm install -g nodemon
-RUN npm install -g gulp
+COPY . /home/app/src
+WORKDIR /home/app/src
+RUN chmod 767 docker-start.sh
