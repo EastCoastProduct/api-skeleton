@@ -76,8 +76,10 @@ const users = [{
   email: 'change.email3@mail.com'
 }, {
   // this user needs to stay confirmed
+  // this user needs to have his resource
   // id: 14,
-  email: 'stay.confirmed@mail.com'
+  email: 'stay.confirmed@mail.com',
+  resourceId: 8
 }, {
   // this user will change password in test
   // this email is used for a failed email change in test

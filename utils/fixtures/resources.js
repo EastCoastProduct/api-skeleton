@@ -44,6 +44,11 @@ const resources = [
     // id: 7
     // will be deleted with the user
     name: 'userImage.jpg'
+  },
+  {
+    // id: 8
+    // this resource is used for login to show image
+    name: 'userLoginImage.jpg'
   }
 ];
 
