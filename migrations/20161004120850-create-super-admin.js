@@ -9,10 +9,6 @@ module.exports = {
       bio: {
         type: Sequelize.STRING(1000)
       },
-      confirmed: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -30,7 +26,7 @@ module.exports = {
       }
     };
 
-    return queryInterface.createTable('users', _.extend({},
+    return queryInterface.createTable('super_admins', _.extend({},
       utils.id,
       baseSchema,
       utils.timestamps
@@ -38,6 +34,6 @@ module.exports = {
   },
 
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('super_admins');
   }
 };

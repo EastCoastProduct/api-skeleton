@@ -20,9 +20,9 @@ function create(req, res, next) {
     email: req.body.oldEmail,
     password: req.body.password
   })
-  .then(user =>
+  .then( user =>
     services.emailConfirmation.checkIfEmailInUse(req.body.newEmail)
-    .then(() => services.emailConfirmation.createWithEmail({
+    .then( () => services.emailConfirmation.createWithEmail({
       email: req.body.newEmail,
       id: user.id
     }))
