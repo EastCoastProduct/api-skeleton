@@ -64,7 +64,7 @@ tests('POST /changeEmail', changeEmail => {
         });
     });
 
-    failed.test('User sent an email that is alrady in use', test => {
+    failed.test('User sent an email that is already in use', test => {
       helpers.json('post', '/changeEmail')
         .send({
           oldEmail: 'user@mail.com',

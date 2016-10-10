@@ -27,7 +27,7 @@ function getUser() {
         .catch(err => next(err));
     } else {
       User.findById(req.user.userId)
-        .then(user => {
+        .then( user => {
           if (!user) throw Error404(lang.notFound(lang.models.user));
 
           req.user.dao = user;

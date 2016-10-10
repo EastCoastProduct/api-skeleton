@@ -76,6 +76,10 @@ tests('POST /authenticate', authenticate => {
         });
     });
 
+  });
+
+  authenticate.test('Success', success => {
+
     success.test('Successfull login regular user', test => {
       helpers.json('post', '/authenticate')
         .send({
