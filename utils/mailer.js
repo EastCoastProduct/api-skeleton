@@ -39,7 +39,7 @@ function emailConfirm(options) {
 }
 
 function forgotPassword(options) {
-  let link = `${config.webUrl}/changePassword/${options.token}`;
+  let link = `${config.webUrl}/recoverPassword/${options.token}`;
   let mailOptions = {
     to: options.user.email,
     from: emails.dontReply,

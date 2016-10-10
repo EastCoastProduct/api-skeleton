@@ -17,16 +17,23 @@ const validate = {
 
 function confirm(req, res, next) {
   services.emailConfirmation.getByToken(req.body.token)
-    .then(ec => {
-      return services.user.doesNotExist({where: {email: ec.email}}).then(() =>
-        ec.getUser().then(user => {
-          if (ec.email) user.email = ec.email;
+    .then(emailConfirmation => {
+
+      return services.user.doesNotExist({
+        where: { email: emailConfirmation.email }
+      })
+      .then( () =>
+        emailConfirmation.getUser().then( user => {
+          if (emailConfirmation.email) user.email = emailConfirmation.email;
+
           user.confirmed = true;
+
           return user.save();
         }));
     })
-    .then(() => services.emailConfirmation.removeByToken(req.body.token))
-    .then(() => {
+    .then( () => services.emailConfirmation.removeByToken(req.body.token))
+    .then( () => {
+
       res.status(200);
       res.locals.message = lang.emailConfirmed;
       next();
@@ -36,15 +43,17 @@ function confirm(req, res, next) {
 
 function resend(req, res, next) {
   services.emailConfirmation.getUserAndCreateToken(req.body.email)
-    .then(user => {
+    .then( user => {
       let mailType;
 
       if (user.newEmail) mailType = 'emailChange';
-      return services.emailConfirmation.sendMail(user, mailType).then(() => {
-        res.status(201);
-        res.locals.message = lang.sentConfirmationEmail;
-        next();
-      });
+
+      return services.emailConfirmation.sendMail(user, mailType)
+        .then( () => {
+          res.status(201);
+          res.locals.message = lang.sentConfirmationEmail;
+          next();
+        });
     })
     .catch(err => next(err));
 }

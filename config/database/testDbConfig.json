@@ -1,8 +1,8 @@
 {
-  "username": "test_user",
-  "password": "ecp1950",
+  "username": "api",
+  "password": "notsetyet",
   "database": "test_db",
-  "host": "ecp_test_db",
+  "host": "127.0.0.1",
   "dialect": "postgres",
   "logging": false,
   "seederStorage": "json",

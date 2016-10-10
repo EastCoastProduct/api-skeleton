@@ -17,14 +17,15 @@ module.exports = function(router) {
   router.route('/users/:userId')
     .get(users.show)
     .post(
-      authorization.isAdmin(),
+      authorization.isConfirmed,
+      authorization.isOwner,
       upload.uploadImage('image'),
       resources.mapSingle(),
       users.validate.update,
       users.update
     )
     .delete(
-      authorization.isAdmin(true),
+      authorization.isOwner,
       users.remove
     );
 
@@ -41,7 +42,7 @@ module.exports = function(router) {
       users.passwords.change
     );
 
-  router.route('/changePassword/:token')
+  router.route('/recoverPassword/:token')
     .post(
       users.passwords.validate.changeWithToken,
       users.passwords.changeWithToken

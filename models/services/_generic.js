@@ -16,6 +16,7 @@ module.exports = (Model, keyword) => {
 
   const _exists = (params, shouldNotExist) =>
     Model.count(params).then(r => {
+
       if (r && shouldNotExist) throw Error400(lang.alreadyExists(keyword));
       if (!r && !shouldNotExist) throw Error400(lang.doesNotExist(keyword));
 

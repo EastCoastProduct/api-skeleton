@@ -11,7 +11,7 @@ const Error400 = errors.Error400;
 const Error404 = errors.Error404;
 
 const models = require('../../models');
-const User = models.user;
+const SuperAdmin = models.superAdmin;
 
 const validate = {
   authenticate: validator.validation('body', {
@@ -24,7 +24,7 @@ const validate = {
 };
 
 function authenticate(req, res, next) {
-  User.findOne({ where: { email: req.body.email }})
+  SuperAdmin.findOne({ where: { email: req.body.email }})
     .then( user => {
       if (!user) throw Error404(lang.notFound(lang.models.user));
 
@@ -35,7 +35,7 @@ function authenticate(req, res, next) {
       if (!isCorrectPassword) throw Error400(lang.wrongPassword);
 
       const token = jwt.sign(
-        { userId: user.id },
+        { userId: user.id, isSuperAdmin: true },
         config.jwtKey,
         { expiresIn: config.tokenExpiration }
       );
@@ -49,6 +49,5 @@ function authenticate(req, res, next) {
 
 module.exports = {
   authenticate: authenticate,
-  validate: validate,
-  superAdmin: require('./superAdmin')
+  validate: validate
 };

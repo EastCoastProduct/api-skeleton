@@ -8,10 +8,6 @@ module.exports = function(sequelize, DataTypes) {
   let resourceId;
 
   const user = sequelize.define('user', {
-    admin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
     bio: {
       type: DataTypes.STRING(1000)
     },
@@ -42,18 +38,12 @@ module.exports = function(sequelize, DataTypes) {
 
         this.setDataValue('password', hash);
       }
-    },
-    superAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
     }
   }, {
     instanceMethods: {
       toJSON: function() {
         var values = this.dataValues;
 
-        values.admin = undefined;
-        values.superAdmin = undefined;
         values.password = undefined;
 
         return values;
@@ -73,13 +63,13 @@ module.exports = function(sequelize, DataTypes) {
       },
       afterUpdate: function(model, options, callback) {
         let resource = hookServices(this, 'resource');
-        if (resourceId) resource.remove({id: resourceId});
+        if (resourceId) resource.remove({ id: resourceId });
         callback();
       },
       afterDestroy: function(model, options, callback) {
         if (!model.resourceId) return callback();
         let resource = hookServices(this, 'resource');
-        resource.remove({id: model.resourceId});
+        resource.remove({ id: model.resourceId });
         callback();
       }
     }

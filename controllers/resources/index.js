@@ -21,7 +21,7 @@ function _mapFiles(files) {
 }
 
 function _mapResponse(files) {
-  let filesObj = {_uploaded: {files: []}};
+  let filesObj = { _uploaded: { files: [] }};
 
   _.forEach(files, file =>
     filesObj._uploaded.files.push({id: file.id, _filename: file.path})

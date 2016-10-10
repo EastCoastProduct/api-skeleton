@@ -21,7 +21,7 @@ const forgotPasswords = [
   },
   {
     // this token will be used
-    userId: 8
+    userId: 15
   }
 ];
 

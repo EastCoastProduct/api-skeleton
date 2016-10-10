@@ -34,9 +34,9 @@ tests('Forgot password service', forgotPassword => {
   forgotPassword.test('Success', success => {
 
     success.test('Forgot password get user by token success', test => {
-      ForgotPassword.findOne({where: {userId: 1}}).then(helper =>
+      ForgotPassword.findOne({ where: { userId: 1 }}).then(helper =>
         services.forgotPassword.getByToken(helper.token).then(fps => {
-          test.same({email: fps.email}, {email: 'john.doe@ecp.io'});
+          test.same({email: fps.email}, {email: 'regular@mail.com'});
           test.end();
         })
       );
@@ -45,7 +45,7 @@ tests('Forgot password service', forgotPassword => {
 
     success.test('Forgot password create', test => {
       let emailStub = helpers.stubMailer({status: 200});
-      services.forgotPassword.create({id: 5}).then(fps => {
+      services.forgotPassword.create({ id: 6 }).then(fps => {
         test.same(fps, {status: 200});
         helpers.resetStub(emailStub);
         test.end();
@@ -53,15 +53,15 @@ tests('Forgot password service', forgotPassword => {
     });
 
     success.test('Forgot password get user and remove his tokens success', test => {
-      services.forgotPassword.getUserAndRemoveTokens('user3@ecp.io')
+      services.forgotPassword.getUserAndRemoveTokens('not.confirmed@mail.com')
       .then(user => {
-        test.same({firstname: user.firstname}, {firstname: 'McFirstname2'});
+        test.same({ firstname: user.firstname }, { firstname: 'firstname3'});
         test.end();
       });
     });
 
     success.test('Forgot password remove by token', test => {
-      ForgotPassword.findOne({where: {userId: 5}}).then(helper =>
+      ForgotPassword.findOne({ where: { userId: 6 }}).then(helper =>
         services.forgotPassword.removeByToken(helper.token).then(fps => {
           test.same(fps, 1);
           test.end();
