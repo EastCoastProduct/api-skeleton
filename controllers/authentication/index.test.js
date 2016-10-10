@@ -58,6 +58,23 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
+  });
+
+  authenticate.test('Success', success => {
+    success.test('Successfull login with image', test => {
+      helpers.json('post', '/authenticate')
+        .send({
+          email: 'stay.confirmed@mail.com',
+          password: 'Password123'
+        })
+        .end((err, res) => {
+          test.same(res.status, 200);
+          test.error(!res.body.token, 'No token');
+          test.error(!res.body.user, 'No user');
+          test.error(!res.body.user.image, 'No image for user');
+          test.end();
+        });
+    });
 
   });
 
@@ -76,6 +93,5 @@ tests('POST /authenticate', authenticate => {
           test.end();
         });
     });
-
   });
 });
