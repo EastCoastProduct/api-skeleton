@@ -8,7 +8,10 @@ const users = require('../../controllers').users;
 
 module.exports = function(router) {
   router.route('/users')
-    .get(users.list)
+    .get(
+      users.validate.list,
+      users.list
+    )
     .post(
       users.validate.create,
       users.create

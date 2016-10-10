@@ -38,7 +38,7 @@ module.exports = {
 
   paginate: {
     offset: 0,
-    limit: 20
+    limit: 10
   },
 
   supportedImageExtensions:  ['.jpeg', '.jpg', '.png', '.gif', '.bmp'],

@@ -27,11 +27,9 @@ module.exports = (Model, keyword) => {
 
   const exists = params => _exists(params);
 
-// TODO check with offset and limit null for overriding
+  // TODO merge with listWithPagination (similar to exist and not exists)
   const list = function() {
     let params = {
-      offset: config.paginate.offset,
-      limit: config.paginate.limit,
       order: ['id']
     };
 
@@ -74,19 +72,25 @@ module.exports = (Model, keyword) => {
         return result[1][0];
       });
 
-  const listWithPagination = (queryParams) =>
-    // offset = (page - 1) * itemsPerPage + 1
+  const listWithPagination = function() {
+    let queryParams = arguments['0'];
+    let optionalArguments = arguments['1'];
+
+    let paginationLimit = queryParams.limit
+      ? parseInt(queryParams.limit)
+      : config.paginate.limit;
+    let pageNumber = queryParams.page ? parseInt(queryParams.page) : 1;
+
     let params = {
-      offset: queryParams ? (queryParams.page - 1) * queryParams.limit + 1 : config.paginate.offset
-      limit: queryParams ? queryParams ?.limit : config.paginate.limit,
+      offset: (pageNumber - 1) * paginationLimit,
+      limit: paginationLimit,
       order: ['id']
     };
 
-    // WTF??
-    _.mapKeys(arguments, val => _.merge(params, val));
+    _.mapKeys(optionalArguments, val => _.merge(params, val));
 
-
-    Model.findAndCountAll(params).then(response => response)
+    return Model.findAndCountAll(params).then(response => response);
+  };
 
   return {
     bulkCreate: bulkCreate,

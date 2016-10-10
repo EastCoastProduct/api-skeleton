@@ -1,6 +1,8 @@
 'use strict';
 
+const _ = require('lodash');
 const tests = require('tape');
+const config = require('../../config');
 const helpers = require('../../utils/test/helper');
 const Resource = require('../../models').resource;
 const lang = require('../../config/language');
@@ -22,7 +24,7 @@ tests('POST /users', userCreate => {
         .send({
           confirmed: true
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           const debugInfoError = [
             { path: 'confirmed', message: lang.unrecognizedParameter },
             { path: 'email', message: lang.required },
@@ -92,11 +94,85 @@ tests('POST /users', userCreate => {
 
 
 tests('GET /users', usersList => {
-  usersList.test('List users', test => {
-    helpers.json('get', '/users').end((err, res) => {
-      test.same(res.status, 200);
-      test.end();
+
+  usersList.test('Failed', failed => {
+    failed.test('invalid query parameters', test => {
+      helpers.json('get', '/users?page=string&limit=3').end( (err, res) => {
+        test.same(
+          { status: res.status, message: res.body.debugInfo[0].message },
+          // TODO change message upon validator update
+          { status: 400, message: 'has to be positive' }
+        );
+        test.end();
+      });
     });
+
+    failed.test('invalid query parameters', test => {
+      helpers.json('get', '/users?page=1&limit=string').end( (err, res) => {
+        test.same(
+          { status: res.status, message: res.body.debugInfo[0].message },
+          // TODO change message upon validator update
+          { status: 400, message: 'has to be positive' }
+        );
+        test.end();
+      });
+    });
+
+  });
+
+  usersList.test('Success', success => {
+
+    success.test('List users with default pagination', test => {
+      helpers.json('get', '/users').end( (err, res) => {
+        test.same({
+          status: res.status,
+          count: res.body.rows.length,
+          firstMemberId: res.body.rows[0].id,
+          lastMemberId: _.last(res.body.rows).id
+        }, {
+          status: 200,
+          count: config.paginate.limit,
+          firstMemberId: 1,
+          lastMemberId: 10
+        });
+        test.end();
+      });
+    });
+
+    success.test('List users with custom limit and page', test => {
+      helpers.json('get', '/users?page=1&limit=3').end((err, res) => {
+        test.same({
+          status: res.status,
+          count: res.body.rows.length,
+          firstMemberId: res.body.rows[0].id,
+          lastMemberId: _.last(res.body.rows).id
+        }, {
+          status: 200,
+          count: 3,
+          firstMemberId: 1,
+          lastMemberId: 3
+        });
+        test.end();
+      });
+    });
+
+    success.test('List users for page 2 and custom limit', test => {
+      helpers.json('get', '/users?page=2&limit=7').end((err, res) => {
+        test.same({
+          status: res.status,
+          count: res.body.rows.length,
+          firstMemberId: res.body.rows[0].id,
+          lastMemberId: _.last(res.body.rows).id
+        }, {
+          status: 200,
+          count: 7,
+          firstMemberId: 8,
+          lastMemberId: 14
+        });
+        test.end();
+      });
+    });
+
   });
 });
 
@@ -136,7 +212,6 @@ tests('GET /users/:userId', userShow => {
     });
   });
 });
-
 
 tests('POST /users/:userId', userEdit => {
 

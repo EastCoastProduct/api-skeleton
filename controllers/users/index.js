@@ -25,7 +25,13 @@ const validate = {
       lastname: { type: 'norule', length: { max: 30 }},
       resourceId: { type: 'positive'}
     }
-  })
+  }),
+  list: validator.validation('query', {
+    rules: {
+      page: 'positive',
+      limit: 'positive'
+    }
+  }, true)
 };
 
 function create(req, res, next) {
@@ -45,16 +51,20 @@ function create(req, res, next) {
 }
 
 function list(req, res, next) {
-  services.user.list({ include: [{ model: Resource, required: false }]})
-    .then( users => {
-      res.status(200);
-      res.locals = {
-        count: users.count,
-        rows: _.forEach(users.rows, user => prependS3(user, 'image'))
-      };
-      next();
-    })
-    .catch(err => next(err));
+
+  services.user.listWithPagination(
+    req.query,
+    { include: { model: Resource, required: false }}
+  )
+  .then( users => {
+    res.status(200);
+    res.locals = {
+      count: users.count,
+      rows: _.forEach(users.rows, user => prependS3(user, 'image'))
+    };
+    next();
+  })
+  .catch(err => next(err));
 }
 
 function remove(req, res, next) {
