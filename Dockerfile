@@ -9,4 +9,3 @@ RUN mkdir /home/app/src
 
 COPY . /home/app/src
 WORKDIR /home/app/src
-RUN chmod 767 docker-start.sh
