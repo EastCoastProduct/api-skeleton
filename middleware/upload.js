@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 const config = require('../config');
-const Error400 = require('../utils/errors').Error400;
 const lang = require('../config/language');
 const multer = require('multer');
 const Promise = require('bluebird');
@@ -10,6 +9,9 @@ const path = require('path');
 const services = require('../models/services');
 const utils = require('../utils');
 const uuid = require('node-uuid');
+
+const errors = require('../utils/errors');
+const Error400 = errors.Error400;
 
 const storage = multer.memoryStorage();
 const limits = {
@@ -41,7 +43,7 @@ const documentFilter = (req, file, callback) => {
   let filename = path.extname(file.originalname.toLowerCase());
 
   if (_.includes(supportedDocuments, filename)) return callback(null, true);
-  callback(Error400(lang.unsupportedDocumentExtension));
+  callback(Error400(lang.errors.unsupportedDocumentExtension));
 };
 
 const imageFilter = (req, file, callback) => {
@@ -49,7 +51,7 @@ const imageFilter = (req, file, callback) => {
   let filename = path.extname(file.originalname.toLowerCase());
 
   if (_.includes(supportedImages, filename)) return callback(null, true);
-  callback(Error400(lang.unsupportedImageExtension));
+  callback(Error400(lang.errors.unsupportedImageExtension));
 };
 
 /*
@@ -61,10 +63,10 @@ function multerErrorHandler(err, next) {
 
   switch (err.code) {
   case 'LIMIT_UNEXPECTED_FILE':
-    error = Error400(lang.unrecognizedFileField(err.field)); break;
+    error = Error400(lang.errors.unrecognizedFileField(err.field)); break;
 
   case 'LIMIT_FILE_COUNT':
-    error = Error400(lang.tooManyFiles(config.files.maxNum)); break;
+    error = Error400(lang.errors.tooManyFiles(config.files.maxNum)); break;
 
   default:
     error = err;
@@ -83,7 +85,9 @@ const uploadToS3 = options => (req, res, next) => {
   if (!file) return next();
   file._filename = constructFileName(options, file.originalname);
 
-  services.s3.upload(req.file).then(() => next()).catch(err => next(err));
+  services.s3.upload(req.file)
+  .then( () => next() )
+  .catch(err => next(err) );
 };
 
 function _mapResponseLocals(req, res, next) {
@@ -91,6 +95,7 @@ function _mapResponseLocals(req, res, next) {
     _uploaded: {file: {}, files: []},
     _delete: {file: {}, files: []}
   };
+
   let _uploaded = res.locals._uploaded;
   const file = req.file;
   const files = req.files;
@@ -125,7 +130,9 @@ const _uploadMultipleToS3 = options => (req, res, next) => {
     file._filename = constructFileName(options.field, file.originalname);
     promises.push(services.s3.upload(file));
   });
-  Promise.all(promises).then(() => next()).catch(err => next(err));
+  Promise.all(promises)
+  .then( () => next() )
+  .catch(err => next(err) );
 };
 
 function uploadImages(options) {
@@ -158,7 +165,7 @@ const _uploadSingleFile = options => (req, res, next) =>
     limits: limits,
     fileFilter: options.fileFilter
   })
-  .single(options.field)(req, res, err => multerErrorHandler(err, next));
+  .single(options.field)( req, res, err => multerErrorHandler(err, next));
 
 function uploadImage(options) {
   options.fileFilter = imageFilter;

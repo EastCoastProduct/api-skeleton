@@ -17,7 +17,7 @@ const validate = {
 
 function confirm(req, res, next) {
   services.emailConfirmation.getByToken(req.body.token)
-    .then(emailConfirmation => {
+    .then( emailConfirmation => {
 
       return services.user.doesNotExist({
         where: { email: emailConfirmation.email }
@@ -33,9 +33,8 @@ function confirm(req, res, next) {
     })
     .then( () => services.emailConfirmation.removeByToken(req.body.token))
     .then( () => {
-
       res.status(200);
-      res.locals.message = lang.emailConfirmed;
+      res.locals.message = lang.messages.emailConfirmed;
       next();
     })
     .catch(err => next(err));
@@ -51,7 +50,7 @@ function resend(req, res, next) {
       return services.emailConfirmation.sendMail(user, mailType)
         .then( () => {
           res.status(201);
-          res.locals.message = lang.sentConfirmationEmail;
+          res.locals.message = lang.messages.sentConfirmationEmail;
           next();
         });
     })

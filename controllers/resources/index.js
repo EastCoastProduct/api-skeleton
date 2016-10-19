@@ -1,9 +1,11 @@
 'use strict';
 
 const _ = require('lodash');
-const services = require('../../models/services');
 const lang = require('../../config/language');
-const Error400 = require('../../utils/errors').Error400;
+const services = require('../../models/services');
+
+const errors = require('../../utils/errors');
+const Error400 = errors.Error400;
 
 // map files for db
 function _mapFiles(files) {
@@ -33,12 +35,12 @@ const mapSingle = isRequired => (req, res, next) => {
   const file = req.file;
 
   if (!file) {
-    let error = isRequired ? Error400(lang.fileNotProvided) : null;
+    let error = isRequired ? Error400(lang.errors.fileNotProvided) : null;
     return next(error);
   }
 
   services.resource.create(_mapFiles(file))
-  .then(resource => {
+  .then( resource => {
     res.locals._uploaded.file.id = resource.id;
     req.body.resourceId = resource.id;
     next();
@@ -50,11 +52,12 @@ const mapMultiple = isRequired => (req, res, next) => {
   const files = req.files;
 
   if (_.isEmpty(files)) {
-    let error = isRequired ? Error400(lang.filesNotProvided) : null;
+    let error = isRequired ? Error400(lang.errors.filesNotProvided) : null;
     return next(error);
   }
 
-  services.resource.bulkCreate(_mapFiles(files)).then(resource => {
+  services.resource.bulkCreate(_mapFiles(files))
+  .then( resource => {
     _.merge(res.locals, _mapResponse(resource));
     next();
   })

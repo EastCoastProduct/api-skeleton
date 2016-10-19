@@ -36,22 +36,21 @@ const validate = {
 
 function create(req, res, next) {
   services.user.doesNotExist({ where: { email: req.body.email }})
-    .then( () => services.user.create(req.body))
-    .then( user => services.emailConfirmation.createToken(user)
-      .then( emailConfirmation => services.emailConfirmation.sendMail({
-        email: user.email, token: emailConfirmation.token
-      }))
-      .then(() => {
-        res.status(201);
-        res.locals = user;
-        next();
-      })
-    )
-    .catch(err => next(err));
+  .then( () => services.user.create(req.body))
+  .then( user => services.emailConfirmation.createToken(user)
+    .then( emailConfirmation => services.emailConfirmation.sendMail({
+      email: user.email, token: emailConfirmation.token
+    }))
+    .then(() => {
+      res.status(201);
+      res.locals = user;
+      next();
+    })
+  )
+  .catch(err => next(err));
 }
 
 function list(req, res, next) {
-
   services.user.listWithPagination(
     req.query,
     { include: { model: Resource, required: false }}
@@ -72,7 +71,7 @@ function remove(req, res, next) {
   services.user.removeById(req.params.userId)
     .then( () => {
       res.status(200);
-      res.locals.message = lang.successfullyRemoved(lang.models.user);
+      res.locals.message = lang.messages.successfullyRemoved(lang.models.user);
       next();
     })
     .catch(err => next(err));
@@ -83,7 +82,7 @@ function show(req, res, next) {
     req.params.userId,
     { include: [{ model: Resource, required: false }]}
   )
-  .then(user => {
+  .then( user => {
     res.locals = prependS3(user, 'image');
     res.status(200);
     next();
@@ -97,7 +96,8 @@ function update(req, res, next) {
   .then( () =>
     services.user.update(req.body, { id: req.params.userId })
       .then( updatedUser => {
-        return updatedUser.getResource().then(resource => {
+        return updatedUser.getResource()
+        .then( resource => {
           updatedUser.resource = resource;
           res.status(200);
           res.locals = prependS3(updatedUser, 'image');

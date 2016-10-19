@@ -22,13 +22,13 @@ const createToken = user =>
 
 const checkIfEmailInUse = newEmail =>
   User.count({ where: { email: newEmail }})
-    .then(user => {
-      if (user) throw errors.Error400(lang.emailInUse);
+    .then( user => {
+      if (user) throw errors.Error400(lang.errors.emailInUse);
 
       return EmailConfirmation.count({ where: { email: newEmail }})
         .then( emailConfirmationCount => {
           if (emailConfirmationCount > 0) {
-            throw errors.Error400(lang.emailInUse);
+            throw errors.Error400(lang.errors.emailInUse);
           }
         });
     });
@@ -42,13 +42,13 @@ const createWithEmail = data =>
 const getUserAndCheckPassword = data =>
   User.findOne({ where: {email: data.email }})
     .then( user => {
-      if (!user) throw errors.Error404(lang.notFound(lang.models.user));
+      if (!user) throw errors.Error404(lang.errors.notFound(lang.models.user));
 
       const sentPassword = data.password;
       const oldPassword = user.password.trim();
       let isCorrectPassword = bcrypt.compareSync(sentPassword, oldPassword);
 
-      if (!isCorrectPassword) throw errors.Error400(lang.wrongPassword);
+      if (!isCorrectPassword) throw errors.Error400(lang.errors.wrongPassword);
       return user;
     });
 
@@ -60,13 +60,13 @@ const getUserAndCreateToken = email =>
   User.findOne({ where: { email: email }})
     .then( user => {
 
-      if (!user) throw errors.Error404(lang.notFound(lang.models.user));
+      if (!user) throw errors.Error404(lang.errors.notFound(lang.models.user));
 
       return user;
     })
     .then( user =>
       EmailConfirmation.findOne({ where: { userId: user.id }})
-        .then(emailConfirmation => {
+        .then( emailConfirmation => {
           if (emailConfirmation) return emailConfirmation.save();
 
           return createToken({id: user.id, email: email});

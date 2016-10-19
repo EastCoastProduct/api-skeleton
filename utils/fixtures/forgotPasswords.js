@@ -7,22 +7,17 @@ const preset = () => ({
   token: uuid.v1()
 });
 
-const forgotPasswords = [
-  {
-    userId: 1
-  },
-  {
-    // this token will be removed
-    userId: 2
-  },
-  {
-    // this token will be removed
-    userId: 3
-  },
-  {
-    // this token will be used
-    userId: 15
-  }
-];
+const forgotPasswords = [{
+  userId: 1
+}, {
+  // this token will be removed
+  userId: 2
+}, {
+  // this token will be removed
+  userId: 3
+}, {
+  // this token will be used
+  userId: 15
+}];
 
 module.exports = populatePresets(forgotPasswords, preset);

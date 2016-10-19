@@ -26,9 +26,9 @@ function create(req, res, next) {
       email: req.body.newEmail,
       id: user.id
     }))
-    .then(() => {
+    .then( () => {
       res.status(200);
-      res.locals.message = lang.requestChangeEmail;
+      res.locals.message = lang.messages.requestChangeEmail;
       next();
     })
   )

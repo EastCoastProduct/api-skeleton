@@ -10,11 +10,11 @@ tests('POST /authenticate', authenticate => {
     failed.test('Invalid parameters', test => {
       helpers.json('post', '/superAdmin/authenticate')
         .send({ invalidParam: 'wrong' })
-        .end((err, res) => {
+        .end( (err, res) => {
           const debugInfoError = [
-            { path: 'invalidParam', message: lang.unrecognizedParameter },
-            { path: 'email', message: lang.required },
-            { path: 'password', message: lang.required }
+            { path: 'invalidParam', message: lang.errors.unrecognizedParameter },
+            { path: 'email', message: lang.errors.required },
+            { path: 'password', message: lang.errors.required }
           ];
 
           test.same({
@@ -23,7 +23,7 @@ tests('POST /authenticate', authenticate => {
             debugInfo: res.body.debugInfo
           }, {
             status: 400,
-            message: lang.parametersError,
+            message: lang.errors.parametersError,
             debugInfo: debugInfoError
           });
           test.end();
@@ -36,10 +36,10 @@ tests('POST /authenticate', authenticate => {
           email: 'not.user@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) });
+            { status: 404, message: lang.errors.notFound(lang.models.user) });
           test.end();
         });
     });
@@ -50,10 +50,10 @@ tests('POST /authenticate', authenticate => {
           email: 'super.admin@mail.com',
           password: 'Wrong123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.wrongPassword }
+            { status: 400, message: lang.errors.wrongPassword }
           );
           test.end();
         });
@@ -69,7 +69,7 @@ tests('POST /authenticate', authenticate => {
           email: 'super.admin@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(res.status, 200);
           test.error(!res.body.token, 'No token');
           test.error(!res.body.user, 'No user');

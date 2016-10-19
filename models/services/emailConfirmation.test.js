@@ -13,7 +13,7 @@ tests('Email confirmation service', emailConfirmation => {
       services.emailConfirmation.getByToken().catch(err => {
         test.same(err, {
           status: 404,
-          message: lang.notFound(lang.models.emailConfirmation)
+          message: lang.errors.notFound(lang.models.emailConfirmation)
         });
         test.end();
       });
@@ -24,7 +24,7 @@ tests('Email confirmation service', emailConfirmation => {
         .catch(err => {
           test.same(err, {
             status: 404,
-            message: lang.notFound(lang.models.user)
+            message: lang.errors.notFound(lang.models.user)
           });
           test.end();
         });
