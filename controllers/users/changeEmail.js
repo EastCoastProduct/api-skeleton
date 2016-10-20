@@ -7,31 +7,24 @@ const lang = require('../../config/language');
 const validate = {
   create: validator.validation('body', {
     rules: {
-      oldEmail: 'email',
       newEmail: 'email',
       password: 'password'
     },
-    required: ['oldEmail', 'newEmail', 'password']
+    required: ['newEmail', 'password']
   })
 };
 
 function create(req, res, next) {
-  services.emailConfirmation.getUserAndCheckPassword({
-    email: req.body.oldEmail,
-    password: req.body.password
-  })
-  .then( user =>
-    services.emailConfirmation.checkIfEmailInUse(req.body.newEmail)
-    .then( () => services.emailConfirmation.createWithEmail({
-      email: req.body.newEmail,
-      id: user.id
-    }))
-    .then(() => {
-      res.status(200);
-      res.locals.message = lang.requestChangeEmail;
-      next();
-    })
+  services.emailConfirmation.createEmailConfirmationWithEmail(
+    req.params.userId,
+    req.body.newEmail.toLowerCase(),
+    req.body.password
   )
+  .then( () => {
+    res.status(200);
+    res.locals.message = lang.requestChangeEmail;
+    next();
+  })
   .catch(err => next(err));
 }
 

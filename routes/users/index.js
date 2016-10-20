@@ -32,8 +32,9 @@ module.exports = function(router) {
       users.remove
     );
 
-  router.route('/changeEmail')
+  router.route('/users/:userId/changeEmail')
     .post(
+      authorization.isOwner,
       users.emailUpdate.validate.create,
       users.emailUpdate.create
     );
@@ -57,9 +58,9 @@ module.exports = function(router) {
       users.passwords.reset
     );
 
-  router.route('/resendConfirmation')
+  router.route('/users/:userId/resendConfirmation')
     .post(
-      users.emailConfirmation.validate.resend,
+      authorization.isOwner,
       users.emailConfirmation.resend
     );
 
