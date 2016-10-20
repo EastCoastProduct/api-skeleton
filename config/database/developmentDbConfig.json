@@ -1,8 +1,8 @@
 {
-  "username": "api",
+  "username": "dev_user",
   "password": "ecp1950",
   "database": "dev_db",
-  "host": "127.0.0.1",
+  "host": "ecp_dev_db",
   "dialect": "postgres",
   "logging": false,
   "seederStorage": "json",

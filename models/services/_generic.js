@@ -101,7 +101,7 @@ module.exports = (Model, keyword) => {
       order: ['id']
     };
 
-    _.mapKeys(optionalArguments, val => _.merge(params, val));
+    _.mapKeys(optionalArguments, (val, key) => _.merge(params, { [key]: val }));
 
     return Model.findAndCountAll(params);
   };

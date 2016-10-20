@@ -132,8 +132,8 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
             .send({ token: emailConfirmation.token })
             .end( (err, res) => {
               test.same(
-                { status: res.status, message: res.body.message },
-                { status: 200, message: lang.messages.emailConfirmed }
+                { status: res.status, email: res.body.email },
+                { status: 200, email: 'cool.mail@mail.com' }
               );
               test.end();
             });
