@@ -9,83 +9,128 @@ const emailConfirmationLang = lang.models.emailConfirmation;
 const mailer = require('../../utils/mailer');
 const generic = require('./_generic')(EmailConfirmation, emailConfirmationLang);
 
-const sendMail = (user, type) => {
-  let options = { user: { email: user.email }, token: user.token };
-
-  if (type) return mailer.emailUpdate(options);
-  return mailer.emailConfirm(options);
+const removeEmailConfirmation = function(userId) {
+  return EmailConfirmation.destroy({ where: { userId: userId }});
 };
 
-const createToken = user =>
-  User.update({ confirmed: false }, { where: { id: user.id }})
-    .then( () => generic.create({ userId: user.id }));
+function confirm(token) {
 
-const checkIfEmailInUse = newEmail =>
-  User.count({ where: { email: newEmail }})
-    .then(user => {
-      if (user) throw errors.Error400(lang.emailInUse);
+  const checkIfNewEmailInUse = function(email) {
+    return User.count({ where: { email: email }}).then(function(userCount) {
+      if (userCount > 0) {
+        throw errors.Error400(lang.alreadyExists(lang.models.user));
+      }
+    });
+  };
+
+  return generic.getOne({ token: token })
+    .then(function(emailConfirmation) {
+      this.emailConfirmation = emailConfirmation;
+
+      if (emailConfirmation.email) {
+        return checkIfNewEmailInUse(emailConfirmation.email);
+      }
+    })
+    .then(function() {
+      return this.emailConfirmation.getUser();
+    })
+    .then(function(user) {
+      if (this.emailConfirmation.email) {
+        user.email = this.emailConfirmation.email;
+      }
+      user.confirmed = true;
+
+      return user.save();
+    })
+    .then(function(user) {
+      return removeEmailConfirmation(user.id);
+    });
+}
+
+function sendMail(user, type) {
+  let options = { user: { email: user.email }, token: user.token };
+
+  if (type === 'emailUpdate') return mailer.emailUpdate(options);
+  return mailer.emailConfirm(options);
+}
+
+function resendEmailConfirmation(userId) {
+
+  return generic.getOne({ userId: userId })
+    .bind({})
+    .then(function(emailConfirmation) {
+      this.emailConfirmationData = {
+        email: emailConfirmation.email
+      };
+      return removeEmailConfirmation(userId);
+    })
+    .then(function() {
+      let newEmailConfirmationData = {
+        email: this.emailConfirmationData.email,
+        userId: userId
+      };
+
+      return generic.create(newEmailConfirmationData);
+    })
+    .then(function(newEmailConfirmation) {
+      this.emailConfirmationData.token = newEmailConfirmation.token;
+
+      if (this.emailConfirmationData.email) {
+        this.emailConfirmationData.mailType = 'emailUpdate';
+        return;
+      }
+
+      return newEmailConfirmation.getUser().bind(this).then(function(user) {
+        this.emailConfirmationData.email = user.email;
+      });
+    })
+    .then(function() {
+      return sendMail({
+        email: this.emailConfirmationData.email,
+        token: this.emailConfirmationData.token
+      }, this.emailConfirmationData.mailType);
+    });
+}
+
+function createEmailConfirmationWithEmail(userId, newEmail, userPassword) {
+
+  const checkIfEmailInUse = () =>
+    User.count({ where: { email: newEmail }})
+    .then(function(userCount) {
+      if (userCount > 0) throw errors.Error400(lang.emailInUse);
 
       return EmailConfirmation.count({ where: { email: newEmail }})
-        .then( emailConfirmationCount => {
+        .then(function(emailConfirmationCount) {
           if (emailConfirmationCount > 0) {
             throw errors.Error400(lang.emailInUse);
           }
         });
     });
 
-const createWithEmail = data =>
-  generic.create({ email: data.email, userId: data.id })
-    .then( newEmailConfirmation => sendMail(
-      { email: data.email, token: newEmailConfirmation.token }, 'emailUpdate'
-    ));
-
-const getUserAndCheckPassword = data =>
-  User.findOne({ where: {email: data.email }})
+  return User.findById(userId)
     .then( user => {
-      if (!user) throw errors.Error404(lang.notFound(lang.models.user));
-
-      const sentPassword = data.password;
       const oldPassword = user.password.trim();
-      let isCorrectPassword = bcrypt.compareSync(sentPassword, oldPassword);
+      let isCorrectPassword = bcrypt.compareSync(userPassword, oldPassword);
 
       if (!isCorrectPassword) throw errors.Error400(lang.wrongPassword);
-      return user;
-    });
-
-const getByToken = token =>
-  generic.getOne({ token: token })
-  .then( user => user);
-
-const getUserAndCreateToken = email =>
-  User.findOne({ where: { email: email }})
-    .then( user => {
-
-      if (!user) throw errors.Error404(lang.notFound(lang.models.user));
-
-      return user;
     })
-    .then( user =>
-      EmailConfirmation.findOne({ where: { userId: user.id }})
-        .then(emailConfirmation => {
-          if (emailConfirmation) return emailConfirmation.save();
+    .then( () => checkIfEmailInUse())
+    .then( () => removeEmailConfirmation(userId))
+    .then( () => generic.create({ email: newEmail, userId: userId }))
+    .then( newEmailConfirmation => sendMail(
+      { email: newEmail, token: newEmailConfirmation.token }, 'emailUpdate'
+    ));
+}
 
-          return createToken({id: user.id, email: email});
-        }))
-        .then( newEmailConfirmation => ({
-          email: newEmailConfirmation.email || email,
-          token: newEmailConfirmation.token,
-          newEmail: !!newEmailConfirmation.email
-        }));
-
-const removeByToken = token => generic.remove({ token: token });
+// TODO remove with users controller refactor
+function createToken(user) {
+  return generic.create({ userId: user.id });
+}
 
 module.exports = {
-  createToken: createToken,
-  checkIfEmailInUse: checkIfEmailInUse,
-  createWithEmail: createWithEmail,
-  getUserAndCheckPassword: getUserAndCheckPassword,
-  getByToken: getByToken,
-  getUserAndCreateToken: getUserAndCreateToken,
-  removeByToken: removeByToken,
-  sendMail: sendMail
+  confirm: confirm,
+  sendMail: sendMail,
+  resendEmailConfirmation: resendEmailConfirmation,
+  createEmailConfirmationWithEmail: createEmailConfirmationWithEmail,
+  createToken: createToken
 };

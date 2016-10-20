@@ -3,21 +3,28 @@
 const tests = require('tape');
 const helpers = require('../../utils/test/helper');
 const EmailConfirmation = require('../../models').emailConfirmation;
+const user1Auth = helpers.getAuthorizationHeader(1);
+const user11Auth = helpers.getAuthorizationHeader(11);
 const lang = require('../../config/language');
 
-tests('POST /changeEmail', changeEmail => {
+tests('POST /users/:userId/changeEmail', changeEmail => {
 
   changeEmail.test('Failed', failed => {
     failed.test('Invalid params', test => {
-      helpers.json('post', '/changeEmail')
+      helpers.json('post', '/users/1/changeEmail')
+        .set('Authorization', user1Auth)
         .send({ wrong: 'asd' })
-        .end((err, res) => {
-          const debugInfoError = [
-            { message: lang.unrecognizedParameter, path: 'wrong' },
-            { message: lang.required, path: 'oldEmail' },
-            { message: lang.required, path: 'newEmail' },
-            { message: lang.required, path: 'password' }
-          ];
+        .end( (err, res) => {
+          const debugInfoError = [{
+            message: lang.unrecognizedParameter,
+            path: 'wrong'
+          }, {
+            message: lang.required,
+            path: 'newEmail'
+          }, {
+            message: lang.required,
+            path: 'password'
+          }];
 
           test.same({
             debugInfo: res.body.debugInfo,
@@ -32,30 +39,30 @@ tests('POST /changeEmail', changeEmail => {
         });
     });
 
-    failed.test('User not found', test => {
-      helpers.json('post', '/changeEmail')
+    failed.test('User not authorized', test => {
+      helpers.json('post', '/users/2/changeEmail')
+        .set('Authorization', user1Auth)
         .send({
-          oldEmail: 'not.a.user@mail.com',
           newEmail: 'totaly.changed@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) }
+            { status: 403, message: lang.notAuthorized }
           );
           test.end();
         });
     });
 
     failed.test('User sent wrong password', test => {
-      helpers.json('post', '/changeEmail')
+      helpers.json('post', '/users/1/changeEmail')
+        .set('Authorization', user1Auth)
         .send({
-          oldEmail: 'user@mail.com',
           newEmail: 'totaly.changed123@mail.com',
           password: 'WrongPassword123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
             { status: 400, message: lang.wrongPassword }
@@ -65,13 +72,13 @@ tests('POST /changeEmail', changeEmail => {
     });
 
     failed.test('User sent an email that is already in use', test => {
-      helpers.json('post', '/changeEmail')
+      helpers.json('post', '/users/1/changeEmail')
+        .set('Authorization', user1Auth)
         .send({
-          oldEmail: 'user@mail.com',
           newEmail: 'forgot.password@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
             { status: 400, message: lang.emailInUse }
@@ -81,16 +88,16 @@ tests('POST /changeEmail', changeEmail => {
     });
 
     failed.test('User sent an email that will be in use', test => {
-      helpers.json('post', '/changeEmail')
+      helpers.json('post', '/users/1/changeEmail')
+        .set('Authorization', user1Auth)
         .send({
-          oldEmail: 'regular@mail.com',
           newEmail: 'change3.email@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 400, message: lang.emailInUse}
+            { status: res.status, message: res.body.message },
+            { status: 400, message: lang.emailInUse }
           );
           test.end();
         });
@@ -98,18 +105,18 @@ tests('POST /changeEmail', changeEmail => {
   });
 
   changeEmail.test('Success', success => {
-    let emailStub = helpers.stubMailer({status: 200});
+    let emailStub = helpers.stubMailer({ status: 200 });
     success.test('User request for email change success', test => {
-      helpers.json('post', '/changeEmail')
+      helpers.json('post', '/users/11/changeEmail')
+        .set('Authorization', user11Auth)
         .send({
-          oldEmail: 'change.email@mail.com',
           newEmail: 'new_changed.email@mail.com',
           password: 'Password123'
         })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
-            {status: res.status, message: res.body.message},
-            {status: 200, message: lang.requestChangeEmail}
+            { status: res.status, message: res.body.message },
+            { status: 200, message: lang.requestChangeEmail }
           );
           test.error(!emailStub.calledOnce, 'Mailer should have been called');
           helpers.resetStub(emailStub);
@@ -119,13 +126,13 @@ tests('POST /changeEmail', changeEmail => {
 
     success.test('User successfully changed email', test => {
       EmailConfirmation.findOne({ where: { email: 'cool.mail@mail.com' }})
-        .then(ecs => {
+        .then( emailConfirmation => {
           helpers.json('post', '/emailConfirm')
-            .send({token: ecs.token})
-            .end((err, res) => {
+            .send({ token: emailConfirmation.token })
+            .end( (err, res) => {
               test.same(
-                {status: res.status, message: res.body.message},
-                {status: 200, message: lang.emailConfirmed}
+                { status: res.status, message: res.body.message },
+                { status: 200, message: lang.emailConfirmed }
               );
               test.end();
             });

@@ -8,54 +8,27 @@ const validate = {
   confirm: validator.validation('body', {
     rules: {token: 'uuid'},
     required: ['token']
-  }),
-  resend: validator.validation('body', {
-    rules: {email: 'email'},
-    required: ['email']
   })
 };
 
 function confirm(req, res, next) {
-  services.emailConfirmation.getByToken(req.body.token)
-    .then(emailConfirmation => {
-
-      return services.user.doesNotExist({
-        where: { email: emailConfirmation.email }
-      })
-      .then( () =>
-        emailConfirmation.getUser().then( user => {
-          if (emailConfirmation.email) user.email = emailConfirmation.email;
-
-          user.confirmed = true;
-
-          return user.save();
-        }));
-    })
-    .then( () => services.emailConfirmation.removeByToken(req.body.token))
-    .then( () => {
-
-      res.status(200);
-      res.locals.message = lang.emailConfirmed;
-      next();
-    })
-    .catch(err => next(err));
+  services.emailConfirmation.confirm(req.body.token)
+  .then( () => {
+    res.status(200);
+    res.locals.message = lang.emailConfirmed;
+    next();
+  })
+  .catch(err => next(err));
 }
 
 function resend(req, res, next) {
-  services.emailConfirmation.getUserAndCreateToken(req.body.email)
-    .then( user => {
-      let mailType;
-
-      if (user.newEmail) mailType = 'emailChange';
-
-      return services.emailConfirmation.sendMail(user, mailType)
-        .then( () => {
-          res.status(201);
-          res.locals.message = lang.sentConfirmationEmail;
-          next();
-        });
-    })
-    .catch(err => next(err));
+  services.emailConfirmation.resendEmailConfirmation(req.params.userId)
+  .then( () => {
+    res.status(201);
+    res.locals.message = lang.sentConfirmationEmail;
+    next();
+  })
+  .catch(err => next(err));
 }
 
 

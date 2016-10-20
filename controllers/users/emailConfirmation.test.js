@@ -4,30 +4,22 @@ const tests = require('tape');
 const uuid = require('node-uuid');
 const User = require('../../models').user;
 const helpers = require('../../utils/test/helper');
+const user4Auth = helpers.getAuthorizationHeader(4);
+const user10Auth = helpers.getAuthorizationHeader(10);
+const user19Auth = helpers.getAuthorizationHeader(19);
 const EmailConfirmation = require('../../models').emailConfirmation;
 const lang = require('../../config/language');
 
-tests('POST /resendConfirmation', resendConfirmation => {
+tests('POST /users/:userId/resendConfirmation', resendConfirmation => {
   resendConfirmation.test('Failed', failed => {
-    failed.test('Invalid params', test => {
-      helpers.json('post', '/resendConfirmation')
-        .send({ wrong: 'invalid' })
-        .end( (err, res) => {
-          test.same(
-            { status: res.status, message: res.body.message },
-            { status: 400, message: lang.parametersError }
-          );
-          test.end();
-        });
-    });
-
     failed.test('Token not found', test => {
-      helpers.json('post', '/resendConfirmation')
-        .send({ email: 'jack@mail.com' })
+      helpers.json('post', '/users/4/resendConfirmation')
+        .set('Authorization', user4Auth)
+        .send({ email: 'not.real.user@mail.com' })
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) }
+            { status: 404, message: lang.notFound(lang.models.emailConfirmation) }
           );
           test.end();
         });
@@ -35,11 +27,11 @@ tests('POST /resendConfirmation', resendConfirmation => {
   });
 
   resendConfirmation.test('Success', success => {
-    success.test('Successfully resent email', test => {
-      let emailStub = helpers.stubMailer();
+    let emailStub = helpers.stubMailer();
 
-      helpers.json('post', '/resendConfirmation')
-        .send({ email: 'confirmed.one@mail.com' })
+    success.test('Successfully resent email', test => {
+      helpers.json('post', '/users/10/resendConfirmation')
+        .set('Authorization', user10Auth)
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
@@ -55,9 +47,35 @@ tests('POST /resendConfirmation', resendConfirmation => {
           })
           .then( users => {
             test.error(!users, 'The user should not be confirmed');
-            helpers.resetStub(emailStub);
+            helpers.resetStub(emailStub, false);
             test.end();
           });
+        });
+    });
+
+    success.test('Successfully resent change email', test => {
+      EmailConfirmation.findOne({ where: { userId: 19 }})
+        .then( oldEmailConfirmation => {
+          let oldToken = oldEmailConfirmation.token;
+
+          helpers.json('post', '/users/19/resendConfirmation')
+            .set('Authorization', user19Auth)
+            .end( (err, res) => {
+              test.same(
+                { status: res.status, message: res.body.message },
+                { status: 201, message: lang.sentConfirmationEmail }
+              );
+
+              EmailConfirmation.findOne({ where: { userId: 19 }})
+                .then( updatedEmailConfirmation => {
+                  test.error(
+                    updatedEmailConfirmation.token === oldToken,
+                    'Tokens should not be the same'
+                  );
+                  helpers.resetStub(emailStub);
+                  test.end();
+                });
+            });
         });
     });
   });
@@ -111,7 +129,7 @@ tests('POST /emailConfirm', emailConfirmation => {
 
   emailConfirmation.test('Success', success => {
     success.test('Successfully confirmed user', test => {
-      EmailConfirmation.findOne({ where: { userId: 9 }}).then(emailConfirmationData => {
+      EmailConfirmation.findOne({ where: { userId: 9 }}).then( emailConfirmationData => {
         helpers.json('post', '/emailConfirm')
           .send({ token: emailConfirmationData.token })
           .end( (err, res) => {
