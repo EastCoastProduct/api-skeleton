@@ -1,23 +1,38 @@
 'use strict';
 /* eslint-disable no-console */
 const pg = require('pg');
+const Promise = require('bluebird');
 const cleaner = require('postgres-cleaner');
 
 const dbArgument = () => (process.argv[3] === 'dev')
   ? 'dev_db'
   : 'test_db';
 
+const dbUser = () => (process.argv[3] === 'dev')
+  ? 'dev_user'
+  : 'test_user';
+
 function recreateDatabase() {
-  var connectionString = 'postgres://postgres@localhost/postgres';
+  var connectionString =
+    `postgres://${dbUser()}:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
 
   pg.connect(connectionString)
-    .then( connection =>
-      connection.query(`drop database ${dbArgument()}`).then( () => connection)
-    )
-    .then( connection =>
-      connection.query(`create database ${dbArgument()}`)
-      .then( () => process.exit(0))
-    )
+    .then( connection => {
+      return connection.query(
+        'SELECT table_name FROM information_schema.tables ' +
+        'WHERE table_schema = \'public\''
+      )
+      .then( tables => {
+        if (tables.rows.length === 0) return;
+
+        let promises = tables.rows.map(table =>
+         connection.query(`DROP TABLE "${table.table_name}" CASCADE`)
+        );
+
+        return Promise.all(promises);
+      });
+    })
+    .then( () => process.exit(0))
     .catch( err => {
       console.log(err);
       process.exit(1);
@@ -25,7 +40,8 @@ function recreateDatabase() {
 }
 
 function cleanDatabase() {
-  var connectionString = `postgres://postgres@localhost/${dbArgument()}`;
+  var connectionString =
+    `postgres://${dbUser()}:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
 
   pg.connect(connectionString, (err, connection) => {
     if (err) throw err;

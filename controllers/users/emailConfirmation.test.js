@@ -134,8 +134,8 @@ tests('POST /emailConfirm', emailConfirmation => {
           .send({ token: emailConfirmationData.token })
           .end( (err, res) => {
             test.same(
-              { status: res.status, message: res.body.message },
-              { status: 200, message: lang.messages.emailConfirmed }
+              { status: res.status, email: res.body.email },
+              { status: 200, email: 'update.one@mail.com' }
             );
             emailConfirmationData.getUser().then( user => {
               test.error(!user.confirmed, 'User not confirmed');
