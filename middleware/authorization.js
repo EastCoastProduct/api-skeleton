@@ -14,22 +14,37 @@ const User = models.user;
 const SuperAdmin = models.superAdmin;
 
 function getUser() {
+  const getSuperAdmin = (req) => {
+    return SuperAdmin.findById(req.user.userId)
+      .then( superAdmin => {
+        if (!superAdmin) {
+          throw Error404(lang.errors.notFound(lang.models.user));
+        }
+
+        return superAdmin;
+      });
+  };
+
+  const getRegularUser = (req) => {
+    return User.findById(req.user.userId)
+      .then( user => {
+        if (!user) throw Error404(lang.errors.notFound(lang.models.user));
+
+        return user;
+      });
+  };
 
   return function(req, res, next) {
     if (req.user.isSuperAdmin) {
-      SuperAdmin.findById(req.user.userId)
-        .then( superAdmin => {
-          if (!superAdmin) throw Error404(lang.notFound(lang.models.user));
-
+      getSuperAdmin(req)
+        .then(function(superAdmin) {
           req.user.dao = superAdmin;
           next();
         })
         .catch(err => next(err));
     } else {
-      User.findById(req.user.userId)
-        .then( user => {
-          if (!user) throw Error404(lang.notFound(lang.models.user));
-
+      getRegularUser(req)
+        .then(function(user) {
           req.user.dao = user;
           next();
         })
@@ -47,16 +62,17 @@ function setUserPrivilege(type) {
 
     // regular user requesting super admin route
     if (type === 'superAdmin' && !tokenUser.isSuperAdmin) {
-      throw Error403(lang.notAuthorized);
+      throw Error403(lang.errors.notAuthorized);
     }
 
+    // check if user is confirmed
     if (type === 'confirmed' && !user.confirmed) {
-      throw Error403(lang.notConfirmed(lang.models.user));
+      throw Error403(lang.errors.notConfirmed(lang.models.user));
     }
 
     // check user (self) specific routes
     if (type === 'isOwner' && parseInt(req.params.userId) !== user.id) {
-      throw Error403(lang.notAuthorized);
+      throw Error403(lang.errors.notAuthorized);
     }
 
     next();

@@ -12,7 +12,7 @@ tests('Middleware test', middleware => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.routeNotFound }
+            { status: 404, message: lang.errors.routeNotFound }
           );
           test.end();
         });

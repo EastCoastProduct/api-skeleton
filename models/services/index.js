@@ -6,7 +6,7 @@ const langModel = require('../../config/language').models;
 
 module.exports = {
   emailConfirmation: require('./emailConfirmation'),
-  forgotPassword: require('./forgotPassword'),
+  passwords: require('./passwords'),
   resource: require('./resource'),
   s3: require('./s3'),
   user: generic(models.user, langModel.user),

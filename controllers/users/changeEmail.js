@@ -22,7 +22,7 @@ function create(req, res, next) {
   )
   .then( () => {
     res.status(200);
-    res.locals.message = lang.requestChangeEmail;
+    res.locals.message = lang.messages.requestChangeEmail;
     next();
   })
   .catch(err => next(err));

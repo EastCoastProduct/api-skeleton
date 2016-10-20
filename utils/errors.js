@@ -17,7 +17,7 @@ CustomError.prototype.constructor = CustomError;
 CustomError.prototype = Object.create(Error.prototype);
 
 // Base error that takes care of creating new error object
-// and is used by other shortcut error functions
+// and is used by other to shortcut error functions
 function BaseError(status, message, debug) {
   return new CustomError(status, message, debug);
 }

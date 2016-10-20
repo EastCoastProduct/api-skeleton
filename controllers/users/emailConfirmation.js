@@ -15,7 +15,7 @@ function confirm(req, res, next) {
   services.emailConfirmation.confirm(req.body.token)
   .then( () => {
     res.status(200);
-    res.locals.message = lang.emailConfirmed;
+    res.locals.message = lang.messages.emailConfirmed;
     next();
   })
   .catch(err => next(err));
@@ -25,7 +25,7 @@ function resend(req, res, next) {
   services.emailConfirmation.resendEmailConfirmation(req.params.userId)
   .then( () => {
     res.status(201);
-    res.locals.message = lang.sentConfirmationEmail;
+    res.locals.message = lang.messages.sentConfirmationEmail;
     next();
   })
   .catch(err => next(err));

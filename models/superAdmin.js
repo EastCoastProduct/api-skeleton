@@ -35,6 +35,15 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   }, {
+    instanceMethods: {
+      toJSON: function() {
+        var values = this.dataValues;
+
+        values.password = undefined;
+
+        return values;
+      }
+    },
     tableName: 'super_admins'
   });
 

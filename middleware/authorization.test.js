@@ -16,7 +16,7 @@ tests('Authorization', authorizationTest => {
       authorization.isConfirmed(req, res, err => {
         test.same(
           err,
-          { status: 403, message: lang.notConfirmed(lang.models.user) }
+          { status: 403, message: lang.errors.notConfirmed(lang.models.user) }
         );
         test.end();
       });
@@ -27,17 +27,27 @@ tests('Authorization', authorizationTest => {
       req.headers.authorization = helpers.getAuthorizationHeader(1950);
 
       authorization.isConfirmed(req, res, err => {
-        test.same(err, { status: 404, message: lang.notFound(lang.models.user) });
+        test.same(err, { status: 404, message: lang.errors.notFound(lang.models.user) });
+        test.end();
+      });
+    });
+
+    failed.test('It should fail because super admin user does not exist', test => {
+      const { req, res } = helpers.generateRequestAndResponse();
+      req.headers.authorization = helpers.getSuperAdminAuthorizationHeader(1950);
+
+      authorization.isSuperAdmin(req, res, err => {
+        test.same(err, { status: 404, message: lang.errors.notFound(lang.models.user) });
         test.end();
       });
     });
 
     failed.test('It should fail if user is not super admin', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
       req.headers.authorization = helpers.getAuthorizationHeader(3);
 
       authorization.isSuperAdmin(req, res, err => {
-        test.same(err, { status: 403, message: lang.notAuthorized });
+        test.same(err, { status: 403, message: lang.errors.notAuthorized });
         test.end();
       });
     });
@@ -52,7 +62,7 @@ tests('Authorization', authorizationTest => {
       req.headers.authorization = helpers.getAuthorizationHeader(3);
 
       authorization.isOwner(req, res, err => {
-        test.same(err, { status: 403, message: lang.notAuthorized });
+        test.same(err, { status: 403, message: lang.errors.notAuthorized });
         test.end();
       });
     });
@@ -60,7 +70,7 @@ tests('Authorization', authorizationTest => {
 
   authorizationTest.test('Success', success => {
     success.test('It should succeed because user is confirmed', test => {
-      const {req, res} = helpers.generateRequestAndResponse();
+      const { req, res } = helpers.generateRequestAndResponse();
       req.headers.authorization = helpers.getAuthorizationHeader(3);
 
       authorization.isConfirmed(req, res, err => {

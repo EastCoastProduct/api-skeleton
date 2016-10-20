@@ -6,12 +6,14 @@ const Promise = require('bluebird');
 
 /* eslint-disable no-console */
 function _deleteHangingFiles(err, req, res, next) {
-  let l = res.locals;
+  let locals = res.locals;
   let deleteFiles = [];
   let deletePromises = [];
 
-  if (!err) l._uploaded = {};
-  if (_.isEmpty(l._uploaded) && _.isEmpty(l._delete)) return next(err);
+  if (!err) locals._uploaded = {};
+  if (_.isEmpty(locals._uploaded) && _.isEmpty(locals._delete)) {
+    return next(err);
+  }
 
   // Don't wait for files or give error message
   function _handleRemove() {
@@ -21,19 +23,19 @@ function _deleteHangingFiles(err, req, res, next) {
 
   const _makePromises = file => {
     if (file.id) {
-      deletePromises.push(services.resource.remove({id: file.id}));
+      deletePromises.push(services.resource.remove({ id: file.id }));
     } else if (file._filename) {
       deletePromises.push(services.s3.remove(file));
     }
   };
 
-  const _addToDelete = o => {
-    if (!_.isArray(o)) return deleteFiles.push(o);
-    deleteFiles = deleteFiles.concat(o);
+  const _addToDelete = files => {
+    if (!_.isArray(files)) return deleteFiles.push(files);
+    deleteFiles = deleteFiles.concat(files);
   };
 
-  _.mapValues(l._uploaded, _addToDelete);
-  _.mapValues(l._delete, _addToDelete);
+  _.mapValues(locals._uploaded, _addToDelete);
+  _.mapValues(locals._delete, _addToDelete);
 
   _.map(deleteFiles, _makePromises);
   _handleRemove();

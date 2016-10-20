@@ -25,23 +25,23 @@ const validate = {
 
 function authenticate(req, res, next) {
   SuperAdmin.findOne({ where: { email: req.body.email }})
-    .then( user => {
-      if (!user) throw Error404(lang.notFound(lang.models.user));
+    .then( superAdmin => {
+      if (!superAdmin) throw Error404(lang.errors.notFound(lang.models.user));
 
       const sentPassword = req.body.password;
-      const oldPassword = user.password.trim();
+      const oldPassword = superAdmin.password.trim();
       let isCorrectPassword = bcrypt.compareSync(sentPassword, oldPassword);
 
-      if (!isCorrectPassword) throw Error400(lang.wrongPassword);
+      if (!isCorrectPassword) throw Error400(lang.errors.wrongPassword);
 
       const token = jwt.sign(
-        { userId: user.id, isSuperAdmin: true },
+        { userId: superAdmin.id, isSuperAdmin: true },
         config.jwtKey,
         { expiresIn: config.tokenExpiration }
       );
 
       res.status(200);
-      res.locals = { token: token, user: user };
+      res.locals = { token: token, user: superAdmin };
       next();
     })
     .catch(err => next(err));

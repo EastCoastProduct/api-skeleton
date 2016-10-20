@@ -1,6 +1,7 @@
 'use strict';
 
 const cors = require('cors');
+const controllers = require('../controllers');
 const router = require('express').Router();
 
 // Allow the api to accept request from web app
@@ -12,11 +13,12 @@ router.use(cors({
 // enable cors preflight for all endpoints
 router.options('*', cors());
 
-/*
-  User authentication
-    /authenticate
-*/
-require('./authentication')(router);
+// User authentication
+router.route('/authenticate')
+  .post(
+    controllers.authentication.validate.authenticate,
+    controllers.authentication.authenticate
+  );
 
 /*
   - User CRUD /users

@@ -18,7 +18,7 @@ function confirm(token) {
   const checkIfNewEmailInUse = function(email) {
     return User.count({ where: { email: email }}).then(function(userCount) {
       if (userCount > 0) {
-        throw errors.Error400(lang.alreadyExists(lang.models.user));
+        throw errors.Error400(lang.errors.alreadyExists(lang.models.user));
       }
     });
   };
@@ -97,12 +97,12 @@ function createEmailConfirmationWithEmail(userId, newEmail, userPassword) {
   const checkIfEmailInUse = () =>
     User.count({ where: { email: newEmail }})
     .then(function(userCount) {
-      if (userCount > 0) throw errors.Error400(lang.emailInUse);
+      if (userCount > 0) throw errors.Error400(lang.errors.emailInUse);
 
       return EmailConfirmation.count({ where: { email: newEmail }})
         .then(function(emailConfirmationCount) {
           if (emailConfirmationCount > 0) {
-            throw errors.Error400(lang.emailInUse);
+            throw errors.Error400(lang.errors.emailInUse);
           }
         });
     });
@@ -112,7 +112,7 @@ function createEmailConfirmationWithEmail(userId, newEmail, userPassword) {
       const oldPassword = user.password.trim();
       let isCorrectPassword = bcrypt.compareSync(userPassword, oldPassword);
 
-      if (!isCorrectPassword) throw errors.Error400(lang.wrongPassword);
+      if (!isCorrectPassword) throw errors.Error400(lang.errors.wrongPassword);
     })
     .then( () => checkIfEmailInUse())
     .then( () => removeEmailConfirmation(userId))

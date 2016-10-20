@@ -8,7 +8,7 @@ var emails = {
   dontReply: 'ECP Boilerplate <dont.reply@eastcoastproduct.com>'
 };
 
-const sendEmail = options => transport.sendMail(options).then(r => r);
+const sendEmail = options => transport.sendMail(options);
 
 function emailUpdate(options) {
   let link = `${config.webUrl}/emailConfirm/${options.token}`;

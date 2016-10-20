@@ -34,11 +34,13 @@ function change(req, res, next) {
       const oldPassword = req.body.oldPassword.trim();
       let isCorrectPassword = bcrypt.compareSync(oldPassword, user.password);
 
-      if (!isCorrectPassword) throw Error400(lang.wrongPassword);
+      if (!isCorrectPassword) throw Error400(lang.errors.wrongPassword);
       user.password = req.body.newPassword.trim();
 
-      return user.save().then(resp => {
-        res.locals = resp;
+      return user.save()
+      .then( () => {
+        res.status(200);
+        res.locals.message = lang.messages.passwordChanged;
         next();
       });
     })
@@ -46,29 +48,23 @@ function change(req, res, next) {
 }
 
 function changeWithToken(req, res, next) {
-  services.forgotPassword.getByToken(req.params.token)
-    .then(userFromToken => {
-      userFromToken.password = req.body.password;
-      return userFromToken.save();
-    })
-    .then( () => services.forgotPassword.removeByToken(req.params.token))
-    .then( () => {
-      res.status(200);
-      res.locals.message = lang.passwordChanged;
-      next();
-    })
-    .catch(err => next(err));
+  services.passwords.changeWithToken(req)
+  .then( () => {
+    res.status(200);
+    res.locals.message = lang.messages.passwordChanged;
+    next();
+  })
+  .catch(err => next(err));
 }
 
 function reset(req, res, next) {
-  services.forgotPassword.getUserAndRemoveTokens(req.body.email).then(user =>
-    services.forgotPassword.create(user)
-      .then( () => {
-        res.status(200);
-        res.locals.message = lang.passwordRecovery;
-        next();
-      }))
-      .catch(err => next(err));
+  services.passwords.reset(req)
+  .then( () => {
+    res.status(200);
+    res.locals.message = lang.messages.passwordRecovery;
+    next();
+  })
+  .catch(err => next(err));
 }
 
 module.exports = {

@@ -11,24 +11,24 @@ tests('POST /resetPassword', resetPassword => {
 
   resetPassword.test('Failed', failed => {
     failed.test('Invalid parameters', test => {
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ wrong: 'forgot.password@mail.com' })
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.parametersError }
+            { status: 400, message: lang.errors.parametersError }
           );
           test.end();
         });
     });
 
     failed.test('User not found', test => {
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ email: 'forgot.wrong@ecp.io' })
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) }
+            { status: 404, message: lang.errors.notFound(lang.models.user) }
           );
           test.end();
         });
@@ -38,12 +38,12 @@ tests('POST /resetPassword', resetPassword => {
   resetPassword.test('Success', success => {
     success.test('Successfully reset password', test => {
       let emailStub = helpers.stubMailer({ message: 'Success' });
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ email: 'forgot.password@mail.com' })
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 200, message: lang.passwordRecovery }
+            { status: 200, message: lang.messages.passwordRecovery }
           );
           helpers.resetStub(emailStub);
           test.end();
@@ -56,20 +56,20 @@ tests('POST /changePassword', changePassword => {
 
   changePassword.test('Failed', failed => {
     failed.test('Invalid params', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({ wrong: 'invalid' })
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.parametersError }
+            { status: 400, message: lang.errors.parametersError }
           );
           test.end();
         });
     });
 
     failed.test('Wrong password', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({
           oldPassword: 'wrongPassword123',
@@ -78,7 +78,7 @@ tests('POST /changePassword', changePassword => {
         .end((err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.wrongPassword }
+            { status: 400, message: lang.errors.wrongPassword }
           );
           test.end();
         });
@@ -87,7 +87,7 @@ tests('POST /changePassword', changePassword => {
 
   changePassword.test('Success', success => {
     success.test('Successfully changed password', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({
           oldPassword: 'Password123',
@@ -95,8 +95,8 @@ tests('POST /changePassword', changePassword => {
         })
         .end((err, res) => {
           test.same(
-            { status: res.status, email: res.body.email},
-            { status: 200, email: 'change.password@mail.com'}
+            { status: res.status, message: res.body.message },
+            { status: 200, message: lang.messages.passwordChanged }
           );
           test.end();
         });
@@ -113,7 +113,7 @@ tests('POST /recoverPassword/:token', passwordRecovery => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.parametersError }
+            { status: 400, message: lang.errors.parametersError }
           );
           test.end();
         });
@@ -125,7 +125,7 @@ tests('POST /recoverPassword/:token', passwordRecovery => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.forgotPassword) }
+            { status: 404, message: lang.errors.notFound(lang.models.forgotPassword) }
           );
           test.end();
         });
@@ -141,7 +141,7 @@ tests('POST /recoverPassword/:token', passwordRecovery => {
             .end( (err, res) => {
               test.same(
                 { status: res.status, message: res.body.message },
-                { status: 200, message: lang.passwordChanged }
+                { status: 200, message: lang.messages.passwordChanged }
               );
               test.end();
             });

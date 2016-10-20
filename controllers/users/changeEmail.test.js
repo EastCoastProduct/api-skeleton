@@ -16,13 +16,13 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .send({ wrong: 'asd' })
         .end( (err, res) => {
           const debugInfoError = [{
-            message: lang.unrecognizedParameter,
+            message: lang.errors.unrecognizedParameter,
             path: 'wrong'
           }, {
-            message: lang.required,
+            message: lang.errors.required,
             path: 'newEmail'
           }, {
-            message: lang.required,
+            message: lang.errors.required,
             path: 'password'
           }];
 
@@ -33,7 +33,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
           }, {
             debugInfo: debugInfoError,
             status: 400,
-            message: lang.parametersError
+            message: lang.errors.parametersError
           });
           test.end();
         });
@@ -49,7 +49,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 403, message: lang.notAuthorized }
+            { status: 403, message: lang.errors.notAuthorized }
           );
           test.end();
         });
@@ -65,7 +65,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.wrongPassword }
+            { status: 400, message: lang.errors.wrongPassword }
           );
           test.end();
         });
@@ -81,7 +81,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.emailInUse }
+            { status: 400, message: lang.errors.emailInUse }
           );
           test.end();
         });
@@ -97,7 +97,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.emailInUse }
+            { status: 400, message: lang.errors.emailInUse }
           );
           test.end();
         });
@@ -106,6 +106,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
 
   changeEmail.test('Success', success => {
     let emailStub = helpers.stubMailer({ status: 200 });
+
     success.test('User request for email change success', test => {
       helpers.json('post', '/users/11/changeEmail')
         .set('Authorization', user11Auth)
@@ -116,7 +117,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 200, message: lang.requestChangeEmail }
+            { status: 200, message: lang.messages.requestChangeEmail }
           );
           test.error(!emailStub.calledOnce, 'Mailer should have been called');
           helpers.resetStub(emailStub);
@@ -132,7 +133,7 @@ tests('POST /users/:userId/changeEmail', changeEmail => {
             .end( (err, res) => {
               test.same(
                 { status: res.status, message: res.body.message },
-                { status: 200, message: lang.emailConfirmed }
+                { status: 200, message: lang.messages.emailConfirmed }
               );
               test.end();
             });

@@ -31,13 +31,13 @@ function authenticate(req, res, next) {
     include: { model: Resource, required: false }
   })
   .then( user => {
-    if (!user) throw Error404(lang.notFound(lang.models.user));
+    if (!user) throw Error404(lang.errors.notFound(lang.models.user));
 
     const sentPassword = req.body.password;
     const oldPassword = user.password.trim();
     let isCorrectPassword = bcrypt.compareSync(sentPassword, oldPassword);
 
-    if (!isCorrectPassword) throw Error400(lang.wrongPassword);
+    if (!isCorrectPassword) throw Error400(lang.errors.wrongPassword);
 
     const token = jwt.sign(
       { userId: user.id },

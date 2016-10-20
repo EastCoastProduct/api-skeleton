@@ -8,10 +8,6 @@ const users = require('../../controllers').users;
 
 module.exports = function(router) {
   router.route('/users')
-    .get(
-      users.validate.list,
-      users.list
-    )
     .post(
       users.validate.create,
       users.create
@@ -39,29 +35,30 @@ module.exports = function(router) {
       users.emailUpdate.create
     );
 
-  router.route('/changePassword')
+  router.route('/users/:userId/changePassword')
     .post(
       authorization.isConfirmed,
+      authorization.isOwner,
       users.passwords.validate.change,
       users.passwords.change
-    );
-
-  router.route('/recoverPassword/:token')
-    .post(
-      users.passwords.validate.changeWithToken,
-      users.passwords.changeWithToken
-    );
-
-  router.route('/resetPassword')
-    .post(
-      users.passwords.validate.reset,
-      users.passwords.reset
     );
 
   router.route('/users/:userId/resendConfirmation')
     .post(
       authorization.isOwner,
       users.emailConfirmation.resend
+    );
+
+  router.route('/recoverPassword')
+    .post(
+      users.passwords.validate.reset,
+      users.passwords.reset
+    );
+
+  router.route('/recoverPassword/:token')
+    .post(
+      users.passwords.validate.changeWithToken,
+      users.passwords.changeWithToken
     );
 
   router.route('/emailConfirm')

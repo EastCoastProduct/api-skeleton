@@ -19,7 +19,7 @@ tests('POST /users/:userId/resendConfirmation', resendConfirmation => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.emailConfirmation) }
+            { status: 404, message: lang.errors.notFound(lang.models.emailConfirmation) }
           );
           test.end();
         });
@@ -35,7 +35,7 @@ tests('POST /users/:userId/resendConfirmation', resendConfirmation => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 201, message: lang.sentConfirmationEmail }
+            { status: 201, message: lang.messages.sentConfirmationEmail }
           );
           User.count({
             where: {
@@ -63,7 +63,7 @@ tests('POST /users/:userId/resendConfirmation', resendConfirmation => {
             .end( (err, res) => {
               test.same(
                 { status: res.status, message: res.body.message },
-                { status: 201, message: lang.sentConfirmationEmail }
+                { status: 201, message: lang.messages.sentConfirmationEmail }
               );
 
               EmailConfirmation.findOne({ where: { userId: 19 }})
@@ -90,7 +90,7 @@ tests('POST /emailConfirm', emailConfirmation => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.parametersError }
+            { status: 400, message: lang.errors.parametersError }
           );
           test.end();
         });
@@ -102,7 +102,7 @@ tests('POST /emailConfirm', emailConfirmation => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.emailConfirmation) }
+            { status: 404, message: lang.errors.notFound(lang.models.emailConfirmation) }
           );
           test.end();
         });
@@ -116,7 +116,7 @@ tests('POST /emailConfirm', emailConfirmation => {
             .end( (err, res) => {
               test.same(
                 { status: res.status, message: res.body.message },
-                { status: 400, message: lang.alreadyExists(lang.models.user) }
+                { status: 400, message: lang.errors.alreadyExists(lang.models.user) }
               );
               emailConfirmationData.getUser().then( user => {
                 test.error(!user.confirmed, 'User not confirmed');
@@ -135,7 +135,7 @@ tests('POST /emailConfirm', emailConfirmation => {
           .end( (err, res) => {
             test.same(
               { status: res.status, message: res.body.message },
-              { status: 200, message: lang.emailConfirmed }
+              { status: 200, message: lang.messages.emailConfirmed }
             );
             emailConfirmationData.getUser().then( user => {
               test.error(!user.confirmed, 'User not confirmed');

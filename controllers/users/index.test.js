@@ -26,9 +26,9 @@ tests('POST /users', userCreate => {
         })
         .end( (err, res) => {
           const debugInfoError = [
-            { path: 'confirmed', message: lang.unrecognizedParameter },
-            { path: 'email', message: lang.required },
-            { path: 'password', message: lang.required }
+            { path: 'confirmed', message: lang.errors.unrecognizedParameter },
+            { path: 'email', message: lang.errors.required },
+            { path: 'password', message: lang.errors.required }
           ];
 
           test.same(
@@ -50,7 +50,7 @@ tests('POST /users', userCreate => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.alreadyExists(lang.models.user) }
+            { status: 400, message: lang.errors.alreadyExists(lang.models.user) }
           );
           test.end();
         });
@@ -93,11 +93,13 @@ tests('POST /users', userCreate => {
 });
 
 
-tests('GET /users', usersList => {
+tests('GET /superAdmin/users', usersList => {
 
   usersList.test('Failed', failed => {
     failed.test('invalid query parameters', test => {
-      helpers.json('get', '/users?page=string&limit=3').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users?page=string&limit=3')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same(
           { status: res.status, message: res.body.debugInfo[0].message },
           // TODO change message upon validator update
@@ -108,11 +110,25 @@ tests('GET /users', usersList => {
     });
 
     failed.test('invalid query parameters', test => {
-      helpers.json('get', '/users?page=1&limit=string').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users?page=1&limit=string')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same(
           { status: res.status, message: res.body.debugInfo[0].message },
           // TODO change message upon validator update
           { status: 400, message: 'has to be positive' }
+        );
+        test.end();
+      });
+    });
+
+    failed.test('user not super admin', test => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', normalAuth)
+      .end( (err, res) => {
+        test.same(
+          { status: res.status, message: res.body.message },
+          { status: 403, message: lang.errors.notAuthorized }
         );
         test.end();
       });
@@ -123,7 +139,9 @@ tests('GET /users', usersList => {
   usersList.test('Success', success => {
 
     success.test('List users with default pagination', test => {
-      helpers.json('get', '/users').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,
@@ -140,7 +158,9 @@ tests('GET /users', usersList => {
     });
 
     success.test('List users with custom limit and page', test => {
-      helpers.json('get', '/users?page=1&limit=3').end((err, res) => {
+      helpers.json('get', '/superAdmin/users?page=1&limit=3')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,
@@ -157,7 +177,9 @@ tests('GET /users', usersList => {
     });
 
     success.test('List users for page 2 and custom limit', test => {
-      helpers.json('get', '/users?page=2&limit=7').end((err, res) => {
+      helpers.json('get', '/superAdmin/users?page=2&limit=7')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,
@@ -184,7 +206,7 @@ tests('GET /users/:userId', userShow => {
       helpers.json('get', '/users/1950').end((err, res) => {
         test.same(
           { status: res.status, message: res.body.message },
-          { status: 404, message: lang.notFound(lang.models.user) }
+          { status: 404, message: lang.errors.notFound(lang.models.user) }
         );
         test.end();
       });
@@ -235,7 +257,7 @@ tests('POST /users/:userId', userEdit => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 403, message: lang.notAuthorized }
+            { status: 403, message: lang.errors.notAuthorized }
           );
           test.end();
         });
@@ -245,9 +267,9 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/1')
         .set('Authorization', normalAuth)
         .send({ email: 'cantDo@it.likethis' })
-        .end((err, res) => {
+        .end( (err, res) => {
           const debugInfoError = [
-            {path: 'email', message: lang.unrecognizedParameter}
+            { path: 'email', message: lang.errors.unrecognizedParameter }
           ];
 
           test.same(
@@ -262,10 +284,10 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/1950')
         .set('Authorization', superAdminAuth)
         .send({ firstname: 'no user' })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) }
+            { status: 404, message: lang.errors.notFound(lang.models.user) }
           );
           test.end();
         });
@@ -275,10 +297,10 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/1')
         .set('Authorization', normalAuth)
         .attach('wrongImage', files.image)
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 400, message: lang.unrecognizedFileField('wrongImage') }
+            { status: 400, message: lang.errors.unrecognizedFileField('wrongImage') }
           );
           test.end();
         });
@@ -292,7 +314,7 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/2')
         .set('Authorization', secondNormalAuth)
         .send({ firstname: 'Changed' })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, firstname: res.body.firstname },
             { status: 200, firstname: 'Changed' }
@@ -305,7 +327,7 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/2')
         .set('Authorization', superAdminAuth)
         .send({ firstname: 'Changed by superadmin' })
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same(
             { status: res.status, firstname: res.body.firstname },
             { status: 200, firstname: 'Changed by superadmin' }
@@ -318,10 +340,11 @@ tests('POST /users/:userId', userEdit => {
       helpers.json('post', '/users/2')
         .set('Authorization', secondNormalAuth)
         .attach('image', files.image)
-        .end((err, res) => {
+        .end( (err, res) => {
           test.same({ status: res.status }, { status: 200 });
           test.error(!res.body.image, 'Image not mapped properly');
-          Resource.findById(1).then(resource => {
+          Resource.findById(1)
+          .then( resource => {
             helpers.resetStub(stubS3);
             test.error(resource, 'Resource should not exist');
             test.end();
@@ -340,7 +363,7 @@ tests('DELETE /users/:userId', userDelete => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 403, message: lang.notAuthorized }
+            { status: 403, message: lang.errors.notAuthorized }
           );
           test.end();
         });
@@ -352,7 +375,7 @@ tests('DELETE /users/:userId', userDelete => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 404, message: lang.notFound(lang.models.user) }
+            { status: 404, message: lang.errors.notFound(lang.models.user) }
           );
           test.end();
         });
@@ -367,7 +390,7 @@ tests('DELETE /users/:userId', userDelete => {
         .end( (err, res) => {
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 200, message: lang.successfullyRemoved(lang.models.user) }
+            { status: 200, message: lang.messages.successfullyRemoved(lang.models.user) }
           );
           helpers.resetStub(s3Stub, false);
           test.end();
@@ -381,7 +404,7 @@ tests('DELETE /users/:userId', userDelete => {
           test.error(!s3Stub.calledOnce, 'S3 delete should have been called');
           test.same(
             { status: res.status, message: res.body.message },
-            { status: 200, message: lang.successfullyRemoved(lang.models.user) }
+            { status: 200, message: lang.messages.successfullyRemoved(lang.models.user) }
           );
           helpers.resetStub(s3Stub);
           test.end();

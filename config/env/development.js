@@ -4,6 +4,7 @@
   Default configuration file
   Used for development and for overriding
 */
+
 module.exports = {
   env: 'development',
 
@@ -55,5 +56,5 @@ module.exports = {
     }
   },
 
-  language: 'en'
+  language: 'english'
 };

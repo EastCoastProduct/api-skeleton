@@ -16,7 +16,7 @@ function addHeaders(req, res, next) {
 }
 
 function catch404(req, res, next) {
-  var err = new Error(lang.routeNotFound);
+  var err = new Error(lang.errors.routeNotFound);
   err.status = 404;
   next(err);
 }

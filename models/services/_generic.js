@@ -9,18 +9,22 @@ const Error404 = errors.Error404;
 
 module.exports = (Model, keyword) => {
 
-  const bulkCreate = params => Model.bulkCreate(params, {returning: true})
-    .then(r => r);
+  const bulkCreate = params => Model.bulkCreate(params, { returning: true });
 
-  const create = params => Model.create(params).then(r => r);
+  const create = params => Model.create(params);
 
   const _exists = (params, shouldNotExist) =>
-    Model.count(params).then(r => {
+    Model.count(params)
+    .then(result => {
+      if (result && shouldNotExist) {
+        throw Error400(lang.errors.alreadyExists(keyword));
+      }
 
-      if (r && shouldNotExist) throw Error400(lang.alreadyExists(keyword));
-      if (!r && !shouldNotExist) throw Error400(lang.doesNotExist(keyword));
+      if (!result && !shouldNotExist) {
+        throw Error400(lang.errors.doesNotExist(keyword));
+      }
 
-      return r;
+      return result;
     });
 
   const doesNotExist = params => _exists(params, true);
@@ -35,42 +39,52 @@ module.exports = (Model, keyword) => {
 
     _.mapKeys(arguments, val => _.merge(params, val));
 
-    return Model.findAndCountAll(params).then(response => response);
+    return Model.findAndCountAll(params);
   };
 
   const remove = params =>
-    Model.destroy({where: params, individualHooks: true})
-      .then(response => {
-        if (!response) throw Error404(lang.notFound(keyword));
-        return response;
-      });
+    Model.destroy({ where: params, individualHooks: true })
+    .then( result => {
+      if (!result) throw Error404(lang.errors.notFound(keyword));
+
+      return result;
+    });
 
   const removeById = id =>
-    Model.destroy({where: {id: id}, individualHooks: true}).then(r => {
-      if (!r) throw Error404(lang.notFound(keyword));
-      return r;
+    Model.destroy({ where: { id: id }, individualHooks: true })
+    .then( result => {
+      if (!result) throw Error404(lang.errors.notFound(keyword));
+
+      return result;
     });
 
   const getById = (id, options) =>
-    Model.findById(id, options).then(r => {
-      if (!r) throw Error404(lang.notFound(keyword));
-      return r;
+    Model.findById(id, options)
+    .then( result => {
+      if (!result) throw Error404(lang.errors.notFound(keyword));
+
+      return result;
     });
 
   const getOne = params =>
-    Model.findOne({where: params})
-      .then(response => {
-        if (!response) throw Error404(lang.notFound(keyword));
-        return response;
-      });
+    Model.findOne({ where: params })
+    .then( result => {
+      if (!result) throw Error404(lang.errors.notFound(keyword));
+
+      return result;
+    });
 
   const update = (body, params) =>
-    Model.update(body, {where: params, returning: true, individualHooks: true})
-      .then(result => {
-        if (!result[0]) throw Error404(lang.notFound(keyword));
+    Model.update(body, {
+      where: params,
+      returning: true,
+      individualHooks: true
+    })
+    .then( result => {
+      if (!result[0]) throw Error404(lang.errors.notFound(keyword));
 
-        return result[1][0];
-      });
+      return result[1][0];
+    });
 
   const listWithPagination = function() {
     let queryParams = arguments['0'];
@@ -89,7 +103,7 @@ module.exports = (Model, keyword) => {
 
     _.mapKeys(optionalArguments, val => _.merge(params, val));
 
-    return Model.findAndCountAll(params).then(response => response);
+    return Model.findAndCountAll(params);
   };
 
   return {
@@ -106,10 +120,3 @@ module.exports = (Model, keyword) => {
     update: update
   };
 };
-
-/*
-  {
-    where: {},
-    order: {}
-  }
-*/
