@@ -41,7 +41,7 @@ function create(req, res, next) {
     .then( emailConfirmation => services.emailConfirmation.sendMail({
       email: user.email, token: emailConfirmation.token
     }))
-    .then(() => {
+    .then( () => {
       res.status(201);
       res.locals = user;
       next();

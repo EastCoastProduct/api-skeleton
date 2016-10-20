@@ -120,7 +120,7 @@ tests('Resources', resources => {
       let stub = helpers.stubS3();
 
       services.resource.remove({ id: 3 })
-      .then(response => {
+      .then( response => {
         test.error(!response, 'There should be a response');
         helpers.resetStub(stub);
         test.end();

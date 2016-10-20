@@ -8,7 +8,8 @@ const langForgotPassword = lang.models.forgotPassword;
 const generic = require('./_generic')(ForgotPassword, langForgotPassword);
 const mailer = require('../../utils/mailer');
 
-
+//TODO figure out what to send as argument to this services
+//(req, req.body/params/query, or specific parameters)
 function reset(req) {
   const createUser = user => generic.create({ userId: user.id })
     .then( confirmation =>
@@ -40,7 +41,7 @@ function changeWithToken(req) {
   const removeByToken = token => generic.remove({ token: token });
 
   return getByToken(req.params.token)
-    .then(userFromToken => {
+    .then( userFromToken => {
       userFromToken.password = req.body.password;
       return userFromToken.save();
     })

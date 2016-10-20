@@ -11,10 +11,10 @@ function recreateDatabase() {
   var connectionString = 'postgres://postgres@localhost/postgres';
 
   pg.connect(connectionString)
-    .then(connection =>
+    .then( connection =>
       connection.query(`drop database ${dbArgument()}`).then( () => connection)
     )
-    .then(connection =>
+    .then( connection =>
       connection.query(`create database ${dbArgument()}`)
       .then( () => process.exit(0))
     )

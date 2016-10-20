@@ -11,7 +11,7 @@ tests('POST /resetPassword', resetPassword => {
 
   resetPassword.test('Failed', failed => {
     failed.test('Invalid parameters', test => {
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ wrong: 'forgot.password@mail.com' })
         .end( (err, res) => {
           test.same(
@@ -23,7 +23,7 @@ tests('POST /resetPassword', resetPassword => {
     });
 
     failed.test('User not found', test => {
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ email: 'forgot.wrong@ecp.io' })
         .end( (err, res) => {
           test.same(
@@ -38,7 +38,7 @@ tests('POST /resetPassword', resetPassword => {
   resetPassword.test('Success', success => {
     success.test('Successfully reset password', test => {
       let emailStub = helpers.stubMailer({ message: 'Success' });
-      helpers.json('post', '/resetPassword')
+      helpers.json('post', '/recoverPassword')
         .send({ email: 'forgot.password@mail.com' })
         .end( (err, res) => {
           test.same(
@@ -56,7 +56,7 @@ tests('POST /changePassword', changePassword => {
 
   changePassword.test('Failed', failed => {
     failed.test('Invalid params', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({ wrong: 'invalid' })
         .end( (err, res) => {
@@ -69,7 +69,7 @@ tests('POST /changePassword', changePassword => {
     });
 
     failed.test('Wrong password', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({
           oldPassword: 'wrongPassword123',
@@ -87,7 +87,7 @@ tests('POST /changePassword', changePassword => {
 
   changePassword.test('Success', success => {
     success.test('Successfully changed password', test => {
-      helpers.json('post', '/changePassword')
+      helpers.json('post', '/users/15/changePassword')
         .set('Authorization', normalAuth)
         .send({
           oldPassword: 'Password123',

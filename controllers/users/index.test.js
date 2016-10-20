@@ -93,11 +93,13 @@ tests('POST /users', userCreate => {
 });
 
 
-tests('GET /users', usersList => {
+tests('GET /superAdmin/users', usersList => {
 
   usersList.test('Failed', failed => {
     failed.test('invalid query parameters', test => {
-      helpers.json('get', '/users?page=string&limit=3').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users?page=string&limit=3')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same(
           { status: res.status, message: res.body.debugInfo[0].message },
           // TODO change message upon validator update
@@ -108,11 +110,25 @@ tests('GET /users', usersList => {
     });
 
     failed.test('invalid query parameters', test => {
-      helpers.json('get', '/users?page=1&limit=string').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users?page=1&limit=string')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same(
           { status: res.status, message: res.body.debugInfo[0].message },
           // TODO change message upon validator update
           { status: 400, message: 'has to be positive' }
+        );
+        test.end();
+      });
+    });
+
+    failed.test('user not super admin', test => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', normalAuth)
+      .end( (err, res) => {
+        test.same(
+          { status: res.status, message: res.body.message },
+          { status: 403, message: lang.errors.notAuthorized }
         );
         test.end();
       });
@@ -123,7 +139,9 @@ tests('GET /users', usersList => {
   usersList.test('Success', success => {
 
     success.test('List users with default pagination', test => {
-      helpers.json('get', '/users').end( (err, res) => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,
@@ -140,7 +158,9 @@ tests('GET /users', usersList => {
     });
 
     success.test('List users with custom limit and page', test => {
-      helpers.json('get', '/users?page=1&limit=3').end((err, res) => {
+      helpers.json('get', '/superAdmin/users?page=1&limit=3')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,
@@ -157,7 +177,9 @@ tests('GET /users', usersList => {
     });
 
     success.test('List users for page 2 and custom limit', test => {
-      helpers.json('get', '/users?page=2&limit=7').end((err, res) => {
+      helpers.json('get', '/superAdmin/users?page=2&limit=7')
+      .set('Authorization', superAdminAuth)
+      .end( (err, res) => {
         test.same({
           status: res.status,
           count: res.body.rows.length,

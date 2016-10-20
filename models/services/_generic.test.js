@@ -50,7 +50,7 @@ tests('Generic model tests', generic => {
         { firstname: 'New firstname', lastname: 'New lastname' },
         { email: 'not.user@mail.com' }
       )
-      .catch(err => {
+      .catch( err => {
         test.same(err, { status: 404, message: lang.errors.notFound(lang.models.user) });
         test.end();
       });
@@ -121,7 +121,7 @@ tests('Generic model tests', generic => {
 
     success.test('Generic remove success', test => {
       services.user.remove({ email: 'delete.one@mail.com' })
-      .then(result => {
+      .then( result => {
         test.same(result, 1);
         test.end();
       });
@@ -129,7 +129,7 @@ tests('Generic model tests', generic => {
 
     success.test('Generic remove by id success', test => {
       services.user.removeById(8)
-      .then(result => {
+      .then( result => {
         test.same(result, 1);
         test.end();
       });

@@ -98,6 +98,10 @@ const users = [{
   // id: 18
   // this user will fail to change his email in test
   email: 'change.email5@mail.com'
+}, {
+  // id: 19
+  // this user will want to resend his confirmation
+  email: 'resend@mail.com'
 }];
 
 module.exports = populatePresets(users, preset);

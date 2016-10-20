@@ -44,7 +44,7 @@ module.exports = (Model, keyword) => {
 
   const remove = params =>
     Model.destroy({ where: params, individualHooks: true })
-    .then(result => {
+    .then( result => {
       if (!result) throw Error404(lang.errors.notFound(keyword));
 
       return result;
@@ -52,7 +52,7 @@ module.exports = (Model, keyword) => {
 
   const removeById = id =>
     Model.destroy({ where: { id: id }, individualHooks: true })
-    .then(result => {
+    .then( result => {
       if (!result) throw Error404(lang.errors.notFound(keyword));
 
       return result;
@@ -80,7 +80,7 @@ module.exports = (Model, keyword) => {
       returning: true,
       individualHooks: true
     })
-    .then(result => {
+    .then( result => {
       if (!result[0]) throw Error404(lang.errors.notFound(keyword));
 
       return result[1][0];
