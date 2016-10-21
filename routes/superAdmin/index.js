@@ -12,6 +12,11 @@ module.exports = function(router) {
       users.validate.list,
       users.list
     )
+    .post(
+      authorization.isSuperAdmin,
+      users.superAdmin.validate.create,
+      users.superAdmin.create
+    )
 
   router.route('/superAdmin/authenticate')
     .post(
