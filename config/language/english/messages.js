@@ -22,5 +22,8 @@ module.exports = {
   // S
   sentConfirmationEmail: 'Your confirmation email has been sent',
 
-  successfullyRemoved: prependKeyword('successfully removed')
+  successfullyRemoved: prependKeyword('successfully removed'),
+
+  // U
+  userCreated: 'User successfully created'
 };

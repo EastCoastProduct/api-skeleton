@@ -114,6 +114,7 @@ module.exports = {
   emailConfirmation: require('./emailConfirmation'),
   list: list,
   passwords: require('./passwords'),
+  superAdmin: require('./superAdmin'),
   remove: remove,
   show: show,
   update: update,
