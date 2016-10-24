@@ -92,7 +92,6 @@ tests('POST /users', userCreate => {
   });
 });
 
-
 tests('GET /superAdmin/users', usersList => {
 
   usersList.test('Failed', failed => {
@@ -195,9 +194,43 @@ tests('GET /superAdmin/users', usersList => {
       });
     });
 
+    success.test('List users with custom pagination and search', test => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', superAdminAuth)
+      .query({ page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' })
+      .end( (err, res) => {
+        test.error(!res.body.rows, 'No users');
+        test.same(res.body.rows.length, 2);
+        test.end();
+      });
+    });
+
+    success.test('List users with custom pagination and filter', test => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', superAdminAuth)
+      .query({ page: '1', limit: '4', confirmed: 'false' })
+      .end( (err, res) => {
+        test.error(!res.body.rows, 'No users');
+        _.forEach(res.body.rows, (user) => {
+          test.same(user.confirmed, false);
+        });
+        test.end();
+      });
+    });
+
+    success.test('List users with custom pagination, filter, search and optional arguments', test => {
+      helpers.json('get', '/superAdmin/users')
+      .set('Authorization', superAdminAuth)
+      .query({ page: '1', limit: '4', confirmed: 'true', search: 'regular,not.confirmed@mail.com' })
+      .end( (err, res) => {
+        test.error(!res.body.rows, 'No users');
+        test.same(res.body.rows.length, 1);
+        test.end();
+      });
+    });
+
   });
 });
-
 
 tests('GET /users/:userId', userShow => {
 

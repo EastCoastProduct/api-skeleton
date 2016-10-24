@@ -1,8 +1,12 @@
 'use strict';
-
+const _ = require('lodash');
 const services = require('.');
 const tests = require('tape');
+
+const config = require('../../config');
 const lang = require('../../config/language');
+
+const Resource = require('../').resource;
 
 tests('Generic model tests', generic => {
 
@@ -111,12 +115,217 @@ tests('Generic model tests', generic => {
       });
     });
 
-    success.test('Generic list', test => {
-      services.user.list({ limit: 1 })
-      .then( users => {
-        test.error(!users.rows, 'No users');
-        test.end();
+    success.test('Generic list tests', listTest => {
+
+      // list service tests
+
+      listTest.test('Generic list', test => {
+        services.user.list()
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, config.paginate.limit);
+          test.end();
+        });
       });
+
+      listTest.test('Generic list - custom limit', test => {
+        services.user.list({ limit: '2' })
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 2);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list - custom limit and page and optional arguments', test => {
+        services.user.list({ page: '2', limit: '2' }, { include: { model: Resource, required: false }})
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 2);
+          test.same(users.rows[0].id, 3);
+          test.end();
+        });
+      });
+
+      // listWithSearchAndFilter service tests
+      listTest.test('Generic list with search and filter - error in sending arguments', test => {
+        services.user.listWithSearchAndFilter(
+          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          [],
+          { confirmed: 'true' },
+          { include: { model: Resource, required: false }}
+        )
+        .catch( err => {
+          test.same(err, { status: 500, message: 'Search values sent without search conditions in service for User' });
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - empty parameters', test => {
+        services.user.listWithSearchAndFilter()
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - custom pagination', test => {
+        services.user.listWithSearchAndFilter({ page: '2', limit: '3' })
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 3);
+          test.same(users.rows[0].id, 4);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - custom pagination and search', test => {
+        services.user.listWithSearchAndFilter(
+          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          ['firstname', 'lastname', 'email']
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 2);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - custom pagination and filter', test => {
+        services.user.listWithSearchAndFilter(
+          { page: '1', limit: '4' },
+          ['firstname', 'lastname', 'email'],
+          { confirmed: 'false' }
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          _.forEach(users.rows, (user) => {
+            test.same(user.confirmed, false);
+          });
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - custom pagination, filter, search and optional arguments', test => {
+        services.user.listWithSearchAndFilter(
+          { page: '1', limit: '4', search: 'regular,not.confirmed@mail.com' },
+          ['firstname', 'lastname', 'email'],
+          { confirmed: 'true' },
+          { include: { model: Resource, required: false }}
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 1);
+          test.end();
+        });
+      });
+
+      // listWithSearch service tests
+
+      listTest.test('Generic list with search and filter - error in sending arguments', test => {
+        services.user.listWithSearch(
+          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          [],
+          { include: { model: Resource, required: false }}
+        )
+        .catch( err => {
+          test.same(err, { status: 500, message: 'Search values sent without search conditions in service for User' });
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search - empty parameters', test => {
+        services.user.listWithSearch()
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search - custom pagination', test => {
+        services.user.listWithSearch({ page: '2', limit: '3' })
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 3);
+          test.same(users.rows[0].id, 4);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search - custom pagination and search', test => {
+        services.user.listWithSearch(
+          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          ['firstname', 'lastname', 'email']
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 2);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search - custom pagination, search and optional arguments', test => {
+        services.user.listWithSearch(
+          { page: '1', limit: '4', search: 'regular,not.confirmed@mail.com' },
+          ['firstname', 'lastname', 'email'],
+          { include: { model: Resource, required: false }}
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 2);
+          test.end();
+        });
+      });
+
+      // listWithFilter service tests
+
+      listTest.test('Generic list with filter - empty parameters', test => {
+        services.user.listWithFilter()
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with search and filter - custom pagination', test => {
+        services.user.listWithFilter({ page: '2', limit: '3' })
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          test.same(users.rows.length, 3);
+          test.same(users.rows[0].id, 4);
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with filter - custom pagination and filter', test => {
+        services.user.listWithFilter(
+          { page: '1', limit: '4' },
+          { confirmed: 'false' }
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          _.forEach(users.rows, (user) => {
+            test.same(user.confirmed, false);
+          });
+          test.end();
+        });
+      });
+
+      listTest.test('Generic list with filter - custom pagination, filter and optional arguments', test => {
+        services.user.listWithFilter(
+          { page: '1', limit: '4' },
+          { confirmed: 'true' },
+          { include: { model: Resource, required: false }}
+        )
+        .then( users => {
+          test.error(!users.rows, 'No users');
+          _.forEach(users.rows, (user) => {
+            test.same(user.confirmed, true);
+          });
+          test.end();
+        });
+      });
+
     });
 
     success.test('Generic remove success', test => {

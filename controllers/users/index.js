@@ -29,7 +29,9 @@ const validate = {
   list: validator.validation('query', {
     rules: {
       page: 'positive',
-      limit: 'positive'
+      limit: 'positive',
+      search: 'norule',
+      confirmed: 'stringBoolean'
     }
   }, true)
 };
@@ -51,8 +53,10 @@ function create(req, res, next) {
 }
 
 function list(req, res, next) {
-  services.user.listWithPagination(
+  services.user.listWithSearchAndFilter(
     req.query,
+    ['firstname', 'lastname', 'email'],
+    { confirmed: req.query.confirmed },
     { include: { model: Resource, required: false }}
   )
   .then( users => {
