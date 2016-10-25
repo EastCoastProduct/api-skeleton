@@ -13,9 +13,9 @@ const validate = {
 
 function confirm(req, res, next) {
   services.emailConfirmation.confirm(req.body.token)
-  .then( () => {
+  .then( userEmail => {
     res.status(200);
-    res.locals.message = lang.messages.emailConfirmed;
+    res.locals.email = userEmail;
     next();
   })
   .catch(err => next(err));

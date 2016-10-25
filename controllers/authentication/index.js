@@ -27,7 +27,7 @@ const validate = {
 
 function authenticate(req, res, next) {
   User.findOne({
-    where: { email: req.body.email },
+    where: { email: req.body.email.toLowerCase() },
     include: { model: Resource, required: false }
   })
   .then( user => {

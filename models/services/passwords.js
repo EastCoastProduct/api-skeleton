@@ -29,7 +29,7 @@ function reset(req) {
     ForgotPassword.destroy({ where: { userId: user.id }})
     .then( () => user );
 
-  return getUser(req.body.email)
+  return getUser(req.body.email.toLowerCase())
   .then( userToRemoveTokens => removeTokens(userToRemoveTokens) )
   .then( userToCreate => createUser(userToCreate) );
 }

@@ -10,6 +10,6 @@ module.exports = {
   resource: require('./resource'),
   s3: require('./s3'),
   user: generic(models.user, langModel.user),
-  superAdmin: generic(models.superAdmin)
+  superAdmin: require('./superAdmin')
 
 };

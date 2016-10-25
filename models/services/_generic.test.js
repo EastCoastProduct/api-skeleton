@@ -2,8 +2,6 @@
 const _ = require('lodash');
 const services = require('.');
 const tests = require('tape');
-
-const config = require('../../config');
 const lang = require('../../config/language');
 
 const Resource = require('../').resource;
@@ -119,28 +117,23 @@ tests('Generic model tests', generic => {
 
       // list service tests
 
-      listTest.test('Generic list', test => {
-        services.user.list()
+      listTest.test('Generic list - custom pagination', test => {
+        services.user.list({ limit: 2, offset: 2 })
         .then( users => {
-          test.error(!users.rows, 'No users');
-          test.same(users.rows.length, config.paginate.limit);
-          test.end();
-        });
-      });
-
-      listTest.test('Generic list - custom limit', test => {
-        services.user.list({ limit: '2' })
-        .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 2);
+          test.same(users.rows[0].id, 3);
           test.end();
         });
       });
 
-      listTest.test('Generic list - custom limit and page and optional arguments', test => {
-        services.user.list({ page: '2', limit: '2' }, { include: { model: Resource, required: false }})
+      listTest.test('Generic list - custom pagination and optional arguments', test => {
+        services.user.list(
+          { offset: 2, limit: 2 },
+          { include: { model: Resource, required: false }}
+        )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 2);
           test.same(users.rows[0].id, 3);
           test.end();
@@ -150,7 +143,7 @@ tests('Generic model tests', generic => {
       // listWithSearchAndFilter service tests
       listTest.test('Generic list with search and filter - error in sending arguments', test => {
         services.user.listWithSearchAndFilter(
-          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 3 }, query: { search: 'regular,not.confirmed@mail.com' }},
           [],
           { confirmed: 'true' },
           { include: { model: Resource, required: false }}
@@ -164,28 +157,28 @@ tests('Generic model tests', generic => {
       listTest.test('Generic list with search and filter - empty parameters', test => {
         services.user.listWithSearchAndFilter()
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.end();
         });
       });
 
       listTest.test('Generic list with search and filter - custom pagination', test => {
-        services.user.listWithSearchAndFilter({ page: '2', limit: '3' })
+        services.user.listWithSearchAndFilter({ paginate: { offset: 2, limit: 3 }})
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 3);
-          test.same(users.rows[0].id, 4);
+          test.same(users.rows[0].id, 3);
           test.end();
         });
       });
 
       listTest.test('Generic list with search and filter - custom pagination and search', test => {
         services.user.listWithSearchAndFilter(
-          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 3 }, query: { search: 'regular,not.confirmed@mail.com' }},
           ['firstname', 'lastname', 'email']
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 2);
           test.end();
         });
@@ -193,12 +186,12 @@ tests('Generic model tests', generic => {
 
       listTest.test('Generic list with search and filter - custom pagination and filter', test => {
         services.user.listWithSearchAndFilter(
-          { page: '1', limit: '4' },
+          { paginate: { offset: 0, limit: 4 }},
           ['firstname', 'lastname', 'email'],
           { confirmed: 'false' }
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           _.forEach(users.rows, (user) => {
             test.same(user.confirmed, false);
           });
@@ -208,23 +201,23 @@ tests('Generic model tests', generic => {
 
       listTest.test('Generic list with search and filter - custom pagination, filter, search and optional arguments', test => {
         services.user.listWithSearchAndFilter(
-          { page: '1', limit: '4', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 4 }, query: { search: 'regular,not.confirmed@mail.com' }},
           ['firstname', 'lastname', 'email'],
           { confirmed: 'true' },
           { include: { model: Resource, required: false }}
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 1);
           test.end();
         });
       });
 
-      // listWithSearch service tests
+      //listWithSearch service tests
 
       listTest.test('Generic list with search and filter - error in sending arguments', test => {
         services.user.listWithSearch(
-          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 3 }, query: { search: 'regular,not.confirmed@mail.com' }},
           [],
           { include: { model: Resource, required: false }}
         )
@@ -237,28 +230,28 @@ tests('Generic model tests', generic => {
       listTest.test('Generic list with search - empty parameters', test => {
         services.user.listWithSearch()
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.end();
         });
       });
 
       listTest.test('Generic list with search - custom pagination', test => {
-        services.user.listWithSearch({ page: '2', limit: '3' })
+        services.user.listWithSearch({ paginate: { offset: 1, limit: 3 }})
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 3);
-          test.same(users.rows[0].id, 4);
+          test.same(users.rows[0].id, 2);
           test.end();
         });
       });
 
       listTest.test('Generic list with search - custom pagination and search', test => {
         services.user.listWithSearch(
-          { page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 3 }, query: { search: 'regular,not.confirmed@mail.com' }},
           ['firstname', 'lastname', 'email']
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 2);
           test.end();
         });
@@ -266,12 +259,12 @@ tests('Generic model tests', generic => {
 
       listTest.test('Generic list with search - custom pagination, search and optional arguments', test => {
         services.user.listWithSearch(
-          { page: '1', limit: '4', search: 'regular,not.confirmed@mail.com' },
+          { paginate: { offset: 0, limit: 4 }, query: { search: 'regular,not.confirmed@mail.com' }},
           ['firstname', 'lastname', 'email'],
           { include: { model: Resource, required: false }}
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 2);
           test.end();
         });
@@ -288,9 +281,9 @@ tests('Generic model tests', generic => {
       });
 
       listTest.test('Generic list with search and filter - custom pagination', test => {
-        services.user.listWithFilter({ page: '2', limit: '3' })
+        services.user.listWithFilter({ paginate: { offset: 3, limit: 3 }})
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           test.same(users.rows.length, 3);
           test.same(users.rows[0].id, 4);
           test.end();
@@ -299,11 +292,11 @@ tests('Generic model tests', generic => {
 
       listTest.test('Generic list with filter - custom pagination and filter', test => {
         services.user.listWithFilter(
-          { page: '1', limit: '4' },
+          { paginate: { offset: 1, limit: 4 }},
           { confirmed: 'false' }
         )
         .then( users => {
-          test.error(!users.rows, 'No users');
+          test.error(!users.rows.length, 'No users');
           _.forEach(users.rows, (user) => {
             test.same(user.confirmed, false);
           });
@@ -313,7 +306,7 @@ tests('Generic model tests', generic => {
 
       listTest.test('Generic list with filter - custom pagination, filter and optional arguments', test => {
         services.user.listWithFilter(
-          { page: '1', limit: '4' },
+          { paginate: { page: 1, limit: 4 }},
           { confirmed: 'true' },
           { include: { model: Resource, required: false }}
         )

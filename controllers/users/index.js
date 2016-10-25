@@ -54,7 +54,7 @@ function create(req, res, next) {
 
 function list(req, res, next) {
   services.user.listWithSearchAndFilter(
-    req.query,
+    req,
     ['firstname', 'lastname', 'email'],
     { confirmed: req.query.confirmed },
     { include: { model: Resource, required: false }}
@@ -118,6 +118,7 @@ module.exports = {
   emailConfirmation: require('./emailConfirmation'),
   list: list,
   passwords: require('./passwords'),
+  superAdmin: require('./superAdmin'),
   remove: remove,
   show: show,
   update: update,

@@ -4,7 +4,7 @@ const uuid = require('node-uuid');
 const populatePresets = require('../migrations').populatePresets;
 
 const preset = () => ({
-  path: uuid.v1(),
+  path: `images/${uuid.v1()}.jpg`,
   mimetype: 'image/jpeg',
   extension: 'jpg'
 });

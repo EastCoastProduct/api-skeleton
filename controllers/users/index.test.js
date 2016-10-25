@@ -199,7 +199,7 @@ tests('GET /superAdmin/users', usersList => {
       .set('Authorization', superAdminAuth)
       .query({ page: '1', limit: '3', search: 'regular,not.confirmed@mail.com' })
       .end( (err, res) => {
-        test.error(!res.body.rows, 'No users');
+        test.error(!res.body.rows.length, 'No users');
         test.same(res.body.rows.length, 2);
         test.end();
       });
@@ -210,7 +210,7 @@ tests('GET /superAdmin/users', usersList => {
       .set('Authorization', superAdminAuth)
       .query({ page: '1', limit: '4', confirmed: 'false' })
       .end( (err, res) => {
-        test.error(!res.body.rows, 'No users');
+        test.error(!res.body.rows.length, 'No users');
         _.forEach(res.body.rows, (user) => {
           test.same(user.confirmed, false);
         });
@@ -223,7 +223,7 @@ tests('GET /superAdmin/users', usersList => {
       .set('Authorization', superAdminAuth)
       .query({ page: '1', limit: '4', confirmed: 'true', search: 'regular,not.confirmed@mail.com' })
       .end( (err, res) => {
-        test.error(!res.body.rows, 'No users');
+        test.error(!res.body.rows.length, 'No users');
         test.same(res.body.rows.length, 1);
         test.end();
       });

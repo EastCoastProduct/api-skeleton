@@ -43,7 +43,11 @@ function confirm(token) {
       return user.save();
     })
     .then(function(user) {
+      this.userEmail = user.email;
       return removeEmailConfirmation(user.id);
+    })
+    .then(function() {
+      return this.userEmail;
     });
 }
 
