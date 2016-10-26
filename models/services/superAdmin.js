@@ -8,9 +8,6 @@ const genericUser = require('./_generic')(User, lang.models.user);
 const ForgotPassword = models.forgotPassword;
 const mailer = require('../../utils/mailer');
 
-const errors = require('../../utils/errors');
-const Error400 = errors.Error400;
-
 function createUser(req) {
   let userEmail = req.body.email.toLowerCase();
 

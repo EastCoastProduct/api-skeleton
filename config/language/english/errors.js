@@ -5,6 +5,9 @@ const appendKeyword = messageBuilder.appendKeyword;
 const prependKeyword = messageBuilder.prependKeyword;
 
 module.exports = {
+
+  // Errors 400 familly
+
   // A
   alreadyExists: prependKeyword('already exists'),
 
@@ -54,5 +57,9 @@ module.exports = {
 
   // W
   wrongPassword: 'Wrong password',
+
+
+  // Errors 500
+  searchParametersError: appendKeyword('Search values sent without search conditions in service for')  
 
 };
