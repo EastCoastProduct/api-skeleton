@@ -1,9 +1,29 @@
-var path = require('path');
+'use strict';
 
-function getEnv() {
-  return process.env.NODE_ENV || 'development';
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+
+function decrypt(cryptedFile) {
+  let key = process.env.HASH_SECRET;
+  let file = fs.readFileSync('./config/database/hash.txt').toString();
+
+  let decipher = crypto.createDecipher('aes192', key)
+  let decrypted = decipher.update(file, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  fs.writeFileSync('./config/database/stagingDbConfig.json', decrypted);
+}
+
+function getFile() {
+  let env = process.env.NODE_ENV || 'development';
+  let file = path.resolve('config/database/' + env + 'DbConfig.json');
+
+  if (env === 'staging') decrypt();
+
+  return file;
 }
 
 module.exports = {
-  config: path.resolve('config/database/', getEnv() + 'DbConfig.json')
+  config: getFile()
 };

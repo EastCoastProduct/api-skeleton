@@ -8,13 +8,9 @@ const dbArgument = () => (process.argv[3] === 'dev')
   ? 'dev_db'
   : 'test_db';
 
-const dbUser = () => (process.argv[3] === 'dev')
-  ? 'dev_user'
-  : 'test_user';
-
 function recreateDatabase() {
   var connectionString =
-    `postgres://${dbUser()}:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
+    `postgres://postgres:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
 
   pg.connect(connectionString)
     .then( connection => {
@@ -41,7 +37,7 @@ function recreateDatabase() {
 
 function cleanDatabase() {
   var connectionString =
-    `postgres://${dbUser()}:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
+    `postgres://postgres:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
 
   pg.connect(connectionString, (err, connection) => {
     if (err) throw err;
