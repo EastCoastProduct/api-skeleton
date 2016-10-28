@@ -1,6 +1,7 @@
 machine:
   environment:
     NODE_ENV: test
+    DB_LINK: localhost
   node:
     version: v6
   services:

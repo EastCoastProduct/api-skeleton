@@ -9,8 +9,11 @@ const dbArgument = () => (process.argv[3] === 'dev')
   : 'test_db';
 
 function recreateDatabase() {
-  var connectionString =
-    `postgres://postgres:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
+  let dbLink = process.env.DB_LINK
+    || dbArgument() === 'dev_db' ? 'ecp_dev_db' : 'ecp_test_db';
+  let connectionString =
+    `postgres://postgres:ecp1950@${dbLink}/${dbArgument()}`;
+
 
   pg.connect(connectionString)
     .then( connection => {
@@ -36,12 +39,14 @@ function recreateDatabase() {
 }
 
 function cleanDatabase() {
-  var connectionString =
-    `postgres://postgres:ecp1950@ecp_${dbArgument()}/${dbArgument()}`;
+  let dbLink = process.env.DB_LINK
+    || dbArgument() === 'dev_db' ? 'ecp_dev_db' : 'ecp_test_db';
+  let connectionString =
+    `postgres://postgres:ecp1950@${dbLink}/${dbArgument()}`;
 
   pg.connect(connectionString, (err, connection) => {
     if (err) throw err;
-    var options = {
+    let options = {
       type: 'delete',
       skipTables: ['SequelizeMeta']
     };
@@ -57,8 +62,8 @@ function cleanDatabase() {
 }
 
 if (require.main === module) {
-  var arg = process.argv[2];
-  var toExecute;
+  let arg = process.argv[2];
+  let toExecute;
 
   switch (arg) {
   case 'recreate':
