@@ -57,7 +57,7 @@ gulp.task('db-clean', database('delete'));
 gulp.task('db-recreate', database('recreate'));
 gulp.task('db-recreate-dev', database('recreate dev'));
 gulp.task('migrate', migrate());
-gulp.task('migrate-test', migrate('test'));
+gulp.task('migrate-test', migrate(process.env.NODE_ENV || 'test'));
 
 
 /*
@@ -87,7 +87,9 @@ gulp.task('lint', ['lint-src', 'lint-test']);
   Test tasks
 */
 gulp.task('run-tests', function() {
-  process.env.NODE_ENV = 'test';
+  if (process.env.NODE_ENV !== 'circleci') {
+    process.env.NODE_ENV = 'test';
+  }
   gulp.src(paths.test)
     .pipe(tape({timeout: 14000, reporter: tapColorize(colorizeColors)}))
     .once('end', () => {
@@ -96,7 +98,9 @@ gulp.task('run-tests', function() {
 });
 
 gulp.task('run-test-cover', () => {
-  process.env.NODE_ENV = 'test';
+  if (process.env.NODE_ENV !== 'circleci') {
+    process.env.NODE_ENV = 'test';
+  }
   gulp.src(paths.src)
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())

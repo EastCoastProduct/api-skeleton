@@ -1,0 +1,11 @@
+{
+  "username": "postgres",
+  "password": "ecp1950",
+  "database": "test_db",
+  "host": "localhost",
+  "dialect": "postgres",
+  "logging": false,
+  "seederStorage": "json",
+  "seederStoragePath": "seedManifest.js",
+  "seederStorageTableName": "test_db"
+}

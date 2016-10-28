@@ -9,7 +9,7 @@
     "postinstall": "NODE_ENV=staging; ./staging.sh"
   },
   "engines": {
-    "node": ">=6.7"
+    "node": ">=6.7 <7"
   },
   "author": "EastCoastProduct",
   "license": "ISC",

@@ -1,6 +1,7 @@
 machine:
   environment:
-    NODE_ENV: test
+    NODE_ENV: circleci
+    DB_LINK: localhost
   node:
     version: v6
   services:
@@ -14,7 +15,7 @@ database:
 test:
   post:
     - gulp lint
-    - gulp test-build
+    - (export NODE_ENV=circleci; gulp test-build)
 
 general:
   branches:
