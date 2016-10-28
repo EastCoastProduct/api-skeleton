@@ -1,5 +1,5 @@
 {
-  "username": "test_user",
+  "username": "postgres",
   "password": "ecp1950",
   "database": "test_db",
   "host": "ecp_test_db",

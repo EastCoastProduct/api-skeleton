@@ -17,5 +17,14 @@ test:
     - gulp test-build
 
 general:
+  branches:
+    only:
+      - master
   artifacts:
     - "coverage" # relative to the user's home directory
+
+deployment:
+  staging:
+    branch: master
+    heroku:
+      appname: skeleton-api
