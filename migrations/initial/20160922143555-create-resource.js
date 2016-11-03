@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const utils = require('../utils/migrations');
+const utils = require('../../utils/migrations');
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
