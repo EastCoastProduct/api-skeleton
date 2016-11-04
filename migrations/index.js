@@ -8,6 +8,12 @@ const fs = require('fs');
 /* eslint-disable no-console */
 function run(version, method, specific) {
   let specificMigrations = specific ? specific.split(',') : [];
+  let migrations = fs.readdirSync(`${__dirname}/${version}`);
+
+  if (migrations.length < 1) {
+    console.log('Error: no migrations files in selected folder');
+    process.exit(1);
+  }
 
   const umzug = new Umzug({
     storage: 'sequelize',
@@ -44,13 +50,6 @@ function run(version, method, specific) {
         process.exit(0);
       });
     } else {
-      let migrations = fs.readdirSync(`${__dirname}/${version}`);
-
-      if (migrations.lenght > 0) {
-        console.log('Error: migrations version folder not found');
-        process.exit(1);
-      }
-
       let firstMigration = migrations[0].substr(0,
          migrations[0].lastIndexOf('.')
       );
@@ -84,7 +83,6 @@ function initialize() {
 
   umzug.up().then( () => {
     console.log('Migration complete!');
-    process.exit(0);
   });
 }
 
