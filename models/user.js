@@ -63,7 +63,9 @@ module.exports = function(sequelize, DataTypes) {
       },
       afterUpdate: function(model, options, callback) {
         let resource = hookServices(this, 'resource');
-        if (resourceId) resource.remove({ id: resourceId });
+        if (resourceId !== model.resourceId) {
+          resource.remove({ id: resourceId });
+        }
         callback();
       },
       afterDestroy: function(model, options, callback) {

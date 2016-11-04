@@ -9,4 +9,4 @@ const production = {
 };
 
 
-module.exports = _.merge({}, production, defaultConfig);
+module.exports = _.merge({}, defaultConfig, production);

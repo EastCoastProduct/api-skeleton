@@ -19,9 +19,9 @@ module.exports = {
     prefix: process.env.IMAGE_PREFIX || 'https://s3.amazonaws.com/'
   },
 
-  apiUrl: 'http://192.168.50.4:3000',
-  webUrl: 'http://192.168.50.4:7000',
-  superAdminUrl: 'http://192.168.50.4:7001',
+  apiUrl: 'http://localhost:3000',
+  webUrl: 'http://localhost:7000',
+  superAdminUrl: 'http://localhost:7001',
   mockTmpDir: false,
 
   genSaltRounds: 10,
@@ -45,6 +45,11 @@ module.exports = {
   supportedImageExtensions:  ['.jpeg', '.jpg', '.png', '.gif', '.bmp'],
   supportedDocumentsExtensions: ['.pdf', '.csv', '.xls', '.xlsx', '.doc',
    '.docx', '.txt', '.ods', '.odt', '.zip', '.gif', '.jpg', '.png'],
+
+  syslog: {
+    host: 'ecp_syslog',
+    port: 514
+  },
 
   // mail option (mailtrap service)
   mailOptions: {
