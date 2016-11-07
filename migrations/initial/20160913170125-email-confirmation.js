@@ -1,11 +1,14 @@
 'use strict';
 
 const _ = require('lodash');
-const utils = require('../utils/migrations');
+const utils = require('../../utils/migrations');
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
     const baseSchema = {
+      email: {
+        type: Sequelize.STRING
+      },
       token: {
         allowNull: false,
         primaryKey: true,
@@ -13,12 +16,12 @@ module.exports = {
       }
     };
 
-    return queryInterface.createTable('forgot_passwords', _.extend({},
+    return queryInterface.createTable('email_confirmations', _.extend({},
       baseSchema,
       utils.timestamps
     ))
     .then(function() {
-      return queryInterface.addColumn('forgot_passwords', 'userId', {
+      return queryInterface.addColumn('email_confirmations', 'userId', {
         type: Sequelize.INTEGER,
         references: {
           model: 'users',
@@ -32,9 +35,7 @@ module.exports = {
   },
 
   down: function(queryInterface, Sequelize) {
-    return queryInterface.removeColumn('forgot_passwords', 'userId')
-      .then(function() {
-        return queryInterface.dropTable('forgot_passwords');
-      });
+    return queryInterface.removeColumn('email_confirmations', 'userId')
+      .then(() => queryInterface.dropTable('email_confirmations'));
   }
 };

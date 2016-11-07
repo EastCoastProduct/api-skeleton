@@ -9,6 +9,7 @@ const tape = require('gulp-tape');
 const istanbul = require('gulp-istanbul');
 const sequence = require('run-sequence');
 const tapColorize = require('tap-colorize');
+let migrations;
 
 const colorizeColors = {
   info: [100, 200, 255],
@@ -41,14 +42,11 @@ const paths = {
 };
 
 const database = (arg) => shell.task(`node utils/fixtures/index.js ${arg}`);
-const migrate = (arg = 'development') => shell.task([
-    `NODE_ENV=${arg} ./node_modules/.bin/sequelize db:migrate`,
+const runSeeds = (arg = 'development') => shell.task(
     `NODE_ENV=${arg} ./node_modules/.bin/sequelize db:seed:all`
-  ]);
-
+  );
 
 gulp.task('clear-seeds', () => gulp.src('./seedManifest.js').pipe(clean()));
-
 
 /*
   Database tasks
@@ -56,16 +54,15 @@ gulp.task('clear-seeds', () => gulp.src('./seedManifest.js').pipe(clean()));
 gulp.task('db-clean', database('delete'));
 gulp.task('db-recreate', database('recreate'));
 gulp.task('db-recreate-dev', database('recreate dev'));
-gulp.task('migrate', migrate());
-gulp.task('migrate-test', migrate(process.env.NODE_ENV || 'test'));
-
+gulp.task('run-seeds', runSeeds());
+gulp.task('run-seeds-test', runSeeds(process.env.NODE_ENV || 'test'));
 
 /*
   Development tasks
 */
 gulp.task('dev-rebuild', callback => {
   process.env.NODE_ENV = 'development';
-  sequence('clear-seeds', 'db-recreate-dev', 'migrate', callback);
+  sequence('clear-seeds', 'db-recreate-dev', 'migrate-initialize', 'run-seeds', callback);
 });
 
 gulp.task('lint-src', () => {
@@ -81,7 +78,6 @@ gulp.task('lint-test', () => {
 });
 
 gulp.task('lint', ['lint-src', 'lint-test']);
-
 
 /*
   Test tasks
@@ -106,7 +102,7 @@ gulp.task('run-test-cover', () => {
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
       gulp.src(paths.test)
-        .pipe(tape({timeout: 14000, reporter: tapColorize(colorizeColors)}))
+        .pipe(tape({ timeout: 14000, reporter: tapColorize(colorizeColors) }))
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({
           thresholds: {
@@ -132,19 +128,55 @@ gulp.task('run-test-cover', () => {
     });
 });
 
-gulp.task('test', cb =>
-  sequence('clear-seeds', 'db-clean', 'migrate-test', 'run-tests', cb));
-gulp.task('test-cover', cb =>
-  sequence('clear-seeds', 'db-clean', 'migrate-test', 'run-test-cover', cb));
+function getGulpTaskArgument(key) {
+  var argumnetIndex = process.argv.indexOf(key);
+  var argumnetValue = process.argv[argumnetIndex + 1];
+  return (argumnetIndex > 0) ? argumnetValue : undefined;
+}
+
+gulp.task('migrate', () => {
+  // TODO quick fix for different environment
+  migrations = require('./migrations');
+  var version = getGulpTaskArgument("--version");
+  var method = getGulpTaskArgument("--method");
+  var specificMigrations = getGulpTaskArgument("--specific");
+
+  if(version && method) {
+    migrations.run(version, method, specificMigrations);
+  }
+  else {
+    console.log('Need to have version and method specified');
+    process.exit(1);
+  }
+
+});
+
+gulp.task('migrate-initialize', () => {
+  // TODO quick fix for test environment
+  migrations = require('./migrations');
+  migrations.initialize();
+});
+
+gulp.task('test', cb => {
+  process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+  sequence('clear-seeds', 'db-clean', 'migrate-initialize', 'run-seeds-test', 'run-tests', cb);
+});
+
+gulp.task('test-cover', cb => {
+  process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+  sequence('clear-seeds', 'db-clean','migrate-initialize', 'run-seeds-test', 'run-test-cover', cb);
+});
 
 gulp.task('test-build', cb => {
-  sequence('clear-seeds', 'migrate-test', 'run-test-cover', cb);
+  process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+  sequence('clear-seeds', 'migrate-initialize', 'run-seeds-test', 'run-test-cover', cb);
 });
 
 gulp.task('test-rebuild', cb => {
-  sequence('clear-seeds', 'db-recreate', 'migrate-test', 'run-test-cover', cb);
+  // TODO quick fix for circle ci environment
+  process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+  sequence('clear-seeds', 'db-recreate','migrate-initialize', 'run-seeds-test', 'run-test-cover', cb);
 });
-
 
 /*
   Server debug tasks
@@ -158,5 +190,3 @@ gulp.task('server-debug', () => {
 
 gulp.task('debug', ['server-debug'],
   shell.task('node-inspector --web-port=3465'));
-
-
