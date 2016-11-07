@@ -47,7 +47,7 @@ module.exports = {
    '.docx', '.txt', '.ods', '.odt', '.zip', '.gif', '.jpg', '.png'],
 
   syslog: {
-    host: 'ecp_syslog',
+    host: 'ecp_static_files',
     port: 514
   },
 

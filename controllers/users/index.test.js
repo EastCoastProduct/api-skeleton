@@ -343,19 +343,6 @@ tests('POST /users/:userId', userEdit => {
   userEdit.test('Success', success => {
     let stubS3 = helpers.stubS3({image: 'someImage'});
 
-    success.test('User successfully updated', test => {
-      helpers.json('post', '/users/2')
-        .set('Authorization', secondNormalAuth)
-        .send({ firstname: 'Changed' })
-        .end( (err, res) => {
-          test.same(
-            { status: res.status, firstname: res.body.firstname },
-            { status: 200, firstname: 'Changed' }
-          );
-          test.end();
-        });
-    });
-
     success.test('User successfully updated by superadmin', test => {
       helpers.json('post', '/users/2')
         .set('Authorization', superAdminAuth)
@@ -376,13 +363,29 @@ tests('POST /users/:userId', userEdit => {
         .end( (err, res) => {
           test.same({ status: res.status }, { status: 200 });
           test.error(!res.body.image, 'Image not mapped properly');
-          Resource.findById(1)
-          .then( resource => {
-            helpers.resetStub(stubS3);
-            test.error(resource, 'Resource should not exist');
-            test.end();
-          });
+          test.end();
         });
+    });
+
+    success.test('User successfully updated', test => {
+      helpers.json('post', '/users/2')
+        .set('Authorization', secondNormalAuth)
+        .send({ firstname: 'Changed' })
+        .end( (err, res) => {
+          test.same(
+            { status: res.status, firstname: res.body.firstname },
+            { status: 200, firstname: 'Changed' }
+          );
+          test.end();
+        });
+    });
+
+    success.test('Removed previous image for user', test => {
+      Resource.findById(1).then( resource => {
+        helpers.resetStub(stubS3);
+        test.error(resource, 'Resource should not exist');
+        test.end();
+      });
     });
   });
 });
