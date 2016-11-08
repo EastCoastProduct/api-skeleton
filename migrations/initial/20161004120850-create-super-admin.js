@@ -1,17 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
-const utils = require('../utils/migrations');
+const utils = require('../../utils/migrations');
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
     const baseSchema = {
       bio: {
         type: Sequelize.STRING(1000)
-      },
-      confirmed: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       email: {
         type: Sequelize.STRING,
@@ -30,7 +26,7 @@ module.exports = {
       }
     };
 
-    return queryInterface.createTable('users', _.extend({},
+    return queryInterface.createTable('super_admins', _.extend({},
       utils.id,
       baseSchema,
       utils.timestamps
@@ -38,6 +34,6 @@ module.exports = {
   },
 
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('super_admins');
   }
 };

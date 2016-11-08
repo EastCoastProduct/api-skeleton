@@ -42,11 +42,11 @@ const logger = bunyan.createLogger({
   },
   streams: process.env.NODE_ENV === 'production'
     ? productionStream
-    : _.concat(productionStream, { stream: consoleBunyanPrettyStream })
+    : [{ stream: consoleBunyanPrettyStream }]
 });
 
 /* istanbul ignore next */
-const isTestEnv = () => (config.env === 'test') || (config.env === 'circleci');
+const isTestEnv = () => (config.env === 'circleci');
 
 /* istanbul ignore next */
 logger.logRequest = ({ req, res }) => {

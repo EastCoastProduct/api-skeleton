@@ -68,7 +68,7 @@ module.exports = function(sequelize, DataTypes) {
         if (resourceId !== model.resourceId) {
           resource.remove({ id: resourceId })
             .catch( err => logger.logAppError(
-              lang.errors.unableToDeletePreviousImage,
+              lang.errors.unableToDeleteUserResource,
               err
             ));
         }
