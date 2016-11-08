@@ -7,5 +7,4 @@ const staging = {
   env: 'staging'
 };
 
-
-module.exports = _.merge({}, staging, defaultConfig);
+module.exports = _.merge({}, defaultConfig, staging);

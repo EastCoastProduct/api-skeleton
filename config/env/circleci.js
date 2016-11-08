@@ -7,4 +7,4 @@ const circleci = {
   env: 'circleci'
 };
 
-module.exports = _.merge({}, circleci, defaultConfig);
+module.exports = _.merge({}, defaultConfig, circleci);

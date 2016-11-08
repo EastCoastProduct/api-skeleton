@@ -47,6 +47,8 @@ module.exports = {
   tooManyFiles: appendKeyword('Max number of files for upload is'),
 
   // U
+  unableToDeleteUserResource: 'Unable to delete user resource',
+
   unrecognizedFileField: appendKeyword('Unrecognized field'),
 
   unrecognizedParameter: 'unrecognized parameter',
@@ -60,6 +62,6 @@ module.exports = {
 
 
   // Errors 500
-  searchParametersError: appendKeyword('Search values sent without search conditions in service for')  
+  searchParametersError: appendKeyword('Search values sent without search conditions in service for')
 
 };

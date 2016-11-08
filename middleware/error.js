@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const logger = require('../utils/logger');
 
 /* istanbul ignore next */
 function formatErrors(errors) {
@@ -43,12 +44,15 @@ function ErrorHandler(options) {
       break;
     }
 
+    if (!err.status) logger.logError({ err, req, res });
+
     res.status(err.status || 500);
 
     res.json({
       message: err.message,
       debugInfo: err.debugInfo,
-      error: (options.env === 'development') ? err : undefined
+      // TODO check if we want to log whole error in tests
+      error: (options.env !== 'production') ? err : undefined
     });
   };
 }
