@@ -102,6 +102,15 @@ const users = [{
   // id: 19
   // this user will want to resend his confirmation
   email: 'resend@mail.com'
+}, {
+  // id: 20
+  // this user be confirmed by superadmin
+  email: 'confirmed.superadmin@mail.com',
+  confirmed: false
+}, {
+  // id: 21
+  // this user will be unconfirmed by superadmin
+  email: 'not.confirmed.superadmin@mail.com'
 }];
 
 module.exports = populatePresets(users, preset);

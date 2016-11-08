@@ -18,14 +18,33 @@ function createUser(req) {
     ForgotPassword.create({ userId: userId });
 
   return genericUser.doesNotExist({ where: { email: userEmail }})
+  .bind({})
   .then( () => _createUser())
-  .then( newUser => createPasswordToken(newUser.id))
+  .then( newUser => {
+    this.newUser = newUser;
+    return createPasswordToken(newUser.id);
+  })
   .then( newPasswordToken => mailer.superAdminCreatedUser({
     user: { email: userEmail },
     token: newPasswordToken.token
-  }));
+  }))
+  .then(() => this.newUser);
+}
+
+function changeUserStatus(req) {
+
+  const _updateUserStatus = () =>
+    genericUser.update({
+      confirmed: req.body.confirmed
+    }, {
+      id: req.params.userId
+    });
+
+  return genericUser.exists({ where: { id: req.params.userId }})
+    .then( () => _updateUserStatus());
 }
 
 module.exports = {
-  createUser: createUser
+  createUser: createUser,
+  changeUserStatus: changeUserStatus
 };
