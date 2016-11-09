@@ -27,6 +27,12 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      facebookId: {
+        type: Sequelize.INTEGER
+      },
+      facebookToken: {
+        type: Sequelize.STRING
       }
     };
 

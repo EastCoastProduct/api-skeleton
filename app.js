@@ -19,7 +19,6 @@ app.use(bodyParser.urlencoded({
 
 app.use(middleware.addHeaders);
 
-// process pagination parameters
 app.use(paginationParams);
 
 app.use('/', routes);

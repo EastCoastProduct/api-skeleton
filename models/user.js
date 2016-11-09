@@ -38,6 +38,12 @@ module.exports = function(sequelize, DataTypes) {
 
         this.setDataValue('password', hash);
       }
+    },
+    facebookId: {
+      type: DataTypes.INTEGER
+    },
+    facebookToken: {
+      type: DataTypes.STRING
     }
   }, {
     instanceMethods: {

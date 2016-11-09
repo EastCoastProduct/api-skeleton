@@ -14,6 +14,13 @@ module.exports = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'notToday'
   },
 
+  // facebook login configuration
+  facebook: {
+    clientID: '1608315746130135',
+    clientSecret: '37423e548933f953980525aa3481db86',
+    callbackURL: 'http://localhost:3000/authenticate/facebook/callback'
+  },
+
   s3Url: {
     bucketName: process.env.BUCKET_NAME || 'ecp-boilerplate',
     prefix: process.env.IMAGE_PREFIX || 'https://s3.amazonaws.com/'

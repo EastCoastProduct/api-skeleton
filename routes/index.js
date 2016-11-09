@@ -1,8 +1,11 @@
 'use strict';
 
 const cors = require('cors');
-const controllers = require('../controllers');
 const router = require('express').Router();
+const passport = require('passport');
+const controllers = require('../controllers');
+
+require('../middleware/passportConfig')(passport);
 
 // Allow the api to accept request from web app
 router.use(cors({
@@ -18,6 +21,36 @@ router.route('/authenticate')
   .post(
     controllers.authentication.validate.authenticate,
     controllers.authentication.authenticate
+  );
+
+// User authentication facebook
+router.route('/authenticate/facebook')
+  .get(
+    passport.authenticate('facebook', { session: false, scope: 'email' })
+  );
+
+router.route('/authenticate/facebook/callback')
+  // here should be a post from web application that will work only on the
+  // same domains
+  .get(
+    passport.authenticate('facebook', function(req, res) {
+
+      // let user = req.user;
+      //
+      // const token = jwt.sign(
+      //   { userId: user.id },
+      //   config.jwtKey,
+      //   { expiresIn: config.tokenExpiration }
+      // );
+      // // this should be send to web application
+      // res.status(200).json({
+      //   token: token,
+      //   user: user,
+      //   socialLogin: true
+      // });
+
+      res.send(req.user? 200 : 401);
+    })
   );
 
 /*

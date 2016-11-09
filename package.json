@@ -29,6 +29,8 @@
     "multer": "^1.2.0",
     "node-mocks-http": "^1.5.4",
     "nodemailer": "^2.6.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
     "pg": "^6.1.0",
     "sequelize": "^3.24.3",
     "umzug":"^1.11",
