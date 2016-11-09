@@ -76,10 +76,26 @@ function superAdminCreatedUser(options) {
   return sendEmail(mailOptions);
 }
 
+function superAdminChangedUserEmail(options) {
+  let mailOptions = {
+    to: options.user.email,
+    from: emails.dontReply,
+    subject: 'Account email changed',
+    text: `
+      Your account email has been changed.`,
+    html: `
+      <p>Your account email has been changed.</p>
+    `
+  };
+
+  return sendEmail(mailOptions);
+}
+
 module.exports = {
   transport: transport,
   emailUpdate: emailUpdate,
   emailConfirm: emailConfirm,
   forgotPassword: forgotPassword,
-  superAdminCreatedUser: superAdminCreatedUser
+  superAdminCreatedUser: superAdminCreatedUser,
+  superAdminChangedUserEmail: superAdminChangedUserEmail
 };

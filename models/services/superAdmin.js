@@ -31,6 +31,29 @@ function createUser(req) {
   .then(() => this.newUser);
 }
 
+function changeUserEmail(req) {
+
+  let newEmail = req.body.newEmail.toLowerCase();
+
+  function _updateUserEmail() {
+    this.user.email = newEmail;
+    this.user.confirmed = true;
+
+    return this.user.save();
+  }
+
+  return genericUser.getById(req.params.userId)
+    .bind({})
+    .then( user => {
+      this.user = user;
+      return genericUser.doesNotExist({ where: { email: newEmail }});
+    })
+    .then( () => _updateUserEmail.call(this))
+    .then( () => mailer.superAdminChangedUserEmail({
+      user: { email: newEmail }
+    }));
+}
+
 function changeUserStatus(req) {
 
   const _updateUserStatus = () =>
@@ -46,5 +69,6 @@ function changeUserStatus(req) {
 
 module.exports = {
   createUser: createUser,
+  changeUserEmail: changeUserEmail,
   changeUserStatus: changeUserStatus
 };

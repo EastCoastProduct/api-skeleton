@@ -11,9 +11,15 @@ const validate = {
     },
     required: ['email']
   }),
+  changeUserEmail: validator.validation('body', {
+    rules: {
+      newEmail: { type: 'email' }
+    },
+    required: ['newEmail']
+  }),
   changeUserStatus: validator.validation('body', {
     rules: {
-      confirmed: 'stringBoolean'
+      confirmed: { type: 'stringBoolean' }
     },
     required: ['confirmed']
   })
@@ -29,6 +35,16 @@ function create(req, res, next) {
   .catch(err => next(err));
 }
 
+function changeUserEmail(req, res, next) {
+  services.superAdmin.changeUserEmail(req)
+    .then( () => {
+      res.status(200);
+      res.locals.message = lang.messages.userEmailUpdated;
+      next();
+    })
+    .catch(err => next(err));
+}
+
 function changeUserStatus(req, res, next) {
   services.superAdmin.changeUserStatus(req)
     .then( () => {
@@ -41,6 +57,7 @@ function changeUserStatus(req, res, next) {
 
 module.exports = {
   create: create,
+  changeUserEmail: changeUserEmail,
   changeUserStatus: changeUserStatus,
   validate: validate
 };

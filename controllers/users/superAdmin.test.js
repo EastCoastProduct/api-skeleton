@@ -101,6 +101,106 @@ tests('POST /superAdmin/users', superAdmin => {
   });
 });
 
+tests('POST /superAdmin/users/:userId/changeEmail', changeEmail => {
+
+  changeEmail.test('Failed', failed => {
+
+    failed.test('Validation error', test => {
+      let validationError = {
+        message: 'Parameters error',
+        debugInfo: [{
+          path: 'wrong',
+          message: 'unrecognized parameter'
+        }, {
+          path: 'newEmail',
+          message: 'required'
+        }],
+        error: {
+          message: 'Parameters error',
+          status: 400,
+          debugInfo: [{
+            path: 'wrong',
+            message: 'unrecognized parameter'
+          }, {
+            path: 'newEmail',
+            message: 'required'
+          }]
+        }
+      };
+
+      helpers.json('post', '/superAdmin/users/20/changeEmail')
+        .set('Authorization', superAdminAuth)
+        .send({ wrong: 'wrong' })
+        .end( (err, res) => {
+          test.same(res.body, validationError);
+          test.end();
+        });
+    });
+
+    failed.test('Not authorized', test => {
+      helpers.json('post', '/superAdmin/users/20/changeEmail')
+        .set('Authorization', normalAuth)
+        .send({ confirmed: 'true' })
+        .end( (err, res) => {
+          test.same(
+            { status: res.status, message: res.body.message },
+            { status: 403, message: lang.errors.notAuthorized }
+          );
+          test.end();
+        });
+    });
+
+    failed.test('Fail to change user email because it is in use', test => {
+      helpers.json('post', '/superAdmin/users/21/changeEmail')
+        .set('Authorization', superAdminAuth)
+        .send({ newEmail: 'regular@mail.com' })
+        .end( (err, res) => {
+          test.same(
+            { status: res.status, message: res.body.message },
+            { status: 400, message: lang.errors.alreadyExists(lang.models.user) }
+          );
+          test.end();
+        });
+    });
+
+    failed.test('Fail to change user email because user does not exist', test => {
+      helpers.json('post', '/superAdmin/users/1950/changeEmail')
+        .set('Authorization', superAdminAuth)
+        .send({ newEmail: 'regular@mail.com' })
+        .end( (err, res) => {
+          test.same(
+            { status: res.status, message: res.body.message },
+            { status: 404, message: lang.errors.notFound(lang.models.user) }
+          );
+          test.end();
+        });
+    });
+  });
+
+  changeEmail.test('Success', success => {
+
+    let emailStub = helpers.stubMailer('success');
+
+    success.test('User email successfully changed', test => {
+      helpers.json('post', '/superAdmin/users/22/changeEmail')
+        .set('Authorization', superAdminAuth)
+        .send({ newEmail: 'super.admin.set.new.email@mail.com' })
+        .end( (err, res) => {
+          test.same(res.body.message, lang.messages.userEmailUpdated);
+          test.error(!emailStub.calledOnce, 'Email should have been sent');
+          User.findById(22).then( user => {
+            helpers.resetStub(emailStub);
+            test.same(
+              { email: user.email, confirmed: user.confirmed },
+              { email: 'super.admin.set.new.email@mail.com', confirmed: true }
+            );
+            test.end();
+          });
+        });
+    });
+  });
+});
+
 tests('POST /superAdmin/users/:userId/changeStatus', changeStatus => {
 
   changeStatus.test('Failed', failed => {

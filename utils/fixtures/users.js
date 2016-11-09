@@ -110,7 +110,13 @@ const users = [{
 }, {
   // id: 21
   // this user will be unconfirmed by superadmin
+  // superadmin will fail to change this user email
   email: 'not.confirmed.superadmin@mail.com'
+}, {
+  // id: 22
+  // this user will have his email changed by superadmin and confirmed
+  email: 'superadmin.mail.change@mail.com',
+  confirmed: false
 }];
 
 module.exports = populatePresets(users, preset);
