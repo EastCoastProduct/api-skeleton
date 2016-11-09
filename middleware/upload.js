@@ -15,7 +15,7 @@ const Error400 = errors.Error400;
 
 const storage = multer.memoryStorage();
 const limits = {
-  fieldSize: config.files.size * 1024 * 1024,
+  fileSize: config.files.size * 1024 * 1024,
   files: config.files.maxNum
 };
 
@@ -62,6 +62,9 @@ function multerErrorHandler(err, next) {
   let error;
 
   switch (err.code) {
+  case 'LIMIT_FILE_SIZE':
+    error = Error400(lang.errors.fileTooLarge); break;
+
   case 'LIMIT_UNEXPECTED_FILE':
     error = Error400(lang.errors.unrecognizedFileField(err.field)); break;
 

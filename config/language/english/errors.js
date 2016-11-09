@@ -21,6 +21,8 @@ module.exports = {
   emailInUse: 'Email is already in use',
 
   // F
+  fileTooLarge: 'File is too large',
+
   fileNotProvided: 'File was not provided',
 
   filesNotProvided: 'Files not provided',

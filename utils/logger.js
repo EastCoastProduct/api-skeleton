@@ -1,7 +1,6 @@
 'use strict';
 
-const _ = require('lodash'),
-  bunyan = require('bunyan'),
+const bunyan = require('bunyan'),
   bsyslog = require('bunyan-syslog'),
   config = require('../config'),
   PrettyStream = require('bunyan-prettystream');
