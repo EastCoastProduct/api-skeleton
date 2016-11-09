@@ -25,5 +25,9 @@ module.exports = {
   successfullyRemoved: prependKeyword('successfully removed'),
 
   // U
-  userCreated: 'User successfully created'
+  userEmailUpdated: 'User email updated',
+
+  userCreated: 'User successfully created',
+
+  userStatusUpdated: 'User status has been updated'
 };

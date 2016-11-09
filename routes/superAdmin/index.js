@@ -18,6 +18,20 @@ module.exports = function(router) {
       users.superAdmin.create
     )
 
+  router.route('/superAdmin/users/:userId/changeEmail')
+    .post(
+      authorization.isSuperAdmin,
+      users.superAdmin.validate.changeUserEmail,
+      users.superAdmin.changeUserEmail
+    );
+
+  router.route('/superAdmin/users/:userId/changeStatus')
+    .post(
+      authorization.isSuperAdmin,
+      users.superAdmin.validate.changeUserStatus,
+      users.superAdmin.changeUserStatus
+    );
+
   router.route('/superAdmin/authenticate')
     .post(
       authentication.superAdmin.validate.authenticate,

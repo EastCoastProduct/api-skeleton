@@ -4,7 +4,10 @@ const helpers = require('../../utils/test/helper');
 const lang = require('../../config/language');
 const tests = require('tape');
 const resourcesMiddleware = require('.');
+const normalAuth = helpers.getAuthorizationHeader(1);
 const services = require('../../models/services');
+
+const filePath = helpers.filePath('large_file.png');
 
 function generateImage(name, extension) {
   return {
@@ -52,6 +55,19 @@ tests('Resources', resources => {
         );
         test.end();
       });
+    });
+
+    failed.test('It should fail because file is too large', test => {
+      helpers.json('post', '/users/1')
+        .set('Authorization', normalAuth)
+        .attach('image', filePath)
+        .end( (err, res) => {
+          test.same(
+            { status: res.status, message: res.body.message },
+            { status: 400, message: lang.errors.fileTooLarge }
+          );
+          test.end();
+        });
     });
 
     failed.test('It should fail to create multiple because invalid file', test => {
