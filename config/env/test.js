@@ -7,4 +7,4 @@ const test = {
   env: 'test'
 };
 
-module.exports = _.merge({}, test, defaultConfig);
+module.exports = _.merge({}, defaultConfig, test);

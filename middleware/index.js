@@ -1,9 +1,12 @@
 'use strict';
 
-const _ = require('lodash');
-const lang = require('../config/language');
-const deleteHangingFiles = require('./remove').deleteHangingFiles;
-const utils = require('../utils');
+const _ = require('lodash'),
+  logger = require('../utils/logger'),
+  lang = require('../config/language'),
+  deleteHangingFiles = require('./remove').deleteHangingFiles,
+  utils = require('../utils'),
+  uuid = require('node-uuid');
+
 
 // add headers to every response
 function addHeaders(req, res, next) {
@@ -26,7 +29,15 @@ function _responseMiddleware(req, res, next) {
   delete res.locals._delete;
 
   if (_.isEmpty(res.locals)) return next();
+  logger.logRequest({ req, res });
   res.json(res.locals).end();
+}
+
+function logMiddleware(req, res, next) {
+  // add request id for whole request
+  req.log = logger.child({ requestId: uuid.v4() });
+
+  next();
 }
 
 const responseMiddleware = () =>
@@ -35,5 +46,6 @@ const responseMiddleware = () =>
 module.exports = {
   addHeaders: addHeaders,
   catch404: catch404,
-  responseMiddleware: responseMiddleware()
+  responseMiddleware: responseMiddleware(),
+  logMiddleware: logMiddleware
 };
