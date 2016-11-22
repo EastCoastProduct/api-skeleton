@@ -2,58 +2,38 @@
 
 const cors = require('cors');
 const router = require('express').Router();
-const passport = require('passport');
 const controllers = require('../controllers');
 
-require('../middleware/passportConfig')(passport);
+module.exports = function(passport) {
+  // Allow the api to accept request from web app
+  router.use(cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,POST,DELETE,OPTIONS'
+  }));
 
-// Allow the api to accept request from web app
-router.use(cors({
-  origin: '*',
-  methods: 'GET,HEAD,PUT,POST,DELETE,OPTIONS'
-}));
+  // enable cors preflight for all endpoints
+  router.options('*', cors());
 
-// enable cors preflight for all endpoints
-router.options('*', cors());
-
-// User authentication
-router.route('/authenticate')
+  // User authentication
+  router.route('/authenticate')
   .post(
     controllers.authentication.validate.authenticate,
     controllers.authentication.authenticate
   );
 
-// User authentication facebook
-router.route('/authenticate/facebook')
+  // User authentication facebook
+  router.route('/authenticate/facebook')
   .get(
-    passport.authenticate('facebook', { session: false, scope: 'email' })
+    passport.authenticate('facebook', { session: false, scope: ['email'] })
   );
 
-router.route('/authenticate/facebook/callback')
-  // here should be a post from web application that will work only on the
-  // same domains
+  router.route('/authenticate/facebook/callback')
   .get(
-    passport.authenticate('facebook', function(req, res) {
-
-      // let user = req.user;
-      //
-      // const token = jwt.sign(
-      //   { userId: user.id },
-      //   config.jwtKey,
-      //   { expiresIn: config.tokenExpiration }
-      // );
-      // // this should be send to web application
-      // res.status(200).json({
-      //   token: token,
-      //   user: user,
-      //   socialLogin: true
-      // });
-
-      res.send(req.user? 200 : 401);
-    })
+    passport.authenticate('facebook', { session: false }),
+    controllers.authentication.authenticateSocial
   );
 
-/*
+  /*
   - User CRUD /users
 
   - Change/Reset Password
@@ -67,15 +47,16 @@ router.route('/authenticate/facebook/callback')
   - User Confirmation
     /emailConfirm
     /resendConfirmation
-*/
-require('./users')(router);
+  */
+  require('./users')(router);
 
-/*
+  /*
   Super admin routes
 
     - Authentication
       /superAdmin/authenticate
-*/
-require('./superAdmin')(router);
+  */
+  require('./superAdmin')(router);
 
-module.exports = router;
+  return router;
+};

@@ -15,7 +15,6 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
         unique: true
       },
       firstname: {
@@ -25,13 +24,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       password: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING
       },
       facebookId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING,
+        unique: true
       },
       facebookToken: {
+        type: Sequelize.STRING
+      },
+      facebookEmail: {
         type: Sequelize.STRING
       }
     };

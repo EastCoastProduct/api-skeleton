@@ -341,7 +341,7 @@ tests('POST /users/:userId', userEdit => {
   });
 
   userEdit.test('Success', success => {
-    let stubS3 = helpers.stubS3({image: 'someImage'});
+    let stubS3 = helpers.stubS3({ image: 'someImage' });
 
     success.test('User successfully updated', test => {
       helpers.json('post', '/users/2')

@@ -17,10 +17,9 @@ module.exports = function(sequelize, DataTypes) {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
       unique: true,
-      set: function(v) {
-        this.setDataValue('email', v.toLowerCase());
+      set: function(value) {
+        this.setDataValue('email', value.toLowerCase());
       }
     },
     firstname: {
@@ -31,18 +30,23 @@ module.exports = function(sequelize, DataTypes) {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
-      set: function(v) {
+      set: function(value) {
+        if (!value) return undefined;
+
         const salt = bcrypt.genSaltSync(config.genSaltRounds);
-        const hash = bcrypt.hashSync(v, salt);
+        const hash = bcrypt.hashSync(value, salt);
 
         this.setDataValue('password', hash);
       }
     },
     facebookId: {
-      type: DataTypes.INTEGER
+      type: DataTypes.STRING,
+      unique: true
     },
     facebookToken: {
+      type: DataTypes.STRING
+    },
+    facebookEmail: {
       type: DataTypes.STRING
     }
   }, {
@@ -51,8 +55,21 @@ module.exports = function(sequelize, DataTypes) {
         var values = this.dataValues;
 
         values.password = undefined;
+        values.facebookId = undefined;
+        values.facebookToken = undefined;
+        values.facebookEmail = undefined;
 
         return values;
+      }
+    },
+    defaultScope: {
+      where: {
+        password: { $ne: null }
+      }
+    },
+    scopes: {
+      socialUsers: {
+        where: { password: null }
       }
     },
     classMethods: {

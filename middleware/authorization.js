@@ -26,7 +26,7 @@ function getUser() {
   };
 
   const getRegularUser = (req) => {
-    return User.findById(req.user.userId)
+    return User.unscoped().findById(req.user.userId)
       .then( user => {
         if (!user) throw Error404(lang.errors.notFound(lang.models.user));
 

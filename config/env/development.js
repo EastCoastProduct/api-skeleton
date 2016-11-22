@@ -14,11 +14,11 @@ module.exports = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'notToday'
   },
 
-  // facebook login configuration
+  // facebook authentication configuration
   facebook: {
-    clientID: '1608315746130135',
-    clientSecret: '37423e548933f953980525aa3481db86',
-    callbackURL: 'http://localhost:3000/authenticate/facebook/callback'
+    clientID: '1610142749280768',
+    clientSecret: '237a2647cc9a832ab56ba53504bec3e9',
+    callbackURL: 'http://localhost:7000/authenticate/facebook/callback'
   },
 
   s3Url: {

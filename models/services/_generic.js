@@ -96,7 +96,7 @@ module.exports = (Model, keyword) => {
 
     _.merge(params, optionalArguments);
 
-    return Model.findAndCountAll(params);
+    return Model.unscoped().findAndCountAll(params);
   };
 
   /*

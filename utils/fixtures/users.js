@@ -102,6 +102,14 @@ const users = [{
   // id: 19
   // this user will want to resend his confirmation
   email: 'resend@mail.com'
+}, {
+  // id: 20
+  // this user will be used in facebook authentication
+  firstname: 'facebookName',
+  lastname: 'facebookLastName',
+  facebookId: '130331354110247',
+  password: null,
+  facebookToken: 'TestToken'
 }];
 
 module.exports = populatePresets(users, preset);

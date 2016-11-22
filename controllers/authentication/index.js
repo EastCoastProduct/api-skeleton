@@ -52,8 +52,28 @@ function authenticate(req, res, next) {
   .catch(err => next(err));
 }
 
+/* istanbul ignore next */
+function authenticateSocial(req, res, next) {
+  let user = req.user;
+
+  const token = jwt.sign(
+    { userId: user.id },
+    config.jwtKey,
+    { expiresIn: config.tokenExpiration }
+  );
+
+  res.status(200);
+  res.locals = {
+    token: token,
+    user: prependS3(user, 'image'),
+    socialLogin: true
+  };
+  next();
+}
+
 module.exports = {
   authenticate: authenticate,
+  authenticateSocial: authenticateSocial,
   validate: validate,
   superAdmin: require('./superAdmin')
 };

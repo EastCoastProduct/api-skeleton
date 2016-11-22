@@ -7,6 +7,7 @@ const errorHandler = require('./middleware/error');
 const logger = require('morgan');
 const middleware = require('./middleware');
 const paginationParams = require('./middleware/paginationParams');
+const passport = require('passport');
 const routes = require('./routes');
 const deleteFiles = require('./middleware/remove');
 
@@ -21,7 +22,11 @@ app.use(middleware.addHeaders);
 
 app.use(paginationParams);
 
-app.use('/', routes);
+app.use(passport.initialize());
+
+require('./middleware/passportConfig')(passport);
+
+app.use('/', routes(passport));
 
 app.use(middleware.responseMiddleware);
 app.use(middleware.catch404);
