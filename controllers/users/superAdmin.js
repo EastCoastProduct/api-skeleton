@@ -7,7 +7,10 @@ const validator = require('../../middleware/validator');
 const validate = {
   create: validator.validation('body', {
     rules: {
-      email: { type: 'email' }
+      bio: { type: 'norule', length: { max: 1000 }},
+      email: { type: 'email' },
+      firstname: { type: 'norule', length: { max: 30 }},
+      lastname: { type: 'norule', length: { max: 30 }}
     },
     required: ['email']
   }),

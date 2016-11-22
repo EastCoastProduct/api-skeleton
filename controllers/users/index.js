@@ -20,9 +20,9 @@ const validate = {
   }),
   update: validator.validation('body', {
     rules: {
-      bio: { type: 'norule', length: { max: 1000 }},
-      firstname: { type: 'norule', length: { max: 30 }},
-      lastname: { type: 'norule', length: { max: 30 }},
+      bio: { type: 'norule', length: { max: 1000 }, allowEmpty: true },
+      firstname: { type: 'norule', length: { max: 30 }, allowEmpty: true },
+      lastname: { type: 'norule', length: { max: 30 }, allowEmpty: true },
       resourceId: { type: 'positive'}
     }
   }),
