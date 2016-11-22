@@ -77,12 +77,22 @@ tests('POST /superAdmin/users', superAdmin => {
 
       helpers.json('post', '/superAdmin/users')
         .set('Authorization', superAdminAuth)
-        .send({ email: 'super.admin.created.user@mail.com' })
+        .send({
+          email: 'super.admin.created.user@mail.com',
+          firstname: 'superAdminCreatedName',
+          lastname: 'superAdminCreatedLastName',
+          bio: 'superAdminBio'
+        })
         .end( (err, res) => {
-          test.same(
-            { email: res.body.email, confirmed: res.body.confirmed },
-            { email: 'super.admin.created.user@mail.com', confirmed: true }
-          );
+          test.same({
+            email: res.body.email,
+            firstname: 'superAdminCreatedName',
+            confirmed: res.body.confirmed
+          }, {
+            email: 'super.admin.created.user@mail.com',
+            firstname: 'superAdminCreatedName',
+            confirmed: true
+          });
           User.findOne({ where: { email: 'super.admin.created.user@mail.com' }})
           .then( newUser => {
             test.error(!newUser.confirmed, 'User should be confirmed');
