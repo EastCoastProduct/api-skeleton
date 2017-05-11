@@ -64,7 +64,7 @@ function run(version, method, specific) {
   }
 }
 
-function initialize() {
+function initialize(cb) {
   const umzug = new Umzug({
     storage: 'sequelize',
     storageOptions: { sequelize: sequlizeInstance },
@@ -83,6 +83,7 @@ function initialize() {
 
   umzug.up().then( () => {
     console.log('Migration complete!');
+	cb();
   });
 }
 

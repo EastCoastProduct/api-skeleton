@@ -60,9 +60,9 @@ gulp.task('run-seeds-test', runSeeds(process.env.NODE_ENV || 'test'));
 /*
   Development tasks
 */
-gulp.task('dev-rebuild', callback => {
+gulp.task('dev-rebuild', cb => {
   process.env.NODE_ENV = 'development';
-  sequence('clear-seeds', 'db-recreate-dev', 'migrate-initialize', 'run-seeds', callback);
+  sequence('clear-seeds', 'db-recreate-dev', 'migrate-initialize', 'run-seeds', cb);
 });
 
 gulp.task('lint-src', () => {
@@ -151,10 +151,10 @@ gulp.task('migrate', () => {
 
 });
 
-gulp.task('migrate-initialize', () => {
+gulp.task('migrate-initialize', cb => {
   // TODO quick fix for test environment
   migrations = require('./migrations');
-  migrations.initialize();
+  migrations.initialize(cb);
 });
 
 gulp.task('test', cb => {

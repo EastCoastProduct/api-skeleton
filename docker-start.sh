@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-npm install
+set -e
+
+npm i
 
 if [ ! -f 'seedManifest.js' ]; then
-  sequelize db:migrate
-  sequelize db:seed:all
+	npm run dev-rebuild
 fi
 
 npm run dev-start
