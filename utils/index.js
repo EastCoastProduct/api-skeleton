@@ -32,8 +32,31 @@ function chainMiddleware(middlewares) {
   return chain;
 }
 
+const promisifyControllerMethod = method => function(req, res, next) {
+  new Promise(resolve => {
+    resolve(method.apply(this, arguments));
+  })
+  .then(result => {
+    res.locals = result;
+  })
+  .then(next, next);
+};
+
+function createController(body) {
+  const controller = {};
+
+  for (const name in body) {
+    const val = body[name];
+
+    controller[name] = (typeof val === 'function' && val.length < 3)
+      ? promisifyControllerMethod(val)
+      : val;
+  }
+}
+
 module.exports = {
-  defaultValue: defaultValue,
+  defaultValue,
   middleware: { chain: chainMiddleware },
-  userFromJwtHeader: userFromJwtHeader
+  userFromJwtHeader,
+  createController
 };
