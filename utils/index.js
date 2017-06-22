@@ -52,6 +52,8 @@ function createController(body) {
       ? promisifyControllerMethod(val)
       : val;
   }
+
+  return controller;
 }
 
 module.exports = {
