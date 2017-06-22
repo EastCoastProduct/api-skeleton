@@ -37,7 +37,12 @@ const promisifyControllerMethod = method => function(req, res, next) {
     resolve(method.apply(this, arguments));
   })
   .then(result => {
-    res.locals = result;
+    if (res.statusCode == null) {
+      res.status(200);
+    }
+    if (result !== undefined) {
+      res.locals = result;
+    }
   })
   .then(next, next);
 };
