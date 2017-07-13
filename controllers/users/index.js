@@ -6,6 +6,7 @@ const Resource = require('../../models').resource;
 const lang = require('../../config/language');
 const validator = require('../../middleware/validator');
 const prependS3 = require('../../utils/s3').prependS3;
+const createController = require('../../utils').createController;
 
 const validate = {
   create: validator.validation('body', {
@@ -36,91 +37,72 @@ const validate = {
   }, true)
 };
 
-function create(req, res, next) {
-  services.user.doesNotExist({ where: { email: req.body.email }})
-  .then( () => services.user.create(req.body))
-  .then( user => services.emailConfirmation.createToken(user)
-    .then( emailConfirmation => services.emailConfirmation.sendMail({
-      email: user.email, token: emailConfirmation.token
-    }))
-    .then( () => {
-      res.status(201);
-      res.locals = user;
-      next();
-    })
-  )
-  .catch(err => next(err));
+function create(req, res) {
+  return services.user.doesNotExist({ where: { email: req.body.email }})
+  .then(() => services.user.create(req.body))
+  .then(user =>
+    services.emailConfirmation.createToken(user)
+      .then(emailConfirmation => services.emailConfirmation.sendMail({
+        email: user.email, token: emailConfirmation.token
+      }))
+      .then(() => {
+        res.status(201);
+        return user;
+      })
+  );
 }
 
-function list(req, res, next) {
-  services.user.listWithSearchAndFilter(
+function list(req) {
+  return services.user.listWithSearchAndFilter(
     req,
     ['firstname', 'lastname', 'email'],
     { confirmed: req.query.confirmed },
     { include: { model: Resource, required: false }}
   )
-  .then( users => {
-    res.status(200);
-    res.locals = {
-      count: users.count,
-      rows: _.forEach(users.rows, user => prependS3(user, 'image'))
-    };
-    next();
-  })
-  .catch(err => next(err));
+  .then(users => ({
+    count: users.count,
+    rows: _.forEach(users.rows, user => prependS3(user, 'image'))
+  }));
 }
 
-function remove(req, res, next) {
-
-  services.user.removeById(req.params.userId)
-    .then( () => {
-      res.status(200);
-      res.locals.message = lang.messages.successfullyRemoved(lang.models.user);
-      next();
-    })
-    .catch(err => next(err));
+function remove(req) {
+  return services.user.removeById(req.params.userId)
+    .then(() => ({
+      message: lang.messages.successfullyRemoved(lang.models.user)
+    }));
 }
 
-function show(req, res, next) {
-  services.user.getById(
+function show(req) {
+  return services.user.getById(
     req.params.userId,
     { include: [{ model: Resource, required: false }]}
   )
-  .then( user => {
-    res.locals = prependS3(user, 'image');
-    res.status(200);
-    next();
-  })
-  .catch(err => next(err));
+  .then(user => prependS3(user, 'image'));
 }
 
-function update(req, res, next) {
-
-  services.user.getById(req.params.userId)
-  .then( () =>
+function update(req) {
+  return services.user.getById(req.params.userId)
+  .then(() =>
     services.user.update(req.body, { id: req.params.userId })
-      .then( updatedUser => {
-        return updatedUser.getResource()
-        .then( resource => {
+      .then(updatedUser =>
+        updatedUser.getResource()
+        .then(resource => {
           updatedUser.resource = resource;
-          res.status(200);
-          res.locals = prependS3(updatedUser, 'image');
-          next();
-        });
-      })
-  )
-  .catch(err => next(err));
+          return prependS3(updatedUser, 'image');
+        })
+      )
+  );
 }
 
-module.exports = {
+module.exports = createController({
   emailUpdate: require('./changeEmail'),
-  create: create,
+  create,
   emailConfirmation: require('./emailConfirmation'),
-  list: list,
+  list,
   passwords: require('./passwords'),
   superAdmin: require('./superAdmin'),
-  remove: remove,
-  show: show,
-  update: update,
-  validate: validate
-};
+  remove,
+  show,
+  update,
+  validate
+});
